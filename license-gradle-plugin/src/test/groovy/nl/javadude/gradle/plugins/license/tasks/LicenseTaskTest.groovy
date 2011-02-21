@@ -8,6 +8,7 @@ import static org.junit.internal.matchers.IsCollectionContaining.hasItem
 import static org.junit.Assert.assertThat
 import org.hamcrest.core.Is
 import static org.hamcrest.core.IsNull.notNullValue
+import org.gradle.api.GradleException
 
 class LicenseTaskTest {
 	Project project
@@ -26,6 +27,8 @@ class LicenseTaskTest {
 		licensedJava = new File('testProject/src/main/java/Licensed.java').absoluteFile
 		barProperties = new File('testProject/src/main/resources/bar.properties').absoluteFile
 		bazProperties = new File('testProject/src/main/resources/baz.properties').absoluteFile
+
+		project.tasks.license.init()
 	}
 
 	@Test
@@ -50,5 +53,11 @@ class LicenseTaskTest {
 		assertThat(project.tasks.license.shouldBeLicensed(licensedJava), Is.is(false))
 		assertThat(project.tasks.license.shouldBeLicensed(barProperties), Is.is(true))
 		assertThat(project.tasks.license.shouldBeLicensed(bazProperties), Is.is(true))
+	}
+
+	@Test(expected = GradleException.class)
+	public void shouldThrowWhenLicenseNotFound() {
+		project.license = new File("NOTHERE").absoluteFile
+		project.tasks.license.init()		
 	}
 }
