@@ -5,10 +5,15 @@ apply plugin: 'maven'
 group = 'nl.javadude.gradle.plugins'
 version = '0.1-SNAPSHOT'
 
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
 dependencies {
 	groovy gradleApi()
 	groovy localGroovy()
-	groovy 'junit:junit:4.8.1'
-	groovy 'ch.qos.logback:logback-classic:0.9.24'
+	testCompile 'junit:junit:4.8.1'
+	testRuntime 'ch.qos.logback:logback-classic:0.9.24'
 	groovy 'org.slf4j:slf4j-api:1.6.1'
 }
