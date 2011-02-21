@@ -25,23 +25,30 @@ import nl.javadude.gradle.plugins.license.types.HashFormat
 import nl.javadude.gradle.plugins.license.types.SlashStarFormat
 
 class LicenseTask extends ConventionTask {
-	Properties filetypes
 	Map licenses = [:]
-	static Map formatters = [:]
-
-	static {
-		formatters[HashFormat.class.name] = new HashFormat()
-		formatters[SlashStarFormat.class.name] = new SlashStarFormat()
-	}
+	Map formatters = [:]
+	Map filetypes = [:]
 
 	def LicenseTask() {
-		filetypes = new Properties()
-		filetypes.load this.getClass().getClassLoader().getResourceAsStream("filetypes.properties")
+		registerFormatters()
+		registerDefaultFileTypes()
+	}
+
+	def registerFormatters() {
+		formatters[HashFormat.class.simpleName] = new HashFormat()
+		formatters[SlashStarFormat.class.simpleName] = new SlashStarFormat()
+	}
+
+	def registerDefaultFileTypes() {
+		filetypes['java'] = SlashStarFormat.class.simpleName
+		filetypes['scala'] = SlashStarFormat.class.simpleName
+		filetypes['groovy'] = SlashStarFormat.class.simpleName
+		filetypes['properties'] = HashFormat.class.simpleName
 	}
 
 	def convertAllLicenseTypes(List<java.lang.String> license) {
 		filetypes.each { k, v ->
-			def format = LicenseTask.formatters[v]
+			def format = formatters[v]
 			licenses[v] = format.transform(license)
 		}
 	}

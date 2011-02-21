@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat
 import org.hamcrest.core.Is
 import static org.hamcrest.core.IsNull.notNullValue
 import org.gradle.api.GradleException
+import nl.javadude.gradle.plugins.license.types.HashFormat
 
 class LicenseTaskTest {
 	Project project
@@ -77,6 +78,15 @@ class LicenseTaskTest {
 	public void shouldThrowWhenLicenseNotFound() {
 		project.license = new File("NOTHERE").absoluteFile
 		project.tasks.license.init()		
+	}
+
+	@Test
+	public void shouldRegisterAdditionalType() {
+		project.license {
+			filetypes['txt'] = HashFormat.class.simpleName
+		}
+		def files = project.tasks.license.scanForFiles()
+		assertThat(files, hasItem(new File('testProject/src/main/resources/Other.txt').absoluteFile))
 	}
 }
 

@@ -19,6 +19,8 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.Project
+import nl.javadude.gradle.plugins.license.types.SlashStarFormat
+import nl.javadude.gradle.plugins.license.types.HashFormat
 
 class LicensePluginConvention {
 	File license
@@ -26,5 +28,6 @@ class LicensePluginConvention {
 	def LicensePluginConvention(Project project) {
 		license = new File(project.projectDir, "LICENSE")
 	}
+
 }
 
