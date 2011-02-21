@@ -12,8 +12,8 @@ class HashFormatTest {
 	public void shouldAddHashToLines() {
 		List<String> input = ["Line 1", "Line 2"]
 		def output = new HashFormat().transform(input)
-		assertThat output, hasItem("# Line 1")
-		assertThat output, hasItem("# Line 2")
-		assertThat output.size, Is.is(2)
+		assertThat output.lines, hasItem("# Line 1")
+		assertThat output.lines, hasItem("# Line 2")
+		assertThat output.lines.size, Is.is(2)
 	}
 }

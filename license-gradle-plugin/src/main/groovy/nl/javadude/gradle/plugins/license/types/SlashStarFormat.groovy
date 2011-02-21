@@ -1,16 +1,18 @@
 package nl.javadude.gradle.plugins.license.types
 
+import nl.javadude.gradle.plugins.license.License
+
 class SlashStarFormat implements LicenseFormat {
 
 
-	def List<String> transform(List<String> input) {
-		List<String> output = []
-		output.add('/*')
+	def License transform(List<String> input) {
+		def license = new License()
+		license.add('/*')
 		input.each {String line ->
-			output.add(' * ' + line)
+			license.add(' * ' + line)
 		}
-		output.add(' */')
+		license.add(' */')
 
-		return output
+		license
 	}
 }

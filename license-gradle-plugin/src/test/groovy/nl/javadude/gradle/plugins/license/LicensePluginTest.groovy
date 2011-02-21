@@ -16,8 +16,6 @@ class LicensePluginTest {
 	public void setupProject() {
 		project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
 		project.apply plugin: 'license'
-		project.apply plugin: 'java'
-		project.sourceSets.main.java.srcDirs = ['src/main/java']
 	}
 
 	@Test
@@ -36,8 +34,4 @@ class LicensePluginTest {
 		assertThat(project.convention.plugins.license.license.name, Is.is("OTHERLICENSE"))
 	}
 
-	@Test
-	public void shouldScanFilesForLicense() {
-		project.tasks.license.process()
-	}
 }

@@ -11,10 +11,10 @@ class SlashStarFormatTest {
 	public void shouldAddSlashStar() {
 		List<String> input = ["Line 1", "Line 2"]
 		def output = new SlashStarFormat().transform(input)
-		assertThat output, hasItem("/*")
-		assertThat output, hasItem(" * Line 1")
-		assertThat output, hasItem(" * Line 2")
-		assertThat output, hasItem(" */")
-		assertThat output.size, Is.is(4)
+		assertThat output.lines, hasItem("/*")
+		assertThat output.lines, hasItem(" * Line 1")
+		assertThat output.lines, hasItem(" * Line 2")
+		assertThat output.lines, hasItem(" */")
+		assertThat output.lines.size, Is.is(4)
 	}
 }

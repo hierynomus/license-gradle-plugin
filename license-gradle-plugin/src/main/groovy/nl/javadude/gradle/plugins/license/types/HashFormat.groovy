@@ -1,11 +1,13 @@
 package nl.javadude.gradle.plugins.license.types
 
+import nl.javadude.gradle.plugins.license.License
+
 class HashFormat implements LicenseFormat {
-	def List<String> transform(List<String> input) {
-		List<String> output = []
+	def License transform(List<String> input) {
+		def license = new License()
 		input.each { line ->
-			output.add('# ' + line)
+			license.add('# ' + line)
 		}
-		return output
+		license
 	}
 }

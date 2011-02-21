@@ -1,5 +1,7 @@
 package nl.javadude.gradle.plugins.license.types
 
+import nl.javadude.gradle.plugins.license.License
+
 interface LicenseFormat {
-	List<String> transform(List<String> input)
+	License transform(List<String> input)
 }
