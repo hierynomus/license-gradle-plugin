@@ -24,31 +24,15 @@ import org.gradle.api.tasks.TaskAction
 import nl.javadude.gradle.plugins.license.types.HashFormat
 import nl.javadude.gradle.plugins.license.types.SlashStarFormat
 
-class LicenseTask extends ConventionTask {
+class LicenseTask extends AbstractLicenseTask {
 	Map licenses = [:]
-	Map formatters = [:]
-	Map filetypes = [:]
 
 	def LicenseTask() {
-		registerFormatters()
-		registerDefaultFileTypes()
-	}
-
-	def registerFormatters() {
-		formatters[HashFormat.class.simpleName] = new HashFormat()
-		formatters[SlashStarFormat.class.simpleName] = new SlashStarFormat()
-	}
-
-	def registerDefaultFileTypes() {
-		filetypes['java'] = SlashStarFormat.class.simpleName
-		filetypes['scala'] = SlashStarFormat.class.simpleName
-		filetypes['groovy'] = SlashStarFormat.class.simpleName
-		filetypes['properties'] = HashFormat.class.simpleName
 	}
 
 	def convertAllLicenseTypes(List<java.lang.String> license) {
-		filetypes.each { k, v ->
-			def format = formatters[v]
+		project.licenseTypes.each { k, v ->
+			def format = project.formatters[v]
 			licenses[v] = format.transform(license)
 		}
 	}
@@ -71,32 +55,20 @@ class LicenseTask extends ConventionTask {
 		}
 	}
 
+    def getLicenseForFile(File file) {
+        def ext = file.name.substring(file.name.indexOf('.') + 1)
+        licenses.get(project.licenseTypes.get(ext))
+    }
+
+
 	def init() {
 		List<String> license = loadLicense()
 		convertAllLicenseTypes(license)
 	}
 
-	def scanForFiles() {
-		List<File> toBeLicensed = []
-		project.sourceSets.each { set ->
-			set.allSource.each { file ->
-				def ext = file.name.substring(file.name.indexOf('.') + 1)
-				if (filetypes.containsKey(ext)) {
-					toBeLicensed.add file
-				}
-			}
-		}
-		toBeLicensed
-	}
-
 	boolean shouldBeLicensed(File file) {
 		def license = getLicenseForFile(file)
 		!license.isLicensed(file)
-	}
-
-	private def getLicenseForFile(File file) {
-		def ext = file.name.substring(file.name.indexOf('.') + 1)
-		licenses.get(filetypes.get(ext))
 	}
 
 	def handleFile(File file) {

@@ -24,10 +24,26 @@ import nl.javadude.gradle.plugins.license.types.HashFormat
 
 class LicensePluginConvention {
 	File license
+    def formatters = [:]
+    def licenseTypes = [:]
 
-	def LicensePluginConvention(Project project) {
+
+    def LicensePluginConvention(Project project) {
 		license = new File(project.projectDir, "LICENSE")
+        registerFormatters()
+        registerDefaultFileTypes()
 	}
 
+    def registerFormatters() {
+        formatters[HashFormat.class.simpleName] = new HashFormat()
+        formatters[SlashStarFormat.class.simpleName] = new SlashStarFormat()
+    }
+
+    def registerDefaultFileTypes() {
+        licenseTypes['java'] = SlashStarFormat.class.simpleName
+        licenseTypes['scala'] = SlashStarFormat.class.simpleName
+        licenseTypes['groovy'] = SlashStarFormat.class.simpleName
+        licenseTypes['properties'] = HashFormat.class.simpleName
+    }
 }
 

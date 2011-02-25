@@ -82,11 +82,27 @@ class LicenseTaskTest {
 
 	@Test
 	public void shouldRegisterAdditionalType() {
-		project.license {
-			filetypes['txt'] = HashFormat.class.simpleName
-		}
+		project.licenseTypes['txt'] = HashFormat.class.simpleName
 		def files = project.tasks.license.scanForFiles()
 		assertThat(files, hasItem(new File('testProject/src/main/resources/Other.txt').absoluteFile))
 	}
+
+    @Test
+    public void shouldAddLicense() {
+        def file = new File('testProject/src/main/java/Bar.java')
+        file.createNewFile()
+        try {
+            file.withWriter { writer ->
+                writer.writeLine('import nl.javadude.*;')
+            }
+
+            project.tasks.license.handleFile(file)
+
+            def lines = file.readLines()
+            assertThat(lines, hasItem(' * This is a sample license'))
+        } finally {
+            file.delete()
+        }
+    }
 }
 
