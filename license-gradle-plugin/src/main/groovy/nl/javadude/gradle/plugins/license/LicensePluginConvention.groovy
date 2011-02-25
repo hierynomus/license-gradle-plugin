@@ -19,31 +19,35 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.Project
-import nl.javadude.gradle.plugins.license.types.SlashStarFormat
-import nl.javadude.gradle.plugins.license.types.HashFormat
+import nl.javadude.gradle.plugins.license.types.LicenseFormat
 
 class LicensePluginConvention {
 	File license
-    def formatters = [:]
     def licenseTypes = [:]
 
 
     def LicensePluginConvention(Project project) {
 		license = new File(project.projectDir, "LICENSE")
-        registerFormatters()
         registerDefaultFileTypes()
 	}
 
-    def registerFormatters() {
-        formatters[HashFormat.class.simpleName] = new HashFormat()
-        formatters[SlashStarFormat.class.simpleName] = new SlashStarFormat()
+    private def registerDefaultFileTypes() {
+        registerLicense('java', licenseFormat('/*', ' *', ' */'))
+        registerLicense('scala', licenseFormat('/*', ' *', ' */'))
+        registerLicense('groovy', licenseFormat('/*', ' *', ' */'))
+        registerLicense('properties', licenseFormat('#'))
     }
 
-    def registerDefaultFileTypes() {
-        licenseTypes['java'] = SlashStarFormat.class.simpleName
-        licenseTypes['scala'] = SlashStarFormat.class.simpleName
-        licenseTypes['groovy'] = SlashStarFormat.class.simpleName
-        licenseTypes['properties'] = HashFormat.class.simpleName
+    def registerLicense(String ext, LicenseFormat format) {
+        licenseTypes[ext] = format
+    }
+
+    def licenseFormat(String linePrefix) {
+        new LicenseFormat(prefix: linePrefix, line: linePrefix)
+    }
+
+    def licenseFormat(String licensePrefix, String linePrefix, String licenseSuffix) {
+        new LicenseFormat(prefix: licensePrefix, line: linePrefix, suffix: licenseSuffix)
     }
 }
 

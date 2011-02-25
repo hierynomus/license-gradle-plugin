@@ -27,7 +27,6 @@ import static org.junit.Assert.assertThat
 import org.hamcrest.core.Is
 import static org.hamcrest.core.IsNull.notNullValue
 import org.gradle.api.GradleException
-import nl.javadude.gradle.plugins.license.types.HashFormat
 
 class LicenseTaskTest {
 	Project project
@@ -47,7 +46,8 @@ class LicenseTaskTest {
 		barProperties = new File('testProject/src/main/resources/bar.properties').absoluteFile
 		bazProperties = new File('testProject/src/main/resources/baz.properties').absoluteFile
 
-		project.tasks.license.init()
+		def licenseTask = project.tasks.license
+		licenseTask.licenseLines = licenseTask.loadLicense()
 	}
 
 	@Test
@@ -77,12 +77,12 @@ class LicenseTaskTest {
 	@Test(expected = GradleException.class)
 	public void shouldThrowWhenLicenseNotFound() {
 		project.license = new File("NOTHERE").absoluteFile
-		project.tasks.license.init()		
+		project.tasks.license.loadLicense()
 	}
 
 	@Test
 	public void shouldRegisterAdditionalType() {
-		project.licenseTypes['txt'] = HashFormat.class.simpleName
+		project.registerLicense('txt', project.licenseFormat('#'))
 		def files = project.tasks.license.scanForFiles()
 		assertThat(files, hasItem(new File('testProject/src/main/resources/Other.txt').absoluteFile))
 	}
@@ -96,7 +96,7 @@ class LicenseTaskTest {
                 writer.writeLine('import nl.javadude.*;')
             }
 
-            project.tasks.license.handleFile(file)
+            project.tasks.license.licenseFile(file)
 
             def lines = file.readLines()
             assertThat(lines, hasItem(' * This is a sample license'))

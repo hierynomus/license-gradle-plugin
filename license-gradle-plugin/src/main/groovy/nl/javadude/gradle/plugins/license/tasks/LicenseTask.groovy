@@ -19,73 +19,58 @@
 package nl.javadude.gradle.plugins.license.tasks
 
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ConventionTask
+
 import org.gradle.api.tasks.TaskAction
-import nl.javadude.gradle.plugins.license.types.HashFormat
-import nl.javadude.gradle.plugins.license.types.SlashStarFormat
-
 class LicenseTask extends AbstractLicenseTask {
-	Map licenses = [:]
+    def licenseCache = [:]
+    List<String> licenseLines
 
-	def LicenseTask() {
-	}
+    List<java.lang.String> loadLicense() {
+        def license = project.convention.plugins.license.license
+        if (!license.exists()) {
+            throw new GradleException("The license file [" + license + "] does not exist.")
+        }
+        license.readLines()
+    }
 
-	def convertAllLicenseTypes(List<java.lang.String> license) {
-		project.licenseTypes.each { k, v ->
-			def format = project.formatters[v]
-			licenses[v] = format.transform(license)
-		}
-	}
-
-	List<java.lang.String> loadLicense() {
-		def license = project.convention.plugins.license.license
-		if (!license.exists()) {
-			throw new GradleException("The license file [" + license + "] does not exist.")
-		}
-		license.readLines()
-	}
-
-	@TaskAction
-	protected void process() {
-		init()
-
-		toBeLicensed = scanForFiles()
-		toBeLicensed.findAll({ shouldBeLicensed it }).each { file ->
-			handleFile(file)
-		}
-	}
+    @TaskAction
+    protected void process() {
+        licenseLines = loadLicense()
+        toBeLicensed = scanForFiles()
+        toBeLicensed.findAll({ shouldBeLicensed it }).each { file ->
+            licenseFile(file)
+        }
+    }
 
     def getLicenseForFile(File file) {
         def ext = file.name.substring(file.name.indexOf('.') + 1)
-        licenses.get(project.licenseTypes.get(ext))
+        if (!licenseCache[ext]) {
+            format = project.licenseTypes[ext]
+            licenseCache[ext] = format.transform(licenseLines)
+        }
+        licenseCache[ext]
     }
 
+    boolean shouldBeLicensed(File file) {
+        def license = getLicenseForFile(file)
+        !license.isLicensed(file)
+    }
 
-	def init() {
-		List<String> license = loadLicense()
-		convertAllLicenseTypes(license)
-	}
-
-	boolean shouldBeLicensed(File file) {
-		def license = getLicenseForFile(file)
-		!license.isLicensed(file)
-	}
-
-	def handleFile(File file) {
-		println "Adding license on " + file
-		def license = getLicenseForFile(file)
-		def lines = file.readLines()
-		file.delete()
-		file.createNewFile()
-		file.withWriter { w ->
-			license.lines.each { line ->
-				w.writeLine(line)
-			}
-			lines.each { line ->
-				w.writeLine(line)
-			}
-			w.newLine()
-		}
-	}
+    def licenseFile(File file) {
+        println "Adding license on " + file
+        def license = getLicenseForFile(file)
+        def lines = file.readLines()
+        file.delete()
+        file.createNewFile()
+        file.withWriter { w ->
+            license.lines.each { line ->
+                w.writeLine(line)
+            }
+            lines.each { line ->
+                w.writeLine(line)
+            }
+            w.newLine()
+        }
+    }
 }
 

@@ -20,7 +20,25 @@ package nl.javadude.gradle.plugins.license.types
 
 import nl.javadude.gradle.plugins.license.License
 
-interface LicenseFormat {
-	License transform(List<String> input)
+class LicenseFormat {
+    static final String LICENSE_KEY = "GRADLE-LICENSE-PLUGIN"
+    def prefix = ""
+    def line = ""
+    def suffix = ""
+
+    License transform(List<String> input) {
+        def license = new License()
+        license.add(prefix + " " + LICENSE_KEY)
+        input.each { line ->
+            license.add(this.line + " " + line)
+        }
+        !suffix ?: license.add(suffix)
+
+        license
+    }
+
+    static boolean isLicensedByPlugin(File file) {
+        file.readLines()[0].contains(LICENSE_KEY)
+    }
 }
 

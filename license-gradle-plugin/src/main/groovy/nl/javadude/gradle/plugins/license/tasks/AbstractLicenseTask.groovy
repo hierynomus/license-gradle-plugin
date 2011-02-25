@@ -2,8 +2,6 @@ package nl.javadude.gradle.plugins.license.tasks
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.internal.ConventionTask
-import nl.javadude.gradle.plugins.license.types.HashFormat
-import nl.javadude.gradle.plugins.license.types.SlashStarFormat
 
 abstract class AbstractLicenseTask extends ConventionTask {
 

@@ -1,4 +1,4 @@
-/*
+/* GRADLE-LICENSE-PLUGIN
  * This is a sample license
  * It is used for testing
  */
