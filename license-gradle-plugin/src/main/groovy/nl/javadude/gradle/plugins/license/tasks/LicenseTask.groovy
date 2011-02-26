@@ -43,7 +43,7 @@ class LicenseTask extends AbstractLicenseTask {
     }
 
     def getLicenseForFile(File file) {
-        def ext = file.name.substring(file.name.indexOf('.') + 1)
+        def ext = getExtension(file)
         if (!licenseCache[ext]) {
             format = project.licenseTypes[ext]
             licenseCache[ext] = format.transform(licenseLines)
@@ -66,6 +66,8 @@ class LicenseTask extends AbstractLicenseTask {
             license.lines.each { line ->
                 w.writeLine(line)
             }
+            // Add empty line, prevents us from stripping too much in the unlicense task if there is no specific suffix marker
+            w.writeLine('')
             lines.each { line ->
                 w.writeLine(line)
             }

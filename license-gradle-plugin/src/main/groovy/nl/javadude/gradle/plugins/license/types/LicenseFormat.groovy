@@ -21,10 +21,10 @@ package nl.javadude.gradle.plugins.license.types
 import nl.javadude.gradle.plugins.license.License
 
 class LicenseFormat {
-    static final String LICENSE_KEY = "GRADLE-LICENSE-PLUGIN"
+    static final String LICENSE_KEY = "License added by: GRADLE-LICENSE-PLUGIN"
     def prefix = ""
     def line = ""
-    def suffix = ""
+    def suffix = null
 
     License transform(List<String> input) {
         def license = new License()
@@ -38,7 +38,34 @@ class LicenseFormat {
     }
 
     static boolean isLicensedByPlugin(File file) {
-        file.readLines()[0].contains(LICENSE_KEY)
+        def lines = file.readLines()
+        lines.size() > 0 ? lines[0].contains(LICENSE_KEY) : false
+    }
+
+    def removeLicenseBlock(lines) {
+        def newLines = []
+        if (!lines[0].startsWith(prefix))
+            lines
+        else {
+            boolean inBlock = true
+            boolean skipEmptyLine = false
+            lines[1..lines.size() - 1].each { l ->
+                if (inBlock && l.startsWith(line) && !(suffix && l.startsWith(suffix))) {
+
+                } else if (inBlock && suffix && l.startsWith(suffix)) {
+                    inBlock = false
+                    skipEmptyLine = true
+                } else if (inBlock && !suffix) {
+                    inBlock = false
+                } else if (skipEmptyLine) {
+                    skipEmptyLine = false
+                } else {
+                    newLines.add(l)
+                }
+            }
+
+            newLines
+        }
     }
 }
 

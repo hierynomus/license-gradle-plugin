@@ -17,4 +17,9 @@ abstract class AbstractLicenseTask extends ConventionTask {
         }
         toBeLicensed
     }
+
+    String getExtension(File file) {
+        return file.name.substring(file.name.indexOf('.') + 1)
+    }
+
 }
