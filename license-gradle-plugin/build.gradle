@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 
 group = 'nl.javadude.gradle.plugins'
-version = '0.1-SNAPSHOT'
+version = '0.3-SNAPSHOT'
 
 repositories {
 	mavenLocal()
@@ -14,6 +14,5 @@ dependencies {
 	groovy gradleApi()
 	groovy localGroovy()
 	testCompile 'junit:junit:4.8.1'
-	testRuntime 'ch.qos.logback:logback-classic:0.9.24'
 	groovy 'org.slf4j:slf4j-api:1.6.1'
 }
