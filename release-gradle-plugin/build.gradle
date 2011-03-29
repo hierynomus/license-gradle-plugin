@@ -1,0 +1,18 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+group = 'nl.javadude.gradle.plugins'
+version = '0.1-SNAPSHOT'
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	groovy gradleApi()
+	groovy localGroovy()
+	testCompile 'junit:junit:4.8.1'
+	groovy 'org.slf4j:slf4j-api:1.6.1'
+}
