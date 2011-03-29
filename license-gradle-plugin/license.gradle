@@ -1,14 +1,13 @@
 buildscript {
   repositories {
-    mavenLocal()
     add(new org.apache.ivy.plugins.resolver.URLResolver()) {
       name = "GitHub"
-      addArtifactPattern 'https://github.com/downloads/hierynomus/gradle-plugins/[module]-[revision].[ext]'
+      addArtifactPattern 'http://cloud.github.com/downloads/hierynomus/gradle-plugins/[module]-[revision].[ext]'
     }
   }
 
   dependencies {
-    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3-SNAPSHOT'
+    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
   }
 }
 
@@ -18,3 +17,5 @@ apply plugin: 'groovy'
 cleanLicense {
 force = true
 }
+
+registerLicense('txt', licenseFormat('##', '#', '##'))
