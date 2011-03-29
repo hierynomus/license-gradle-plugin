@@ -17,27 +17,35 @@ In your _build.gradle_ file add:
 	  repositories {
 	    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
 	      name = "GitHub"
-	      addArtifactPattern 'http://github.com/hierynomus/gradle-plugins/downloads/[organization]-[module]-[revision].[ext]'
+	      addArtifactPattern 'http://cloud.github.com/hierynomus/gradle-plugins/downloads/[module]-[revision].[ext]'
 	    }
 	  }
 	
 	  dependencies {
-	    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.1-SNAPSHOT'
+	    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
 	  }
 	}
 
 	apply plugin: 'license'
 
-This will add a `license` task to your project.
+This will add two tasks to your project:
+- license
+- cleanLicense
 
 ## Recognizing other file types.
 Besides the default recognized file types, you can configure the task to recognize other ones.
 
-	project.license {
-		filetypes['txt'] = 'HashFormat'
-	}
+    registerLicense('txt', licenseFormat('#'))
+    registerLicense('js', licenseFormat('/*', ' *', ' */'))
 
-We've currently supplied two different License header formats:
+This will register the '*.txt' and '*.js' files to have a license. For '*.txt' files this will look like
 
-* HashFormat
-* SlashStarFormat
+    # license line 1
+    # license line 2
+
+And for '*.js' files it will be:
+
+    /*
+     * license line 1
+     * license line 2
+     */
