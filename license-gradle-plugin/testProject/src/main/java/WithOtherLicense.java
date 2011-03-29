@@ -1,6 +1,5 @@
-/* License added by: GRADLE-LICENSE-PLUGIN
- *
- * This is a sample license
+/*
+ * This is another sample license
  * It is used for testing
  */
 public class Licensed {

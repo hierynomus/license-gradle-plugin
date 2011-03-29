@@ -1,21 +1,20 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/* License added by: GRADLE-LICENSE-PLUGIN
+ *
+ * Copyright (C)2011 - Jeroen van Erp <jeroen@javadude.nl>
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package nl.javadude.gradle.plugins.license.tasks
 
 import org.junit.Test
@@ -31,7 +30,7 @@ import org.gradle.api.GradleException
 class LicenseTaskTest {
 	Project project
 	File fooJava
-	File licensedJava
+	File licensedJava, otherLicenseJava
 	File barProperties
 	File bazProperties
 
@@ -43,6 +42,7 @@ class LicenseTaskTest {
 
 		fooJava = new File('testProject/src/main/java/Foo.java').absoluteFile
 		licensedJava = new File('testProject/src/main/java/Licensed.java').absoluteFile
+		otherLicenseJava = new File('testProject/src/main/java/WithOtherLicense.java').absoluteFile
 		barProperties = new File('testProject/src/main/resources/bar.properties').absoluteFile
 		bazProperties = new File('testProject/src/main/resources/baz.properties').absoluteFile
 
@@ -55,7 +55,7 @@ class LicenseTaskTest {
 		def files = project.tasks.license.scanForFiles()
 		assertThat(files, hasItem(fooJava))
 		assertThat(files, hasItem(barProperties))
-		assertThat(files.size, Is.is(4))
+		assertThat(files.size, Is.is(5))
 	}
 
 	@Test
@@ -70,6 +70,7 @@ class LicenseTaskTest {
 	public void shouldBeLicensed() {
 		assertThat(project.tasks.license.shouldBeLicensed(fooJava), Is.is(true))
 		assertThat(project.tasks.license.shouldBeLicensed(licensedJava), Is.is(false))
+		assertThat(project.tasks.license.shouldBeLicensed(otherLicenseJava), Is.is(true))
 		assertThat(project.tasks.license.shouldBeLicensed(barProperties), Is.is(true))
 		assertThat(project.tasks.license.shouldBeLicensed(bazProperties), Is.is(true))
 	}
@@ -105,4 +106,9 @@ class LicenseTaskTest {
         }
     }
 }
+
+
+
+
+
 
