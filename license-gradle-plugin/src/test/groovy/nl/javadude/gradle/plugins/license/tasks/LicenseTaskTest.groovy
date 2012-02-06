@@ -50,6 +50,8 @@ class LicenseTaskTest {
 		licenseTask.licenseLines = licenseTask.loadLicense()
 	}
 
+
+	
 	@Test
 	public void shouldScanFilesForLicense() {
 		def files = project.tasks.license.scanForFiles()

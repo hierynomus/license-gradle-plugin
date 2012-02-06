@@ -1,4 +1,5 @@
 out/
+bin/
 build/
 *.iml
 *.iws
@@ -7,3 +8,6 @@ build/
 userHome/
 s101plugin.state
 .DS_Store
+/.settings
+/.project
+/.classpath
