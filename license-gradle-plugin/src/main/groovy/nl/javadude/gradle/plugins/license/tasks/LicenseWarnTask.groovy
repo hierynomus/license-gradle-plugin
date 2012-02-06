@@ -31,11 +31,14 @@ class LicenseWarnTask extends AbstractLicenseTask {
 	def licenseWarn() {
 		def toBeLicensed = scanForFiles()
 		def needsLicense = false;
+		def licenseMissing = []
 		toBeLicensed.findAll({ shouldBeLicensed it }).each { file ->
-			println file;
+			licenseMissing.add( file );
 			needsLicense = true;
 		} // end each
 		if( needsLicense ) {
+			println "The following files are missing the license header:"
+			println licenseMissing.join( "\n\t")
 			throw new GradleException("Break the build")
 		} // end if
 	} // end method

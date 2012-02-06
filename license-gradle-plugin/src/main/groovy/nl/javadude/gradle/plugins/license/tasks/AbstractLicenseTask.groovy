@@ -51,7 +51,6 @@ abstract class AbstractLicenseTask extends ConventionTask {
 	
 	def getLicenseForFile(File file) {
 		def ext = getExtension(file)
-		println this
 		assert licenseLines != null
 		if (!licenseCache[ext]) {
 			format = project.licenseTypes[ext]

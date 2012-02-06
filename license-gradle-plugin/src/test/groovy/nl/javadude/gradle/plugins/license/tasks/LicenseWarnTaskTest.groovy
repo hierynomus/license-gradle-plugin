@@ -61,7 +61,7 @@ class LicenseWarnTaskTest {
 		taskVar = project.tasks.licenseWarn
 		taskVar.licenseLines = taskVar.loadLicense()
 		
-		println taskVar.licenseLines
+		//println taskVar.licenseLines
 	} // end test initializer
 	
 	
