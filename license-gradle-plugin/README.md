@@ -15,20 +15,18 @@ In your _build.gradle_ file add:
 
 	buildscript {
 	  repositories {
-	    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
-	      name = "GitHub"
-	      addArtifactPattern 'http://cloud.github.com/hierynomus/gradle-plugins/downloads/[module]-[revision].[ext]'
-	    }
+	  	mavenCentral()
 	  }
 	
 	  dependencies {
-	    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
+	    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.4'
 	  }
 	}
 
 	apply plugin: 'license'
 
 This will add two tasks to your project:
+
 - license
 - cleanLicense
 
