@@ -40,11 +40,11 @@ class LicenseTaskTest {
 		project.apply plugin: 'license'
 		project.apply plugin: 'java'
 
-		fooJava = new File('testProject/src/main/java/Foo.java').absoluteFile
-		licensedJava = new File('testProject/src/main/java/Licensed.java').absoluteFile
-		otherLicenseJava = new File('testProject/src/main/java/WithOtherLicense.java').absoluteFile
-		barProperties = new File('testProject/src/main/resources/bar.properties').absoluteFile
-		bazProperties = new File('testProject/src/main/resources/baz.properties').absoluteFile
+		fooJava = new File('testProject/src/main/java/Foo.java').canonicalFile
+		licensedJava = new File('testProject/src/main/java/Licensed.java').canonicalFile
+		otherLicenseJava = new File('testProject/src/main/java/WithOtherLicense.java').canonicalFile
+		barProperties = new File('testProject/src/main/resources/bar.properties').canonicalFile
+		bazProperties = new File('testProject/src/main/resources/baz.properties').canonicalFile
 
 		def licenseTask = project.tasks.license
 		licenseTask.licenseLines = licenseTask.loadLicense()
@@ -85,7 +85,7 @@ class LicenseTaskTest {
 	public void shouldRegisterAdditionalType() {
 		project.registerLicense('txt', project.licenseFormat('#'))
 		def files = project.tasks.license.scanForFiles()
-		assertThat(files, hasItem(new File('testProject/src/main/resources/Other.txt').absoluteFile))
+		assertThat(files, hasItem(new File('testProject/src/main/resources/Other.txt').canonicalFile))
 	}
 
     @Test
