@@ -1,9 +1,0 @@
-out/
-build/
-*.iml
-*.iws
-*.ipr
-.gradle/
-userHome/
-s101plugin.state
-.DS_Store
