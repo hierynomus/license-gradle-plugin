@@ -1,12 +1,12 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'nl.javadude.gradle.plugins'
-version = '0.4.0-SNAPSHOT'
+version = '0.4'
 
 repositories {
-	mavenLocal()
 	mavenCentral()
 }
 
@@ -16,3 +16,72 @@ dependencies {
 	testCompile 'junit:junit:4.8.1'
 	groovy 'org.slf4j:slf4j-api:1.6.1'
 }
+
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar, javadocJar
+}
+
+
+signing {
+	sign configurations.archives
+}
+
+uploadArchives {
+	if(project.hasProperty('sonatypeUsername')) {
+		repositories.mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+			configuration = configurations.archives
+
+			repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+
+			pom.project {
+				name 'Overthere'
+				description 'Remote file manipulation and process execution framework for Java'
+				packaging 'jar'
+				url 'https://github.com/hierynomus/gradle-plugins'
+				inceptionYear '2011'
+
+				scm {
+					url 'https://github.com/hierynomus/gradle-plugins'
+				}
+
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+						distribution 'repo'
+					}
+				}
+
+				developers {
+					developer {
+						id 'hierynomus'
+						name 'Jeroen van Erp'
+						url 'http://www.javadude.nl/'
+						email 'jeroen@javadude.nl'
+						roles {
+							role 'Developer'
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
