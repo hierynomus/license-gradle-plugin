@@ -4,7 +4,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'nl.javadude.gradle.plugins'
-version = '0.4'
+version = '0.5'
 
 repositories {
 	mavenCentral()
@@ -32,10 +32,12 @@ artifacts {
 }
 
 
-signing {
-	sign configurations.archives
+if(project.hasProperty('sonatypeUsername')) {
+	signing {
+		sign configurations.archives
+	}
 }
-
+	
 uploadArchives {
 	if(project.hasProperty('sonatypeUsername')) {
 		repositories.mavenDeployer {
