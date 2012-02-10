@@ -48,7 +48,7 @@ class UnlicenseTaskTest {
 
             project.tasks.license.licenseFile(file)
 
-            project.tasks.cleanLicense.removeLicense(file)
+            project.tasks.licenseClean.removeLicense(file)
             def lines = file.readLines()
             assertThat lines[0], Is.is('import nl.javadude.*;')
         } finally {
@@ -68,7 +68,7 @@ class UnlicenseTaskTest {
 
             project.tasks.license.licenseFile(file)
 
-            project.tasks.cleanLicense.removeLicense(file)
+            project.tasks.licenseClean.removeLicense(file)
             def lines = file.readLines()
             assertThat lines[0], Is.is('# Temporary file.')
         } finally {
@@ -88,7 +88,7 @@ class UnlicenseTaskTest {
                 writer.writeLine('public class Bar {}')
             }
 
-            project.tasks.cleanLicense.removeLicense(file)
+            project.tasks.licenseClean.removeLicense(file)
             def lines = file.readLines()
             assertThat lines[0], Is.is('public class Bar {}')
         } finally {
