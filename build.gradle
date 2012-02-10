@@ -82,6 +82,13 @@ uploadArchives {
 						}
 					}
 				}
+
+				contributors {
+					contributor {
+						name 'Tim Harsch'
+						email 'tharsch@cray.com'
+					}
+				}
 			}
 		}
 	}
