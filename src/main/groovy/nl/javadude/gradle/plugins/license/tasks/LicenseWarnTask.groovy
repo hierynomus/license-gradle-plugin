@@ -17,38 +17,31 @@
 
 package nl.javadude.gradle.plugins.license.tasks
 
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
-class LicenseTask extends AbstractLicenseTask {
-
+class LicenseWarnTask extends AbstractLicenseTask {
+	
     @TaskAction
     protected void process() {
         licenseLines = loadLicense()
-        toBeLicensed = scanForFiles()
-        toBeLicensed.findAll({ shouldBeLicensed it }).each { file ->
-            licenseFile(file)
-        }
+		licenseWarn()
     }
 
-
-    def licenseFile(File file) {
-        println "Adding license on " + file
-        def license = getLicenseForFile(file)
-        def lines = file.readLines()
-        file.delete()
-        file.createNewFile()
-        file.withWriter { w ->
-            license.lines.each { line ->
-                w.writeLine(line)
-            }
-            // Add empty line, prevents us from stripping too much in the unlicense task if there is no specific suffix marker
-            w.writeLine('')
-            lines.each { line ->
-                w.writeLine(line)
-            }
-            w.newLine()
-        }
-    }
+	def licenseWarn() {
+		def toBeLicensed = scanForFiles()
+		def needsLicense = false;
+		def licenseMissing = []
+		toBeLicensed.findAll({ shouldBeLicensed it }).each { file ->
+			licenseMissing.add( file );
+			needsLicense = true;
+		}
+		if( needsLicense ) {
+			println "The following files are missing the license header:"
+			println licenseMissing.join( "\n\t")
+			throw new GradleException("Not all files are licensed, please correct this.")
+		}
+	}
 }
 
 

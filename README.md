@@ -25,10 +25,10 @@ In your _build.gradle_ file add:
 
 	apply plugin: 'license'
 
-This will add two tasks to your project:
-
-- license
-- cleanLicense
+This will add three tasks to your project:
+	- license        : applies the license found in the LICENSE file
+	- licenseClean   : removes the license found in the LICENSE file
+	- licenseWarn    : prints files not containing the license and cause the build to fail.
 
 ## Recognizing other file types.
 Besides the default recognized file types, you can configure the task to recognize other ones.

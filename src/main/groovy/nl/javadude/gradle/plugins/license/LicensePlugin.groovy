@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.Plugin
 import nl.javadude.gradle.plugins.license.tasks.LicenseTask
 import nl.javadude.gradle.plugins.license.tasks.UnlicenseTask
+import nl.javadude.gradle.plugins.license.tasks.LicenseWarnTask
 
 class LicensePlugin implements Plugin<Project> {
 	void apply(Project project) {
@@ -31,7 +32,8 @@ class LicensePlugin implements Plugin<Project> {
 
 	private def addLicenseTask(Project project) {
 		project.tasks.add(name: 'license', type: LicenseTask.class)
-		project.tasks.add(name: 'cleanLicense', type: UnlicenseTask.class)
+		project.tasks.add(name: 'licenseClean', type: UnlicenseTask.class)
+		project.tasks.add(name: 'licenseWarn', type: LicenseWarnTask.class)
 	}
 }
 
