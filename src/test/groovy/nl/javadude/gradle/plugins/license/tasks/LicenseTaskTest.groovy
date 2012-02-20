@@ -23,9 +23,11 @@ import org.junit.Before
 import org.gradle.api.Project
 import static org.junit.internal.matchers.IsCollectionContaining.hasItem
 import static org.junit.Assert.assertThat
-import org.hamcrest.core.Is
+import static org.hamcrest.core.Is.is
+import static org.hamcrest.core.IsNot.not
 import static org.hamcrest.core.IsNull.notNullValue
 import org.gradle.api.GradleException
+import org.gradle.api.file.FileTree
 
 class LicenseTaskTest {
 	Project project
@@ -48,16 +50,31 @@ class LicenseTaskTest {
 
 		def licenseTask = project.tasks.license
 		licenseTask.licenseLines = licenseTask.loadLicense()
-	}
+	} // end test
 
-
-	
 	@Test
 	public void shouldScanFilesForLicense() {
 		def files = project.tasks.license.scanForFiles()
 		assertThat(files, hasItem(fooJava))
 		assertThat(files, hasItem(barProperties))
-		assertThat(files.size, Is.is(5))
+		assertThat(files.size, is(5))
+	}
+	
+	@Test
+	public void shouldScanFilesForLicenseWithExclude() {
+		project.convention.plugins.license.licenseFiles {
+			from 'src'
+			include "main/java/**"
+			include "main/resources/*.properties"
+			exclude "**/Licensed.java"
+			}
+		
+		def files = project.tasks.license.scanForFiles()
+
+		assertThat(files, hasItem(fooJava))
+		assertThat(files, hasItem(barProperties))
+		assertThat(files, not( hasItem(licensedJava) ))
+		assertThat(files.size, is(4))
 	}
 
 	@Test
@@ -65,16 +82,16 @@ class LicenseTaskTest {
 		def license = project.tasks.license.loadLicense()
 		assertThat(license, notNullValue())
 		assertThat(license, hasItem("This is a sample license"))
-		assertThat(license.size, Is.is(2))
+		assertThat(license.size, is(2))
 	}
 
 	@Test
 	public void shouldBeLicensed() {
-		assertThat(project.tasks.license.shouldBeLicensed(fooJava), Is.is(true))
-		assertThat(project.tasks.license.shouldBeLicensed(licensedJava), Is.is(false))
-		assertThat(project.tasks.license.shouldBeLicensed(otherLicenseJava), Is.is(true))
-		assertThat(project.tasks.license.shouldBeLicensed(barProperties), Is.is(true))
-		assertThat(project.tasks.license.shouldBeLicensed(bazProperties), Is.is(true))
+		assertThat(project.tasks.license.shouldBeLicensed(fooJava), is(true))
+		assertThat(project.tasks.license.shouldBeLicensed(licensedJava), is(false))
+		assertThat(project.tasks.license.shouldBeLicensed(otherLicenseJava), is(true))
+		assertThat(project.tasks.license.shouldBeLicensed(barProperties), is(true))
+		assertThat(project.tasks.license.shouldBeLicensed(bazProperties), is(true))
 	}
 
 	@Test(expected = GradleException.class)

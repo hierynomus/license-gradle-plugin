@@ -1,0 +1,21 @@
+buildscript {
+  repositories {
+	  mavenLocal()
+  }
+
+  dependencies {
+    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0-SNAPSHOT'
+  }
+}
+
+apply plugin: 'license'
+apply plugin: 'groovy'
+
+// Create a custom file set for licensing needs
+licenseFiles {
+	from 'src'
+	include "main/java/**"
+	include "main/resources/*.properties"
+	exclude "**/Licensed.java"
+}
+		

@@ -48,3 +48,13 @@ And for '*.js' files it will be:
      * license line 1
      * license line 2
      */
+
+## Custom file specification for licensing needs
+In your _build.gradle_ file add the following configuration:
+
+    licenseFiles {
+    	from 'src'
+    	include "main/java/**"    
+	    include "main/resources/*.properties"
+	    exclude "**/Licensed.java"
+    }

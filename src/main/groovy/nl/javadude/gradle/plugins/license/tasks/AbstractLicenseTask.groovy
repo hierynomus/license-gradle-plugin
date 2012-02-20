@@ -20,7 +20,10 @@ package nl.javadude.gradle.plugins.license.tasks
 import java.io.File;
 import java.util.List;
 
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.file.FileTree
 import org.gradle.api.internal.ConventionTask
 import org.gradle.api.GradleException
 
@@ -37,15 +40,26 @@ abstract class AbstractLicenseTask extends ConventionTask {
 	}
 
     def scanForFiles() {
-        List<File> toBeLicensed = []
-        project.sourceSets.each { set ->
-	        set.allSource.each { file ->
-		        def ext = file.name.substring(file.name.indexOf('.') + 1)
-	            if (project.licenseTypes.containsKey(ext)) {
-	                toBeLicensed.add file
-	            }
+		def licenseFiles =  project.convention.plugins.license.licenseFiles;
+		
+		List<File> toBeLicensed = []
+		
+		if( licenseFiles != null ) {
+			// Iterate over the contents of a tree
+			licenseFiles.each {File file ->
+				toBeLicensed.add file
+			} // end each 
+		} else {
+			src = project.sourceSets
+	        src.each { set ->
+		        set.allSource.each { file ->
+			        def ext = file.name.substring(file.name.indexOf('.') + 1)
+		            if (project.licenseTypes.containsKey(ext)) {
+		                toBeLicensed.add file
+		            }
+		        }
 	        }
-        }
+		} // end if
         toBeLicensed
     }
 	
