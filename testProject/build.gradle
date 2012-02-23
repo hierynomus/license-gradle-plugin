@@ -12,10 +12,10 @@ apply plugin: 'license'
 apply plugin: 'groovy'
 
 // Create a custom file set for licensing needs
-licenseFiles {
-	from 'src'
+licenseFiles('src') {
 	include "main/java/**"
 	include "main/resources/*.properties"
 	exclude "**/Licensed.java"
 }
 		
+println gradle.gradleVersion

@@ -61,9 +61,10 @@ class LicenseTaskTest {
 	}
 	
 	@Test
-	public void shouldScanFilesForLicenseWithExclude() {
-		project.convention.plugins.license.licenseFiles {
-			from 'src'
+	public void shouldScanFilesForLicenseWithExclude() {	
+		println project.gradle.gradleVersion
+		
+		project.licenseFiles( 'src') {
 			include "main/java/**"
 			include "main/resources/*.properties"
 			exclude "**/Licensed.java"

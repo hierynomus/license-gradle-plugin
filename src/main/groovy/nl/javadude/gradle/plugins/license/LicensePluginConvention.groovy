@@ -47,6 +47,10 @@ class LicensePluginConvention {
 	}
 
 
+	def licenseFiles( String obj, Closure closure) {
+		licenseFiles = project.fileTree( obj, closure )
+	}
+
 	private def registerDefaultFileTypes() {
 		registerLicense('java', licenseFormat('/*', ' *', ' */'))
 		registerLicense('scala', licenseFormat('/*', ' *', ' */'))
