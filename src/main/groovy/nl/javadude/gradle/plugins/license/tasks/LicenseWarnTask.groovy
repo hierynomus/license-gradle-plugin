@@ -38,7 +38,7 @@ class LicenseWarnTask extends AbstractLicenseTask {
 		}
 		if( needsLicense ) {
 			println "The following files are missing the license header:"
-			println licenseMissing.join( "\n\t")
+			println "\t" + licenseMissing.join( "\n\t")
 			throw new GradleException("Not all files are licensed, please correct this.")
 		}
 	}

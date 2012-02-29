@@ -18,35 +18,57 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.file.FileTree
+import org.gradle.api.internal.tasks.DefaultSourceSetContainer
+import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.internal.Instantiator
+
 import nl.javadude.gradle.plugins.license.types.LicenseFormat
 
 class LicensePluginConvention {
-	File license
-    def licenseTypes = [:]
+	ProjectInternal project
 
-    def LicensePluginConvention(Project project) {
+	File license
+	def licenseFiles;
+
+	def licenseTypes = [:]
+
+
+	def LicensePluginConvention(Project project) {
+		this.project = project
+
 		license = new File(project.projectDir, "LICENSE")
-        registerDefaultFileTypes()
+		registerDefaultFileTypes()
 	}
 
-    private def registerDefaultFileTypes() {
-        registerLicense('java', licenseFormat('/*', ' *', ' */'))
-        registerLicense('scala', licenseFormat('/*', ' *', ' */'))
-        registerLicense('groovy', licenseFormat('/*', ' *', ' */'))
-        registerLicense('properties', licenseFormat('#'))
-    }
+	def licenseFiles(Closure closure) {
+		licenseFiles = project.fileTree( closure )
+	}
 
-    def registerLicense(String ext, LicenseFormat format) {
-        licenseTypes[ext] = format
-    }
 
-    def licenseFormat(String linePrefix) {
-        new LicenseFormat(prefix: linePrefix, line: linePrefix)
-    }
+	def licenseFiles( String obj, Closure closure) {
+		licenseFiles = project.fileTree( obj, closure )
+	}
 
-    def licenseFormat(String licensePrefix, String linePrefix, String licenseSuffix) {
-        new LicenseFormat(prefix: licensePrefix, line: linePrefix, suffix: licenseSuffix)
-    }
+	private def registerDefaultFileTypes() {
+		registerLicense('java', licenseFormat('/*', ' *', ' */'))
+		registerLicense('scala', licenseFormat('/*', ' *', ' */'))
+		registerLicense('groovy', licenseFormat('/*', ' *', ' */'))
+		registerLicense('properties', licenseFormat('#'))
+	}
+
+	def registerLicense(String ext, LicenseFormat format) {
+		licenseTypes[ext] = format
+	}
+
+	def licenseFormat(String linePrefix) {
+		new LicenseFormat(prefix: linePrefix, line: linePrefix)
+	}
+
+	def licenseFormat(String licensePrefix, String linePrefix, String licenseSuffix) {
+		new LicenseFormat(prefix: licensePrefix, line: linePrefix, suffix: licenseSuffix)
+	}
 }
 
 
