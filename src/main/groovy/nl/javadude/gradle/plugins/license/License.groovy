@@ -1,6 +1,6 @@
 /* License added by: GRADLE-LICENSE-PLUGIN
  *
- * Copyright (C)2011 - Jeroen van Erp <jeroen@javadude.nl>
+ * Copyright 2012 Justin Ryan <jryan@netflix.com>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,145 @@
 
 package nl.javadude.gradle.plugins.license
 
-class License {
+import groovy.lang.Closure;
 
-	List<String> lines
+import java.util.HashMap;
+import java.util.Map;
 
-	def License() {
-		this.lines = [];
-	}
+import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
+import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
+import nl.javadude.gradle.plugins.license.maven.LicenseFormatMojo
+import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
+import com.google.common.collect.Lists
 
-	def add(String line) {
-		lines.add(line)
-	}
+import org.gradle.api.GradleException
+import org.gradle.api.tasks.StopActionException
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.SourceTask
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.VerificationTask
 
-	boolean isLicensed(File file) {
-		def fileLines = file.readLines()
-		fileLines.subList(0, fileLines.size() > lines.size() ? lines.size() : fileLines.size()).containsAll(lines)
-	}
+/**
+ * Task to back License. Using convention of naming Task types with just their name, which makes calls
+ * like tasks.withType(License) nicer, consistent with most internal Gradle tasks.
+ * 
+ * TODO: See if removing headers is valuable to add in
+ * 
+ * @author jryan
+ */
+public class License extends SourceTask implements VerificationTask {
+    /**
+     * Whether or not to allow the build to continue if there are warnings.
+     */
+    boolean ignoreFailures
+
+    /**
+     * Check determines if we doing mutation on the files or just looking
+     *
+     */
+    boolean check;
+
+    /**
+     * Whether to create new files which have changes or to make them inline
+     * 
+     */
+    boolean dryRun = false;
+
+    /**
+     * Whether to skip file where a header has been detected
+     */
+    boolean skipExistingHeaders = false;
+
+    // TODO useDefaultExcludes, not necessary because we're using source sets
+
+    /**
+     * @link {AbstractLicenseMojo.useDefaultMappings}
+     */
+    boolean useDefaultMappings
+    
+    boolean strictCheck
+    
+    @InputFile
+    File header
+
+    @OutputFiles
+    Iterable<File> altered = Lists.newArrayList()
+
+    // Backing AbstraceLicenseMojo
+    FileCollection validHeaders;
+
+    Map<String, String> inheritedProperties;
+    Map<String, String> inheritedMappings;
+
+    @TaskAction
+    protected void process() {
+        if (!enabled) {
+            didWork = false;
+            return;
+        }
+
+        CallbackWithFailure callback;
+        if (check) {
+            callback = new LicenseCheckMojo()
+        } else {
+            callback = new LicenseFormatMojo(dryRun, skipExistingHeaders)
+        }
+
+        Map<String,String> initial = combineVariables();
+        Map<String, String> combinedMappings = combinedMappings();
+
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings)
+            .execute(callback);
+
+        altered = callback.getAffected()
+        didWork = !altered.isEmpty()
+
+        if (!ignoreFailures && callback.hadFailure()) {
+            throw new StopActionException("License violations were found")
+        }
+
+    }
+
+    // Setup up variables
+    // Use properties on this task over the ones from the extension
+    private Map combineVariables() {
+        Map<String, String> initial = new HashMap<String, String>();
+        if (getInheritedProperties() != null ) { // Convention will pull these from the extension
+            initial.putAll(getInheritedProperties());
+        }
+        initial.putAll(ext.properties)
+        return initial
+    }
+
+    // Setup mappings
+    Map<String,String> combinedMappings() {
+        Map<String, String> combinedMappings = new HashMap<String, String>();
+        if (getInheritedMappings() != null) {
+            combinedMappings.putAll(getInheritedMappings());
+        }
+        combinedMappings.putAll(internalMappings)
+        return combinedMappings
+    }
+
+    Map<String, String> internalMappings = new HashMap<String, String>();
+    public void mapping(String fileType, String headerType) {
+        internalMappings.put(fileType, headerType);
+    }
+
+    public void mapping(Map<String, String> provided) {
+        internalMappings.putAll(provided);
+    }
+
+    public void mapping(Closure closure) {
+        Map<String,String> tmpMap = new HashMap<String,String>();
+        closure.delegate = tmpMap;
+        closure();
+        internalMappings.putAll(tmpMap);
+    }
 }
-
-
-
-
-
 

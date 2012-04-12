@@ -6,91 +6,93 @@ apply plugin: 'signing'
 group = 'nl.javadude.gradle.plugins'
 version = '0.5.0-SNAPSHOT'
 
-repositories {
-	mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
-	groovy gradleApi()
-	groovy localGroovy()
-	testCompile 'junit:junit:4.8.1'
-	groovy 'org.slf4j:slf4j-api:1.6.1'
+    // Using compile instead of groovy, so that it goes into the pom
+    compile ('com.mycila.maven-license-plugin:maven-license-plugin:1.10.b1') { 
+        exclude group: 'org.apache.maven', module: 'maven-plugin-api'
+        exclude group: 'org.apache.maven', module: 'maven-project'
+    }
+    compile 'com.google.guava:guava:11.0.2'
+    compile gradleApi()
+    groovy localGroovy() // "org.codehaus.groovy:groovy-all:1.8.6"
+    testCompile 'junit:junit:4.8.1'
 }
 
 task sourcesJar(type: Jar) {
-	from sourceSets.main.allSource
-	classifier = 'sources'
+    from sourceSets.main.allSource
+    classifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
-artifacts {
-	archives sourcesJar, javadocJar
+artifacts { archives sourcesJar, javadocJar }
+
+signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
 }
 
+pom {
+    project {
+        name 'license-gradle-plugin'
+        description 'Applies a header to files, typically a license'
+        url 'https://github.com/hierynomus/gradle-plugins'
+        inceptionYear '2011'
 
-if(project.hasProperty('sonatypeUsername')) {
-	signing {
-		sign configurations.archives
-	}
+        scm { url 'https://github.com/hierynomus/gradle-plugins' }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'hierynomus'
+                name 'Jeroen van Erp'
+                url 'http://www.javadude.nl/'
+                email 'jeroen@javadude.nl'
+                roles { role 'Developer' }
+            }
+        }
+
+        contributors {
+            contributor {
+                name 'Tim Harsch'
+                email 'harschware@yahoo.com'
+            }
+            contributor {
+                name 'Justin Ryan'
+                email 'jryan@netflix.com'
+            }
+        }
+    }
 }
-	
+
 uploadArchives {
-	if(project.hasProperty('sonatypeUsername')) {
-		repositories.mavenDeployer {
-			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+    dependsOn signArchives
+    doFirst {
+        repositories.mavenDeployer {
+            uniqueVersion = false
+            beforeDeployment { org.gradle.api.artifacts.maven.MavenDeployment deployment -> signing.signPom(deployment) }
 
-			configuration = configurations.archives
+            //repository(url: "file://localhost/${rootProject.rootDir}/repo")
 
-			repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-				authentication(userName: sonatypeUsername, password: sonatypePassword)
-			}
-			snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-				authentication(userName: sonatypeUsername, password: sonatypePassword)
-			}
-
-			pom.project {
-				name 'Overthere'
-				description 'Remote file manipulation and process execution framework for Java'
-				packaging 'jar'
-				url 'https://github.com/hierynomus/gradle-plugins'
-				inceptionYear '2011'
-
-				scm {
-					url 'https://github.com/hierynomus/gradle-plugins'
-				}
-
-				licenses {
-					license {
-						name 'The Apache Software License, Version 2.0'
-						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-						distribution 'repo'
-					}
-				}
-
-				developers {
-					developer {
-						id 'hierynomus'
-						name 'Jeroen van Erp'
-						url 'http://www.javadude.nl/'
-						email 'jeroen@javadude.nl'
-						roles {
-							role 'Developer'
-						}
-					}
-				}
-
-				contributors {
-					contributor {
-						name 'Tim Harsch'
-						email 'harschware@yahoo.com'
-					}
-				}
-			}
-		}
-	}
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+        }
+    }
 }
 

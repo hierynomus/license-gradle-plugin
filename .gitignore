@@ -4,6 +4,7 @@ build/
 *.iml
 *.iws
 *.ipr
+*~
 .gradle/
 userHome/
 s101plugin.state
