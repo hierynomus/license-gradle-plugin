@@ -37,45 +37,6 @@ signing {
     sign configurations.archives
 }
 
-pom {
-    project {
-        name 'license-gradle-plugin'
-        description 'Applies a header to files, typically a license'
-        url 'https://github.com/hierynomus/gradle-plugins'
-        inceptionYear '2011'
-
-        scm { url 'https://github.com/hierynomus/gradle-plugins' }
-
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
-
-        developers {
-            developer {
-                id 'hierynomus'
-                name 'Jeroen van Erp'
-                url 'http://www.javadude.nl/'
-                email 'jeroen@javadude.nl'
-                roles { role 'Developer' }
-            }
-        }
-
-        contributors {
-            contributor {
-                name 'Tim Harsch'
-                email 'harschware@yahoo.com'
-            }
-            contributor {
-                name 'Justin Ryan'
-                email 'jryan@netflix.com'
-            }
-        }
-    }
-}
 
 uploadArchives {
     dependsOn signArchives
@@ -91,6 +52,44 @@ uploadArchives {
             }
             snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'license-gradle-plugin'
+                description 'Applies a header to files, typically a license'
+                url 'https://github.com/hierynomus/gradle-plugins'
+                inceptionYear '2011'
+
+                scm { url 'https://github.com/hierynomus/gradle-plugins' }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'hierynomus'
+                        name 'Jeroen van Erp'
+                        url 'http://www.javadude.nl/'
+                        email 'jeroen@javadude.nl'
+                        roles { role 'Developer' }
+                    }
+                }
+
+                contributors {
+                    contributor {
+                        name 'Tim Harsch'
+                        email 'harschware@yahoo.com'
+                    }
+                    contributor {
+                        name 'Justin Ryan'
+                        email 'jryan@netflix.com'
+                    }
+                }
             }
         }
     }
