@@ -33,18 +33,22 @@ import org.gradle.api.logging.Logging;
  */
 public final class LicenseCheckMojo implements CallbackWithFailure {
     Logger logger = Logging.getLogger(LicenseCheckMojo.class);
-
+    private final File basedir;
     public final Collection<File> missingHeaders = new ConcurrentLinkedQueue<File>();
+
+    public LicenseCheckMojo(File basedir) {
+        this.basedir = basedir;
+    }
 
     @Override
     public void onHeaderNotFound(Document document, Header header) {
-        logger.lifecycle("Missing header in: {}", document.getFile());
+        logger.lifecycle("Missing header in: {}", DocumentFactory.getRelativeFile(basedir, document));
         missingHeaders.add(document.getFile());
     }
 
     @Override
     public void onExistingHeader(Document document, Header header) {
-        logger.info("Header OK in: {}", document.getFile());
+        logger.info("Header OK in: {}", DocumentFactory.getRelativeFile(basedir, document));
     }
 
     @Override
