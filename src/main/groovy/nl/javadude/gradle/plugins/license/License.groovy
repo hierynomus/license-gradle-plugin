@@ -101,9 +101,9 @@ public class License extends SourceTask implements VerificationTask {
 
         CallbackWithFailure callback;
         if (check) {
-            callback = new LicenseCheckMojo()
+            callback = new LicenseCheckMojo(getProject().rootDir)
         } else {
-            callback = new LicenseFormatMojo(dryRun, skipExistingHeaders)
+            callback = new LicenseFormatMojo(getProject().rootDir, dryRun, skipExistingHeaders)
         }
 
         Map<String,String> initial = combineVariables();

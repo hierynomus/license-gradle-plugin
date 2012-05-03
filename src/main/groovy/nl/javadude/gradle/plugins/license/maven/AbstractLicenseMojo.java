@@ -102,12 +102,12 @@ public class AbstractLicenseMojo {
                 completionService.submit(new Runnable() {
                     public void run() {
                         Document document = documentFactory.createDocuments(file);
-                        logger.debug("Selected file: {} [header style: {}]", document.getFile(),
+                        logger.debug("Selected file: {} [header style: {}]", DocumentFactory.getRelativeFile(rootDir, document),
                                         document.getHeaderDefinition());
                         if (document.isNotSupported()) {
-                            logger.warn("Unknown file extension: {}", document.getFile());
+                            logger.warn("Unknown file extension: {}", DocumentFactory.getRelativeFile(rootDir, document));
                         } else if (document.is(h)) {
-                            logger.debug("Skipping header file: {}", document.getFile());
+                            logger.debug("Skipping header file: {}", DocumentFactory.getRelativeFile(rootDir, document));
                         } else if (document.hasHeader(h, strictCheck)) {
                             callback.onExistingHeader(document, h);
                         } else {

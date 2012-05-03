@@ -33,9 +33,10 @@ import org.gradle.api.logging.Logging;
  */
 public final class LicenseFormatMojo implements CallbackWithFailure {
     Logger logger = Logging.getLogger(LicenseCheckMojo.class);
-
-    public LicenseFormatMojo(boolean dryRun, boolean skipExistingHeaders) {
-        super();
+    File basedir;
+    
+    public LicenseFormatMojo(File basedir, boolean dryRun, boolean skipExistingHeaders) {
+        this.basedir = basedir;
         this.dryRun = dryRun;
         this.skipExistingHeaders = skipExistingHeaders;
     }
@@ -56,12 +57,12 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
         document.parseHeader();
         if (document.headerDetected()) {
             if (skipExistingHeaders) {
-                logger.info("Keeping license header in: {}", document.getFile());
+                logger.info("Keeping license header in: {}", DocumentFactory.getRelativeFile(basedir, document));
                 return;
             } else
                 document.removeHeader();
         }
-        logger.lifecycle("Updating license header in: {}", document.getFile());
+        logger.lifecycle("Updating license header in: {}", DocumentFactory.getRelativeFile(basedir, document));
         document.updateHeader(header);
         missingHeaders.add(document.getFile());
         if (!dryRun) {
@@ -75,7 +76,7 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
     }
 
     public void onExistingHeader(Document document, Header header) {
-        logger.info("Header OK in: {}", document.getFile());
+        logger.info("Header OK in: {}", DocumentFactory.getRelativeFile(basedir, document));
     }
 
     @Override
