@@ -74,6 +74,7 @@ class LicenseExtension {
     public void mapping(Closure closure) {
         Map<String,String> tmpMap = new HashMap<String,String>()
         closure.delegate = tmpMap;
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure();
         internalMappings.putAll(tmpMap);
     }
