@@ -135,6 +135,11 @@ public class License extends SourceTask implements VerificationTask {
     // Setup mappings
     Map<String,String> combinedMappings() {
         Map<String, String> combinedMappings = new HashMap<String, String>();
+        if (isUseDefaultMappings()) {
+            // Sprinkle in some other well known types, which maven-license-plugin doesn't have
+            combinedMappings.put('json', 'JAVADOC_STYLE')
+            combinedMappings.put('gsp', 'XML_STYLE')
+        }
         if (getInheritedMappings() != null) {
             combinedMappings.putAll(getInheritedMappings());
         }
