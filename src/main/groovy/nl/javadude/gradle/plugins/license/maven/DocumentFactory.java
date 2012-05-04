@@ -64,4 +64,14 @@ public final class DocumentFactory {
         }
         return new Document(file, definitions.get(headerType), encoding, keywords);
     }
+    
+    public static String getRelativeFile(File basedir, Document document) {
+        String prefix = basedir.getAbsolutePath();
+        String whole = document.getFile().getAbsolutePath();
+        if (whole.startsWith(prefix)) {
+            return whole.substring(prefix.length()+1);
+        } else {
+            return document.getFile().getPath();
+        }
+    }
 }
