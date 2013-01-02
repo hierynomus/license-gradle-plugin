@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import nl.javadude.gradle.plugins.license.task.License
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.tasks.SourceSet

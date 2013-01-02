@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import nl.javadude.gradle.plugins.license.task.License
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
