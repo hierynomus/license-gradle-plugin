@@ -36,13 +36,24 @@ public final class LicenseCheckMojo implements CallbackWithFailure {
     private final File basedir;
     public final Collection<File> missingHeaders = new ConcurrentLinkedQueue<File>();
 
-    public LicenseCheckMojo(File basedir) {
+    /**
+     * Whether to skip file where a header has been detected
+     */
+    protected boolean skipExistingHeaders = false;
+
+    public LicenseCheckMojo(File basedir, boolean skipExistingHeaders) {
         this.basedir = basedir;
+        this.skipExistingHeaders = skipExistingHeaders;
     }
 
     @Override
     public void onHeaderNotFound(Document document, Header header) {
-        logger.lifecycle("Missing header in: {}", DocumentFactory.getRelativeFile(basedir, document));
+        if (skipExistingHeaders) {
+            logger.lifecycle("Ignoring header in: {}", DocumentFactory.getRelativeFile(basedir, document));
+            return;
+        } else {
+            logger.lifecycle("Missing header in: {}", DocumentFactory.getRelativeFile(basedir, document));
+        }
         missingHeaders.add(document.getFile());
     }
 

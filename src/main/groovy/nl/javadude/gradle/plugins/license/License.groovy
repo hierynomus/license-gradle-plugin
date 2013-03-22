@@ -98,12 +98,11 @@ public class License extends SourceTask implements VerificationTask {
             didWork = false;
             return;
         }
-
         CallbackWithFailure callback;
-        if (check) {
-            callback = new LicenseCheckMojo(getProject().rootDir)
+        if (isCheck()) {
+            callback = new LicenseCheckMojo(getProject().rootDir, isSkipExistingHeaders())
         } else {
-            callback = new LicenseFormatMojo(getProject().rootDir, dryRun, skipExistingHeaders)
+            callback = new LicenseFormatMojo(getProject().rootDir, isDryRun(), isSkipExistingHeaders())
         }
 
         Map<String,String> initial = combineVariables();
@@ -115,7 +114,7 @@ public class License extends SourceTask implements VerificationTask {
         altered = callback.getAffected()
         didWork = !altered.isEmpty()
 
-        if (!ignoreFailures && callback.hadFailure()) {
+        if (!isIgnoreFailures() && callback.hadFailure()) {
             throw new GradleException("License violations were found")
         }
 
