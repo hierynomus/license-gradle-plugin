@@ -23,6 +23,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.logging.Logging
 import org.gradle.api.logging.Logger
+import org.gradle.api.Task
 
 class LicensePlugin implements Plugin<Project> {
     private static Logger logger = Logging.getLogger(LicensePlugin);
@@ -32,10 +33,17 @@ class LicensePlugin implements Plugin<Project> {
 
     def taskBaseName = 'license'
 
+    protected Task baseCheckTask
+    protected Task baseFormatTask
+
     void apply(Project project) {
         this.project = project
 
         project.plugins.apply(JavaBasePlugin) // First plugin which offers sourceSets
+
+        // Create a single task to run all license checks and reformattings
+        baseCheckTask = project.task(taskBaseName)
+        baseFormatTask = project.task("${taskBaseName}Format")
 
         extension = createExtension()
         configureExtensionRule()
@@ -117,19 +125,22 @@ class LicensePlugin implements Plugin<Project> {
                 License checkTask = project.tasks.add(sourceSetTaskName, License)
                 checkTask.check = true
                 configureForSourceSet(sourceSet, checkTask)
-
-                // Add license checking into check lifecycle, since its a type of code quality plugin
-                project.tasks[JavaBasePlugin.CHECK_TASK_NAME].dependsOn checkTask
+                baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
                 def sourceSetFormatTaskName = sourceSet.getTaskName(taskBaseName + 'Format', null)
                 License formatTask = project.tasks.add(sourceSetFormatTaskName, License)
                 formatTask.check = false
                 configureForSourceSet(sourceSet, formatTask)
+                baseFormatTask.dependsOn formatTask
 
                 // Add independent clean task to remove headers
                 // TODO
             }
+
+            // Add license checking into check lifecycle, since its a type of code quality plugin
+            project.tasks[JavaBasePlugin.CHECK_TASK_NAME].dependsOn baseCheckTask
+
         }
     }
 
