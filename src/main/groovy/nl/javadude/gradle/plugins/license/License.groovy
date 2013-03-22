@@ -115,7 +115,7 @@ public class License extends SourceTask implements VerificationTask {
         didWork = !altered.isEmpty()
 
         if (!isIgnoreFailures() && callback.hadFailure()) {
-            throw new GradleException("License violations were found")
+            throw new StopActionException("License violations were found: ${callback.affected.join(',')}}")
         }
 
     }
