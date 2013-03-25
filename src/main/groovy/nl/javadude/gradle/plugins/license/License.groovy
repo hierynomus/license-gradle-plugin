@@ -29,7 +29,6 @@ import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import com.google.common.collect.Lists
 
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.StopActionException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.InputFile
@@ -39,6 +38,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
+import org.gradle.api.tasks.TaskExecutionException
 
 /**
  * Task to back License. Using convention of naming Task types with just their name, which makes calls
@@ -98,12 +98,11 @@ public class License extends SourceTask implements VerificationTask {
             didWork = false;
             return;
         }
-
         CallbackWithFailure callback;
-        if (check) {
-            callback = new LicenseCheckMojo(getProject().rootDir)
+        if (isCheck()) {
+            callback = new LicenseCheckMojo(getProject().rootDir, isSkipExistingHeaders())
         } else {
-            callback = new LicenseFormatMojo(getProject().rootDir, dryRun, skipExistingHeaders)
+            callback = new LicenseFormatMojo(getProject().rootDir, isDryRun(), isSkipExistingHeaders())
         }
 
         Map<String,String> initial = combineVariables();
@@ -115,8 +114,8 @@ public class License extends SourceTask implements VerificationTask {
         altered = callback.getAffected()
         didWork = !altered.isEmpty()
 
-        if (!ignoreFailures && callback.hadFailure()) {
-            throw new GradleException("License violations were found")
+        if (!isIgnoreFailures() && callback.hadFailure()) {
+            throw new TaskExecutionException("License violations were found: ${callback.affected.join(',')}}")
         }
 
     }
