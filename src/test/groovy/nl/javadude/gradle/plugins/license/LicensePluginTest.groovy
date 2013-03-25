@@ -125,11 +125,30 @@ class LicensePluginTest {
         def task = project.tasks.add('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
+        assertThat dependsOn, hasItem(project.tasks['license'])
+
+        // Manual tests don't get registered with check
+        assertThat dependsOn, not(hasItem(task))
+    }
+
+    @Test
+    public void shouldRunLicenseFromBaseTasks() {
+        project.apply plugin: 'java'
+        def task = project.tasks.add('licenseManual', License)
+
+        Set<Task> dependsOn = project.tasks['license'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['licenseMain'])
         assertThat dependsOn, hasItem(project.tasks['licenseTest'])
         
         // Manual tests don't get registered with check
         assertThat dependsOn, not(hasItem(task))
+
+        Set<Task> dependsOnFormat = project.tasks['licenseFormat'].getDependsOn()
+        assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatMain'])
+        assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatTest'])
+
+        // Manual tests don't get registered with check
+        assertThat dependsOnFormat, not(hasItem(task))
     }
     
     @Test
