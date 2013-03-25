@@ -43,6 +43,8 @@ class LicenseIntegTest {
         project.apply plugin: 'java'
         project.apply plugin: 'license'
 
+        project.license.ignoreFailures = true
+
         licenseTask = project.tasks.licenseMain
         licenseFormatTask = project.tasks.licenseFormatMain
         createLicenseFile()
@@ -110,6 +112,14 @@ class LicenseIntegTest {
         licenseTask.execute()
 
         assert licenseTask.altered.size()  == 2
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void shouldFailWithException() { // Hopefully not StopActionException which gradle will ignore
+        project.license.ignoreFailures = false
+        File propFile = createPropertiesFile()
+
+        licenseTask.execute()
     }
 
     @Test
