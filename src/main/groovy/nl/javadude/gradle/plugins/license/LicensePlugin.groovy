@@ -117,7 +117,7 @@ class LicensePlugin implements Plugin<Project> {
      */
     private void configureSourceSetRule() {
         // This follows the other check task pattern
-        project.plugins.withType(JavaBasePlugin) {  // TODO Confirm this, what exactly are we getting from plugins.withType, we should only be looking at extension.sourceSets
+        project.plugins.withType(JavaBasePlugin) {
             extension.sourceSets.all { SourceSet sourceSet ->
                 def sourceSetTaskName = sourceSet.getTaskName(taskBaseName, null)
                 logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
