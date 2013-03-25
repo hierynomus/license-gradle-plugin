@@ -29,7 +29,6 @@ import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import com.google.common.collect.Lists
 
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.StopActionException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.InputFile
@@ -39,6 +38,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
+import org.gradle.api.tasks.TaskExecutionException
 
 /**
  * Task to back License. Using convention of naming Task types with just their name, which makes calls
@@ -115,7 +115,7 @@ public class License extends SourceTask implements VerificationTask {
         didWork = !altered.isEmpty()
 
         if (!isIgnoreFailures() && callback.hadFailure()) {
-            throw new StopActionException("License violations were found: ${callback.affected.join(',')}}")
+            throw new TaskExecutionException("License violations were found: ${callback.affected.join(',')}}")
         }
 
     }
