@@ -63,7 +63,6 @@ class LicenseExtension {
     boolean strictCheck
 
     Map<String, String> internalMappings = new HashMap<String, String>();
-
     public void mapping(String fileType, String headerType) {
         internalMappings.put(fileType, headerType);
     }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package nl.javadude.gradle.plugins.license.task
+package nl.javadude.gradle.plugins.license
 
 import groovy.lang.Closure;
 
