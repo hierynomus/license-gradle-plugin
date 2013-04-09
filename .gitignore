@@ -12,3 +12,5 @@ s101plugin.state
 /.settings
 /.project
 /.classpath
+.idea/
+classes/
