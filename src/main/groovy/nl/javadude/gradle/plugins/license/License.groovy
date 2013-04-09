@@ -17,28 +17,13 @@
 
 package nl.javadude.gradle.plugins.license
 
-import groovy.lang.Closure;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.collect.Lists
+import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
 import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
 import nl.javadude.gradle.plugins.license.maven.LicenseFormatMojo
-import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
-import com.google.common.collect.Lists
-
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.SourceTask
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.VerificationTask
-import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.api.tasks.*
 
 /**
  * Task to back License. Using convention of naming Task types with just their name, which makes calls
@@ -56,13 +41,11 @@ public class License extends SourceTask implements VerificationTask {
 
     /**
      * Check determines if we doing mutation on the files or just looking
-     *
      */
     boolean check;
 
     /**
      * Whether to create new files which have changes or to make them inline
-     * 
      */
     boolean dryRun = false;
 
@@ -105,7 +88,7 @@ public class License extends SourceTask implements VerificationTask {
             callback = new LicenseFormatMojo(getProject().rootDir, isDryRun(), isSkipExistingHeaders())
         }
 
-        Map<String,String> initial = combineVariables();
+        Map<String, String> initial = combineVariables();
         Map<String, String> combinedMappings = combinedMappings();
 
         new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings)
