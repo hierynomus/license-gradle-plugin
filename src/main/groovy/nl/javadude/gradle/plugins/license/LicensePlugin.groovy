@@ -122,14 +122,14 @@ class LicensePlugin implements Plugin<Project> {
                 def sourceSetTaskName = sourceSet.getTaskName(taskBaseName, null)
                 logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
 
-                License checkTask = project.tasks.add(sourceSetTaskName, License)
+                License checkTask = project.tasks.create(sourceSetTaskName, License)
                 checkTask.check = true
                 configureForSourceSet(sourceSet, checkTask)
                 baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
                 def sourceSetFormatTaskName = sourceSet.getTaskName(taskBaseName + 'Format', null)
-                License formatTask = project.tasks.add(sourceSetFormatTaskName, License)
+                License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
                 formatTask.check = false
                 configureForSourceSet(sourceSet, formatTask)
                 baseFormatTask.dependsOn formatTask
