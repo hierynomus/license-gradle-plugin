@@ -17,16 +17,15 @@
 
 package nl.javadude.gradle.plugins.license
 
-import org.junit.Test
-import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
-import nl.javadude.gradle.plugins.license.License
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Before
+import org.junit.Test
+
+import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
-import static org.hamcrest.CoreMatchers.*
-import static org.junit.matchers.JUnitMatchers.*
-import org.junit.Before
 
 class LicensePluginTest {
     Project project
