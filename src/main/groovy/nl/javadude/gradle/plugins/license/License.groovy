@@ -123,6 +123,7 @@ public class License extends SourceTask implements VerificationTask {
             combinedMappings.put('scala', 'JAVADOC_STYLE')
             combinedMappings.put('gsp', 'DYNASCRIPT_STYLE')
             combinedMappings.put('groovy', 'SLASHSTAR_STYLE')
+            combinedMappings.put('clj', 'SEMICOLON_STYLE')
         }
         if (getInheritedMappings() != null) {
             combinedMappings.putAll(getInheritedMappings());
