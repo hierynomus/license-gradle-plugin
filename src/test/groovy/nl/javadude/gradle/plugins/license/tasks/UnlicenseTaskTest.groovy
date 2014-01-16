@@ -17,11 +17,8 @@
 
 package nl.javadude.gradle.plugins.license.tasks
 
-import org.junit.Before
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Test
-import org.hamcrest.core.Is
-import static org.junit.Assert.assertThat
+import org.junit.Before
 
 class UnlicenseTaskTest {
 

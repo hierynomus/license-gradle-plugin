@@ -17,10 +17,6 @@
 
 package nl.javadude.gradle.plugins.license
 
-import java.io.File;
-
-
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.SourceSet
 
 /**

@@ -1,6 +1,8 @@
 # License Gradle Plugin
 This plugin will scan and adapt your source files to include a provided header, e.g. a LICENSE file.  By default it will scan every source set and report warnings. It will also create format tasks, which will properly format and apply the specified header. A bulk of the logic comes from the maven-license-plugin.
 
+This plugin will also report on the licenses of your dependencies.
+
 ## Usage
 In your _build.gradle_ file add:
 
@@ -11,7 +13,7 @@ In your _build.gradle_ file add:
         }
 
         dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0'
         }
     }
 
@@ -25,6 +27,10 @@ This will add two types of tasks for each source set (created by BasePlugin) in 
 - licenseTest        : checks for header consistency in the test source set
 
 The check tasks are added to the standard Gradle _check_ task.
+
+This will also add a task to manage the downloading and reporting of licenses of your dependencies.
+
+- downloadLicenses   : generates reports on your runtime dependencies
 
 ## License Task
 The license task has a properties, most can be set in the extension:
@@ -40,7 +46,7 @@ The license task has a properties, most can be set in the extension:
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
 
-## License Extension
+### License Extension
 A license extension is added to the project, which can be used to configure all license tasks. E.g.
  
 ```
@@ -63,10 +69,10 @@ Here is a general overview of the options:
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
 
-## File Types
+### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
 
-## Recognizing other file types.
+### Recognizing other file types.
 An extensive list of formats and mappings are available by default, see the SupportedFormats link above. Occasionally a project might need to add a mapping to a unknown file type to an existing comment style.
 
 ```
@@ -83,7 +89,7 @@ licenseMain.mapping 'javascript' 'JAVADOC_STYLE'
 
 Defining new comment types is not currently supported, but file a bug and it can be added.
 
-## Variable substitution
+### Variable substitution
 Variables in the format ${} format will be substituted, as long as they're values are provided in the extension or the task.
 
     Copyright (C) ${year} ${name} <${email}>
@@ -98,4 +104,35 @@ license {
 }
 // or
 licenseMain.ext.year = 2012
+```
+## License Reporting
+The downloadLicense task has a set of properties, most can be set in the extension:
+
+- includeProjectDependencies -- true if you want to include the transitive dependencies of your project dependencies
+- licenses -- a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
+- aliases -- a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
+- excludeDependencies -- a List of dependencies that are to be excluded from reporting
+
+A 'license()' method is made available by the License Extension that takes two Strings, the first is the license name, the second is the URL to the license.
+```
+downloadLicenses {
+    ext.apacheTwo = license('Apache License, Version 2.0', 'http://opensource.org/licenses/Apache-2.0')
+    ext.bsd = license('BSD License', 'http://www.opensource.org/licenses/bsd-license.php')
+    
+    includeProjectDependencies = true
+    licenses = [
+        (group('com.myproject.foo')) : license('My Company License'),
+        'org.apache.james:apache-mime4j:0.6' : apacheTwo,
+        'org.some-bsd:project:1.0' : bsd
+    ]
+
+    aliases = [
+        (apacheTwo) : ['The Apache Software License, Version 2.0', 'Apache 2', 'Apache License Version 2.0', 'Apache License, Version 2.0', 'Apache License 2.0', license('Apache License', 'http://www.apache.org/licenses/LICENSE-2.0')],
+        (bsd) : ['BSD', license('New BSD License', 'http://www.opensource.org/licenses/bsd-license.php')]
+    ]
+
+    excludeDependencies = [
+        'com.some-other-project.bar:foobar:1.0'
+    ]
+}
 ```

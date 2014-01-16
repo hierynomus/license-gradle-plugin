@@ -17,17 +17,8 @@
 
 package nl.javadude.gradle.plugins.license.tasks
 
-import org.junit.Test
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.gradle.api.Project
-import static org.junit.internal.matchers.IsCollectionContaining.hasItem
-import static org.junit.Assert.assertThat
-import org.hamcrest.core.Is
-
 import org.apache.log4j.Logger
-import org.gradle.api.GradleException
-
+import org.gradle.api.Project
 
 class LicenseWarnTaskTest {
     private static Logger logger = Logger.getLogger(LicenseWarnTaskTest.class)

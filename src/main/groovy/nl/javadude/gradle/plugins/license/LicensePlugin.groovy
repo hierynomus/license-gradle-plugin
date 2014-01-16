@@ -17,35 +17,46 @@
 
 package nl.javadude.gradle.plugins.license
 
-import org.gradle.api.Project
 import org.gradle.api.Plugin
-import org.gradle.api.tasks.SourceSet
-import org.gradle.api.plugins.JavaBasePlugin
-import org.gradle.api.logging.Logging
-import org.gradle.api.logging.Logger
+import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
+import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.ReportingBasePlugin
+import org.gradle.api.tasks.SourceSet
 
 class LicensePlugin implements Plugin<Project> {
+
     private static Logger logger = Logging.getLogger(LicensePlugin);
+
+    static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY = "dependency-license"
+    static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE = "license-dependency"
 
     protected Project project
     protected LicenseExtension extension
+    protected DownloadLicensesExtension downloadLicensesExtension
 
     def taskBaseName = 'license'
+    def downloadLicenseTaskName = 'downloadLicenses'
 
     protected Task baseCheckTask
     protected Task baseFormatTask
+    protected Task downloadLicenseTask
 
     void apply(Project project) {
         this.project = project
-
+        project.plugins.apply(ReportingBasePlugin)
         project.plugins.apply(JavaBasePlugin) // First plugin which offers sourceSets
 
         // Create a single task to run all license checks and reformattings
         baseCheckTask = project.task(taskBaseName)
         baseFormatTask = project.task("${taskBaseName}Format")
+        downloadLicenseTask = project.tasks.create(downloadLicenseTaskName, DownloadLicenses)
 
         extension = createExtension()
+        downloadLicensesExtension = createDownloadLicensesExtension()
+
         configureExtensionRule()
         configureSourceSetRule()
         configureTaskRule()
@@ -62,8 +73,37 @@ class LicensePlugin implements Plugin<Project> {
             useDefaultMappings = true
             strictCheck = false
         }
+
         logger.info("Adding license extension");
         return extension
+    }
+
+    /**
+     * Create and init with defaults downloadLicense extension.
+     *
+     * @return DownloadLicensesExtension
+     */
+    protected DownloadLicensesExtension createDownloadLicensesExtension() {
+        downloadLicensesExtension = project.extensions.create(downloadLicenseTaskName, DownloadLicensesExtension)
+
+        def html = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+        def xml = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+
+        downloadLicensesExtension.with {
+            // Default for extension
+            reportByDependency = true
+            reportByLicenseType = true
+            includeProjectDependencies = false
+            reportByDependencyFileName = DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY
+            reportByLicenseFileName = DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE
+            excludeDependencies = []
+            licenses = [:]
+            aliases = [:]
+            report = new DownloadLicensesReportExtension(html: html, xml: xml)
+        }
+
+        logger.info("Adding download licenses extension");
+        return downloadLicensesExtension
     }
 
     /**
@@ -94,6 +134,32 @@ class LicensePlugin implements Plugin<Project> {
             logger.info("Applying license defaults to tasks");
             configureTaskDefaults(task)
         }
+        project.tasks.withType(DownloadLicenses) { DownloadLicenses task ->
+            logger.info("Applying defaults to DownloadLicenses");
+            configureTaskDefaults(task)
+        }
+    }
+
+    /**
+     * Configure convention mapping.
+     *
+     * @param task download license task
+     */
+    protected void configureTaskDefaults(DownloadLicenses task) {
+        task.conventionMapping.with {
+            reportByDependency = { downloadLicensesExtension.reportByDependency }
+            reportByLicenseType = { downloadLicensesExtension.reportByLicenseType }
+            reportByDependencyFileName = { downloadLicensesExtension.reportByDependencyFileName }
+            reportByLicenseFileName = { downloadLicensesExtension.reportByLicenseFileName }
+            includeProjectDependencies = {downloadLicensesExtension.includeProjectDependencies}
+            licenses = { downloadLicensesExtension.licenses }
+            aliases = {downloadLicensesExtension.aliases }
+            xml = { downloadLicensesExtension.report.xml.enabled }
+            html = { downloadLicensesExtension.report.html.enabled }
+            excludeDependencies = { downloadLicensesExtension.excludeDependencies }
+            xmlDestination = { downloadLicensesExtension.report.xml.destination }
+            htmlDestination = { downloadLicensesExtension.report.html.destination }
+        }
     }
 
     protected void configureTaskDefaults(License task) {
@@ -122,14 +188,14 @@ class LicensePlugin implements Plugin<Project> {
                 def sourceSetTaskName = sourceSet.getTaskName(taskBaseName, null)
                 logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
 
-                License checkTask = project.tasks.add(sourceSetTaskName, License)
+                License checkTask = project.tasks.create(sourceSetTaskName, License)
                 checkTask.check = true
                 configureForSourceSet(sourceSet, checkTask)
                 baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
                 def sourceSetFormatTaskName = sourceSet.getTaskName(taskBaseName + 'Format', null)
-                License formatTask = project.tasks.add(sourceSetFormatTaskName, License)
+                License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
                 formatTask.check = false
                 configureForSourceSet(sourceSet, formatTask)
                 baseFormatTask.dependsOn formatTask

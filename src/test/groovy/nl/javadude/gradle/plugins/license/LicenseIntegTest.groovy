@@ -17,20 +17,16 @@
 
 package nl.javadude.gradle.plugins.license
 
-import org.junit.Test
-import org.junit.Before
-import org.junit.After
-import org.gradle.api.GradleException
+import com.google.common.collect.Iterables
+import com.google.common.io.Files
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-
-import static org.junit.Assert.*
-
-import com.google.common.io.Files;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class LicenseIntegTest {
+
     Project project
     License licenseTask
     License licenseFormatTask
@@ -54,7 +50,6 @@ class LicenseIntegTest {
     public void cleanupProject() {
         new AntBuilder().delete(dir: projectDir)
     }
-
 
     @Test
     public void shouldWorkOnEmptyProject() {
