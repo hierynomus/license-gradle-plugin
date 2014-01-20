@@ -22,6 +22,7 @@ import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
 import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
 import nl.javadude.gradle.plugins.license.maven.LicenseFormatMojo
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
 
@@ -98,7 +99,7 @@ public class License extends SourceTask implements VerificationTask {
         didWork = !altered.isEmpty()
 
         if (!isIgnoreFailures() && callback.hadFailure()) {
-            throw new TaskExecutionException("License violations were found: ${callback.affected.join(',')}}")
+            throw new GradleException("License violations were found: ${callback.affected.join(',')}}")
         }
 
     }
