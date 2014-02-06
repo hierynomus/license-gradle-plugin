@@ -181,6 +181,17 @@ key2 = value2
         assert licenseTask.altered.size()  == 0
     }
 
+    @Test
+    public void shouldDetectMissingHeaderIfCheckIsTrueAndSkipExistingHeadersIsTrue() {
+        createPropertiesFile()
+
+        licenseTask.check = true
+        licenseTask.skipExistingHeaders = true
+        licenseTask.execute()
+
+        assert licenseTask.altered.size() == 1
+    }
+
     public File createLicenseFile() {
         File file = project.file("LICENSE")
         Files.createParentDirs(file);

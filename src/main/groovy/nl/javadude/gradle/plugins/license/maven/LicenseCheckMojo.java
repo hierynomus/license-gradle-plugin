@@ -48,7 +48,8 @@ public final class LicenseCheckMojo implements CallbackWithFailure {
 
     @Override
     public void onHeaderNotFound(Document document, Header header) {
-        if (skipExistingHeaders) {
+        document.parseHeader();
+        if (document.headerDetected() && skipExistingHeaders) {
             logger.lifecycle("Ignoring header in: {}", DocumentFactory.getRelativeFile(basedir, document));
             return;
         } else {
