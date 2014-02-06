@@ -4,6 +4,7 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'license'
 
 group = 'nl.javadude.gradle.plugins'
 
@@ -37,6 +38,10 @@ task sourcesJar(type: Jar) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
+}
+
+license {
+	ignoreFailures true
 }
 
 artifacts { archives sourcesJar, javadocJar }
