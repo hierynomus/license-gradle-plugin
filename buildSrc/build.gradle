@@ -1,0 +1,25 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile ('com.mycila.maven-license-plugin:maven-license-plugin:1.10.b1') {
+        exclude group: 'org.apache.maven', module: 'maven-plugin-api'
+        exclude group: 'org.apache.maven', module: 'maven-project'
+    }
+    compile 'com.google.guava:guava:15.0'
+    compile gradleApi()
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir '../src/main/groovy'
+        }
+        resources {
+            srcDir '../src/main/resources'
+        }
+    }
+}
