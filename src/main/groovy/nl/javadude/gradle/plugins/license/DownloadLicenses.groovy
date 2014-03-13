@@ -91,8 +91,14 @@ public class DownloadLicenses extends DefaultTask {
         }.memoize()
 
         // Lazy reporter resolving
-        def reporter = { new LicenseReporter(xmlOutputDir: getXmlDestination(), htmlOutputDir: getHtmlDestination()) }
-
+        def reporter = { 
+			def dependencyToLicenseHtmlHeadRenderer = project.downloadLicenses.report.html.dependencyToLicenseHtmlHeadRenderer;
+			def dependencyToLicenseTableHeadRenderer = project.downloadLicenses.report.html.dependencyToLicenseTableHeadRenderer;
+			def dependencyToLicenseTableRowRenderer = project.downloadLicenses.report.html.dependencyToLicenseTableRowRenderer;
+			return new LicenseReporter(xmlOutputDir: getXmlDestination(), htmlOutputDir: getHtmlDestination(), 
+				dependencyToLicenseHtmlHeadRenderer: dependencyToLicenseHtmlHeadRenderer, dependencyToLicenseTableHeadRenderer: dependencyToLicenseTableHeadRenderer, dependencyToLicenseTableRowRenderer: dependencyToLicenseTableRowRenderer) 
+		}
+	
         // Generate report that groups dependencies
         if (isReportByDependency()) {
             if(isHtml()) {

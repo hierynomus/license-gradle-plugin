@@ -19,6 +19,78 @@ class LicenseReporter {
      * Output directory for xml reports.
      */
     File xmlOutputDir
+	
+    /**
+     * The strategy to fill the HTML head in the dependency to license report
+     */
+	Closure dependencyToLicenseHtmlHeadRenderer
+    /**
+     * The strategy to fill the HTML table header in the dependency to license report
+     */
+	Closure dependencyToLicenseTableHeadRenderer
+    /**
+     * The strategy to fill the HTML table row for each dependency in the dependency to license report
+     */
+	Closure dependencyToLicenseTableRowRenderer
+	
+	static final Closure defaultDependencyToLicenseHtmlHeadRenderer = { head ->
+		head.title("HTML License report")
+		head.style(
+		 '''table {
+                  width: 85%;
+                  border-collapse: collapse;
+                  text-align: center;
+                }
+                .dependencies {
+                  text-align: left;
+                }
+                tr {
+                  border: 1px solid black;
+                }
+                td {
+                  border: 1px solid black;
+                  font-weight: bold;
+                  color: #2E2E2E
+                }
+                th {
+                  border: 1px solid black;
+                }
+                h3 {
+                  text-align:center;
+                  margin:3px
+                }
+                .license {
+                    width:70%
+                }
+
+                .licenseName {
+                    width:15%
+                }
+                ''')
+	}
+	
+	static final Closure defaultDependencyToLicenseTableHeadRenderer = { table ->
+		table.tr {
+			th(){ h3("Dependency") }
+			th(){ h3("Jar") }
+			th(){ h3("License name") }
+			th(){ h3("License text URL") }
+		}
+	}
+	
+	static final Closure defaultDependencyToLicenseTableRowRenderer = { table, depMetadata, license->
+		table.tr {
+			td(depMetadata.dependency, class: 'dependencies')
+			td(depMetadata.dependencyFileName, class: 'licenseName')
+			td(license.licenseName, class: 'licenseName')
+			td(class: 'license') {
+				if (!isNullOrEmpty(license.licenseTextUrl)) {
+					a(href: license.licenseTextUrl, license.licenseTextUrl)
+				}
+			}
+		}
+	}	
+
 
     /**
      * Generate xml report grouping by dependencies.
@@ -85,65 +157,19 @@ class LicenseReporter {
      */
     public void generateHTMLReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
         MarkupBuilder html = getMarkupBuilder(fileName, htmlOutputDir)
-
+		
         html.html {
-            head {
-                title("HTML License report")
-            }
-            style(
-             '''table {
-                  width: 85%;
-                  border-collapse: collapse;
-                  text-align: center;
-                }
-                .dependencies {
-                  text-align: left;
-                }
-                tr {
-                  border: 1px solid black;
-                }
-                td {
-                  border: 1px solid black;
-                  font-weight: bold;
-                  color: #2E2E2E
-                }
-                th {
-                  border: 1px solid black;
-                }
-                h3 {
-                  text-align:center;
-                  margin:3px
-                }
-                .license {
-                    width:70%
-                }
-
-                .licenseName {
-                    width:15%
-                }
-                ''')
+			head {
+				dependencyToLicenseHtmlHeadRenderer(html)
+			}
             body {
                 table(align: 'center') {
-                    tr {
-                        th(){ h3("Dependency") }
-                        th(){ h3("Jar") }
-                        th(){ h3("License name") }
-                        th(){ h3("License text URL") }
-                    }
+					dependencyToLicenseTableHeadRenderer(html)
 
-                    dependencyMetadataSet.each {
+                    dependencyMetadataSet.sort{it.dependency}.each {
                         entry ->
                             entry.licenseMetadataList.each { license ->
-                                tr {
-                                    td(entry.dependency, class: 'dependencies')
-                                    td(entry.dependencyFileName, class: 'licenseName')
-                                    td(license.licenseName, class: 'licenseName')
-                                    td(class: 'license') {
-                                        if (!isNullOrEmpty(license.licenseTextUrl)) {
-                                            a(href: license.licenseTextUrl, "Show license agreement")
-                                        }
-                                    }
-                                }
+								dependencyToLicenseTableRowRenderer(html, entry, license)
                             }
                     }
                 }

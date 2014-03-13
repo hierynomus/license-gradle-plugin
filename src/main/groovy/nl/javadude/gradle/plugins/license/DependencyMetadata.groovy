@@ -1,6 +1,7 @@
 package nl.javadude.gradle.plugins.license
 
 import groovy.transform.Canonical
+import groovy.util.slurpersupport.GPathResult;
 
 /**
  * Dependency metadata. Contains:
@@ -32,7 +33,19 @@ class DependencyMetadata {
      * Dependency jar file name.
      */
     String dependencyFileName
-
+	
+    /**
+     * Tha POM xml structure
+     */
+	GPathResult pomXml
+	
+	/**
+	 * Default lookup for property: into the POM xml
+	 */
+	def propertyMissing (String propertyName){	
+		return pomXml?.getProperty(propertyName)
+	}
+	
     /**
      * Check whether metadata list is empty.
      *
