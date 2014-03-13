@@ -1,6 +1,6 @@
 package nl.javadude.gradle.plugins.license
 
-class LicensesReport {
+class LicensesReportXml {
 
     boolean enabled
     File destination
