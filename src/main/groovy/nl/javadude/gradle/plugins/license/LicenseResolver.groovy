@@ -172,7 +172,9 @@ class LicenseResolver {
      * Tells wether a dependency (GAV string) is to be ignored or not.
      */
     boolean isIgnored(String dependency){
-        return dependenciesToIgnore.contains(dependency) || dependenciesToIgnore.contains(dependency.substring(0, dependency.indexOf(':')))
+        if(dependenciesToIgnore.contains(dependency)) return true
+		int groupEnd = dependency.indexOf(':')
+		return groupEnd>=0 && dependenciesToIgnore.contains(dependency.substring(0, groupEnd))
     }
     
     
