@@ -86,8 +86,8 @@ class LicensePlugin implements Plugin<Project> {
     protected DownloadLicensesExtension createDownloadLicensesExtension() {
         downloadLicensesExtension = project.extensions.create(downloadLicenseTaskName, DownloadLicensesExtension)
 
-        def html = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
-        def xml = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+        def html = new LicensesReportHtml(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+        def xml = new LicensesReportXml(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
 
         downloadLicensesExtension.with {
             // Default for extension

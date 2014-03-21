@@ -76,7 +76,7 @@ class LicenseResolver {
             }
         }
 
-        provideFileDependencies(dependenciesToIgnore).each {
+        provideFileDependencies().each {
             fileDependency ->
                 Closure<DependencyMetadata> licenseMetadata = {
                     if (licenses.containsKey(fileDependency)) {
@@ -125,7 +125,7 @@ class LicenseResolver {
             def runtimeConfiguration = project.configurations.getByName(DEFAULT_CONFIGURATION_TO_HANDLE)
             runtimeConfiguration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(!dependenciesToIgnore.contains(dependencyDesc)) {
+                if(!isIgnored(dependencyDesc)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
                     if (subproject) {
                         if(includeProjectDependencies) {
@@ -143,7 +143,7 @@ class LicenseResolver {
         dependenciesToHandle
     }
 
-    Set<String> provideFileDependencies(List<String> dependenciesToIgnore) {
+    Set<String> provideFileDependencies() {
         Set<String> fileDependencies = newHashSet()
 
         if (project.configurations.any { it.name == DEFAULT_CONFIGURATION_TO_HANDLE }) {
@@ -156,7 +156,7 @@ class LicenseResolver {
             d.each {
                 FileCollectionDependency fileDependency ->
                     fileDependency.source.files.each {
-                        if (!dependenciesToIgnore.contains(it.name)) {
+                        if (!isIgnored(it.name)) {
                             fileDependencies.add(it.name)
                         }
                     }
@@ -167,6 +167,17 @@ class LicenseResolver {
         logger.debug("Project $project.name found ${fileDependencies.size()} file dependencies to handle.")
         fileDependencies
     }
+    
+    /**
+     * Tells wether a dependency (GAV string) is to be ignored or not.
+     */
+    boolean isIgnored(String dependency){
+        if(dependenciesToIgnore.contains(dependency)) return true
+		int groupEnd = dependency.indexOf(':')
+		return groupEnd>=0 && dependenciesToIgnore.contains(dependency.substring(0, groupEnd))
+    }
+    
+    
 
     /**
      * Recursive function for retrieving licenses via creating
@@ -191,6 +202,8 @@ class LicenseResolver {
         File pStream = pomConfiguration.resolve().asList().first()
         GPathResult xml = new XmlSlurper().parse(pStream)
         DependencyMetadata pomData = new DependencyMetadata(dependency: initialDependency)
+        
+        pomData.pomXml = xml
 
         xml.licenses.license.each {
             def license = new LicenseMetadata(licenseName: it.name.text().trim(), licenseTextUrl: it.url.text().trim())
