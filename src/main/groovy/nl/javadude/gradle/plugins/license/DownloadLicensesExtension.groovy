@@ -58,6 +58,11 @@ class DownloadLicensesExtension {
     boolean html
 
     /**
+     * The dependency configuration to report on.
+     */
+    String dependencyConfiguration
+
+    /**
      * Report extension.
      */
     DownloadLicensesReportExtension report = new DownloadLicensesReportExtension()

@@ -186,11 +186,13 @@ class DownloadLicensesIntegTest extends Specification {
         dependencyWithLicenseUrlPresent(xmlByDependency, "com.google.guava:guava:15.0", "MY_URL")
     }
 
-    def "Test that default configuration is runtime"() {
+    def "Test that dependencyConfiguration defaults to runtime"() {
         setup:
         project.dependencies {
             testCompile project.files("testDependency.jar")
-            testRuntime "org.jboss.logging:jboss-logging:3.1.3.GA"
+            testRuntime "com.google.guava:guava:15.0"
+            runtime "org.apache.ivy:ivy:2.3.0",
+                    "org.jboss.logging:jboss-logging:3.1.3.GA"
         }
 
         when:
@@ -203,8 +205,32 @@ class DownloadLicensesIntegTest extends Specification {
         def xmlByDependency = xml4LicenseByDependencyReport(f)
         def xmlByLicense = xml4DependencyByLicenseReport(f)
 
-        dependenciesInReport(xmlByDependency) == 0
-        licensesInReport(xmlByLicense) == 0
+        dependenciesInReport(xmlByDependency) == 2
+        licensesInReport(xmlByLicense) == 2
+    }
+
+    def "Test that explicitly-specified dependencyConfiguration is respected"() {
+        setup:
+        project.dependencies {
+            runtime project.files("testDependency.jar")
+            testRuntime "com.google.guava:guava:15.0"
+            testCompile "org.apache.ivy:ivy:2.3.0",
+                        "org.jboss.logging:jboss-logging:3.1.3.GA"
+        }
+        downloadLicenses.dependencyConfiguration = "testCompile"
+
+        when:
+        downloadLicenses.execute()
+
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+        dependenciesInReport(xmlByDependency) == 2
+        licensesInReport(xmlByLicense) == 2
     }
 
     def "Test that aliases works well for different dependencies with the same license for string->list mapping"() {

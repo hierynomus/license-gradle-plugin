@@ -70,6 +70,11 @@ public class DownloadLicenses extends DefaultTask {
      */
     @Input boolean html
 
+    /**
+     * The dependency configuration to report on.
+     */
+    @Input String dependencyConfiguration
+
     @TaskAction
     def downloadLicenses() {
         if (!enabled || (!isReportByDependency() && !isReportByLicenseType())
@@ -86,7 +91,8 @@ public class DownloadLicenses extends DefaultTask {
                                                           new MapEntry(resolveAliasKey(it.key), it.value)
                                                       },
                                                       licenses: getLicenses(),
-                                                      dependenciesToIgnore: excludeDependencies)
+                                                      dependenciesToIgnore: excludeDependencies,
+                                                      dependencyConfiguration: dependencyConfiguration)
             licenseResolver.provideLicenseMap4Dependencies()
         }.memoize()
 
