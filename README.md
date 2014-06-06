@@ -46,28 +46,12 @@ The license task has a properties, most can be set in the extension:
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
 
-### License Extension
-A license extension is added to the project, which can be used to configure all license tasks. E.g.
- 
 ```
 license {
     header rootProject.file('codequality/HEADER')
     strictCheck true
 }
 ```
-
-Here is a general overview of the options:
-
-- header -- Specify location of header to use in comparisons, default to project.file('LICENSE')
-- ignoreFailures -- Prevent tasks from stopping the build, defaults to false
-- dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
-- skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
-- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_mappings for the complete list
-- strictCheck -- Be extra strict in the formatting of existing headers, defaults to false
-- sourceSets -- List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
-- mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
-- mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
-- mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
 
 ### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
