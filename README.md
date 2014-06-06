@@ -112,6 +112,7 @@ The downloadLicense task has a set of properties, most can be set in the extensi
 - licenses -- a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
 - aliases -- a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
 - excludeDependencies -- a List of dependencies that are to be excluded from reporting
+- dependencyConfiguration -- Gradle dependency configuration to report on (defaults to "runtime").
 
 A 'license()' method is made available by the License Extension that takes two Strings, the first is the license name, the second is the URL to the license.
 ```
@@ -134,5 +135,7 @@ downloadLicenses {
     excludeDependencies = [
         'com.some-other-project.bar:foobar:1.0'
     ]
+    
+    dependencyConfiguration = 'compile'
 }
 ```
