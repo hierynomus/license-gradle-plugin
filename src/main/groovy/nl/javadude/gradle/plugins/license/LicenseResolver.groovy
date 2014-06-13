@@ -20,8 +20,6 @@ class LicenseResolver {
 
     private static final Logger logger = Logging.getLogger(LicenseResolver);
 
-    private static final String DEFAULT_CONFIGURATION_TO_HANDLE = "runtime"
-
     /**
      * Reference to gradle project.
      */
@@ -30,6 +28,7 @@ class LicenseResolver {
     private Map<LicenseMetadata, List<Object>> aliases
     private List<String> dependenciesToIgnore
     private boolean includeProjectDependencies
+    private String dependencyConfiguration
 
     /**
      * Provide set with dependencies metadata.
@@ -121,8 +120,8 @@ class LicenseResolver {
         Set<ResolvedArtifact> dependenciesToHandle = newHashSet()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
-        if (project.configurations.any { it.name == DEFAULT_CONFIGURATION_TO_HANDLE }) {
-            def runtimeConfiguration = project.configurations.getByName(DEFAULT_CONFIGURATION_TO_HANDLE)
+        if (project.configurations.any { it.name == dependencyConfiguration }) {
+            def runtimeConfiguration = project.configurations.getByName(dependencyConfiguration)
             runtimeConfiguration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
                 if(!dependenciesToIgnore.contains(dependencyDesc)) {
@@ -146,8 +145,8 @@ class LicenseResolver {
     Set<String> provideFileDependencies(List<String> dependenciesToIgnore) {
         Set<String> fileDependencies = newHashSet()
 
-        if (project.configurations.any { it.name == DEFAULT_CONFIGURATION_TO_HANDLE }) {
-            Configuration configuration = project.configurations.getByName(DEFAULT_CONFIGURATION_TO_HANDLE)
+        if (project.configurations.any { it.name == dependencyConfiguration }) {
+            Configuration configuration = project.configurations.getByName(dependencyConfiguration)
 
             Set<Dependency> d = configuration.allDependencies.findAll {
                 it instanceof FileCollectionDependency

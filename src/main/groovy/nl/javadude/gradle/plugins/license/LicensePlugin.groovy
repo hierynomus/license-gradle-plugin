@@ -32,6 +32,7 @@ class LicensePlugin implements Plugin<Project> {
 
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY = "dependency-license"
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE = "license-dependency"
+    static final String DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE = "runtime"
 
     protected Project project
     protected LicenseExtension extension
@@ -100,6 +101,7 @@ class LicensePlugin implements Plugin<Project> {
             licenses = [:]
             aliases = [:]
             report = new DownloadLicensesReportExtension(html: html, xml: xml)
+            dependencyConfiguration = DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE
         }
 
         logger.info("Adding download licenses extension");
@@ -159,6 +161,7 @@ class LicensePlugin implements Plugin<Project> {
             excludeDependencies = { downloadLicensesExtension.excludeDependencies }
             xmlDestination = { downloadLicensesExtension.report.xml.destination }
             htmlDestination = { downloadLicensesExtension.report.html.destination }
+            dependencyConfiguration = { downloadLicensesExtension.dependencyConfiguration }
         }
     }
 
