@@ -8,6 +8,9 @@ apply plugin: 'license'
 
 group = 'nl.javadude.gradle.plugins'
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
 repositories { mavenCentral() }
 
 idea {
@@ -40,7 +43,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 license {
-	ignoreFailures true
+    ignoreFailures true
 }
 
 artifacts { archives sourcesJar, javadocJar }
@@ -106,5 +109,11 @@ uploadArchives {
             }
         }
     }
+}
+
+
+def javaVersion = System.properties['java.version']
+if (JavaVersion.toVersion(javaVersion) != project.targetCompatibility) {
+    throw new GradleException("Expected Java version ${project.targetCompatibility} but running with $javaVersion")
 }
 
