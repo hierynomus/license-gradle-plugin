@@ -23,10 +23,9 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.google.guava:guava:15.0'
+    compile 'com.google.guava:guava:17.0'
     compile gradleApi()
-    groovy localGroovy() // "org.codehaus.groovy:groovy-all:1.8.6"
-    testCompile 'junit:junit:4.8.1'
+    testCompile 'junit:junit:4.11'
     testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
 }
 
