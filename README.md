@@ -13,7 +13,7 @@ In your _build.gradle_ file add:
         }
 
         dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.8.0'
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.9.0'
         }
     }
 
@@ -139,3 +139,13 @@ downloadLicenses {
     dependencyConfiguration = 'compile'
 }
 ```
+
+# Changelog
+
+## v0.9.0
+- Fixed build to force Java6 (Fixes [#35](https://github.com/hierynomus/license-gradle-plugin/issues/35))
+- Added example test for [#38](https://github.com/hierynomus/license-gradle-plugin/issues/38)
+
+## v0.8.0
+- Merged pull-requests [#31](https://github.com/hierynomus/license-gradle-plugin/pull/31), [#33](https://github.com/hierynomus/license-gradle-plugin/pull/33), [#42](https://github.com/hierynomus/license-gradle-plugin/pull/42)
+- 
