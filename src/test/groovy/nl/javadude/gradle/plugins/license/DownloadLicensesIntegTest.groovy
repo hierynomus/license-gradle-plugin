@@ -624,6 +624,32 @@ class DownloadLicensesIntegTest extends Specification {
         !xmlByDependency.dependency.license.find { it['@url'] == "testDependency.jar" }.asBoolean()
     }
 
+    def "Test if a dependency from a local repository without pom should be excluded"() {
+      setup:
+      File flatRepoDir = new File(projectDir, "libs")
+      flatRepoDir.mkdir()
+      new File(flatRepoDir, "mydep-1.0.0.jar").createNewFile()
+
+      project.repositories {
+        flatDir name: 'local_repo', dir: 'libs'
+      }
+
+      project.dependencies {
+        compile ":mydep:1.0.0"
+      }
+
+      project.downloadLicenses {
+        excludeDependencies = [":mydep:1.0.0"]
+      }
+
+      when:
+      downloadLicenses.execute()
+
+      then:
+      File f = getLicenseReportFolder()
+      assertLicenseReportsExist(f)
+    }
+
     def "Test that plugin works if no dependencies defined in the project"() {
         setup:
         project.dependencies {
