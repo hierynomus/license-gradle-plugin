@@ -13,7 +13,7 @@ In your _build.gradle_ file add:
         }
 
         dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0'
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.8.0'
         }
     }
 
