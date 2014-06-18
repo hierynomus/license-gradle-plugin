@@ -18,8 +18,8 @@ buildscript {
 
 group = 'nl.javadude.gradle.plugins'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories { jcenter() }
 
@@ -37,6 +37,7 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
     compile 'com.google.guava:guava:17.0'
+    compile 'com.android.tools.build:gradle:0.11.1'
     compile gradleApi()
     testCompile 'junit:junit:4.11'
     testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
