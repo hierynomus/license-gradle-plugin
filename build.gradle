@@ -111,6 +111,9 @@ uploadArchives {
     }
 }
 
+System.properties.each {k, v ->
+    println("$k -> $v")
+}
 
 def javaVersion = System.properties['java.version']
 if (JavaVersion.toVersion(javaVersion) != project.targetCompatibility) {
