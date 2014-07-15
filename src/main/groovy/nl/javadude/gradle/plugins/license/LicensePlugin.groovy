@@ -133,11 +133,11 @@ class LicensePlugin implements Plugin<Project> {
      */
     protected void configureTaskRule() {
         project.tasks.withType(License) { License task ->
-            logger.info("Applying license defaults to tasks");
+            logger.info("Applying license defaults to task: ${task.path}");
             configureTaskDefaults(task)
         }
         project.tasks.withType(DownloadLicenses) { DownloadLicenses task ->
-            logger.info("Applying defaults to DownloadLicenses");
+            logger.info("Applying defaults to download task: ${task.path}");
             configureTaskDefaults(task)
         }
     }
@@ -178,6 +178,7 @@ class LicensePlugin implements Plugin<Project> {
             strictCheck = { extension.strictCheck }
             inheritedProperties = { extension.ext.properties }
             inheritedMappings = { extension.internalMappings }
+            excludes = { extension.excludePatterns }
         }
     }
 
@@ -221,7 +222,6 @@ class LicensePlugin implements Plugin<Project> {
 
         // Default to all source files from SourceSet
         task.source = sourceSet.allSource
-
     }
 
 }

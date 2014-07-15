@@ -63,7 +63,7 @@ public class License extends SourceTask implements VerificationTask {
     boolean useDefaultMappings
     
     boolean strictCheck
-    
+
     @InputFile
     File header
 
@@ -78,6 +78,10 @@ public class License extends SourceTask implements VerificationTask {
 
     @TaskAction
     protected void process() {
+        // Plain weird, but this ensures that the lazy closure from the extension is properly wired into the excludes field of the SourceTask.
+      logger.info("$path: ${getExcludes()}")
+        excludes = getExcludes()
+
         if (!enabled) {
             didWork = false;
             return;

@@ -118,6 +118,22 @@ class LicenseIntegTest {
     }
 
     @Test
+    public void shouldNotFailOnExcludedFileWithMissingHeader_1() {
+      project.license.ignoreFailures = false
+      project.license.excludes(["**/*.properties"])
+      createPropertiesFile()
+      licenseTask.execute()
+    }
+
+    @Test
+    public void shouldNotFailOnExcludedFileWithMissingHeader_2() {
+      project.license.ignoreFailures = false
+      project.license.exclude "**/*.properties"
+      createPropertiesFile()
+      licenseTask.execute()
+    }
+
+    @Test
     public void canAddHeader() {
         File propFile = createPropertiesFile()
 

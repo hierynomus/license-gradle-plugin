@@ -68,6 +68,8 @@ Here is a general overview of the options:
 - mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
+- exclude(String pattern) -- Add an ANT style pattern to exclude files from license absence reporting and license application
+- exclude(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
 
 ### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
@@ -105,6 +107,18 @@ license {
 // or
 licenseMain.ext.year = 2012
 ```
+
+### Exclude files from license absence reporting and license application
+By default all files in the sourceSets configured are required to carry a license. In order to exclude certain file(-types), you can add exclusion patterns.
+
+The following sample will exclude all properties, txt and conf files.
+```
+license {
+    exclude "**/*.properties"
+    excludes(["**/*.txt", "**/*.conf"])
+}
+```
+
 ## License Reporting
 The downloadLicense task has a set of properties, most can be set in the extension:
 
