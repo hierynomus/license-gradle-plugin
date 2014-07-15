@@ -111,7 +111,7 @@ uploadArchives {
     }
 }
 
-System.properties.each {k, v ->
+System.env.each {k, v ->
     println("$k -> $v")
 }
 
