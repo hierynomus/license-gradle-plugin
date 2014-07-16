@@ -119,18 +119,57 @@ class LicenseIntegTest {
 
     @Test
     public void shouldNotFailOnExcludedFileWithMissingHeader_1() {
-      project.license.ignoreFailures = false
-      project.license.excludes(["**/*.properties"])
-      createPropertiesFile()
-      licenseTask.execute()
+        project.license.ignoreFailures = false
+        project.license.excludes(["**/*.properties"])
+        createPropertiesFile()
+        licenseTask.execute()
     }
 
     @Test
     public void shouldNotFailOnExcludedFileWithMissingHeader_2() {
-      project.license.ignoreFailures = false
-      project.license.exclude "**/*.properties"
-      createPropertiesFile()
-      licenseTask.execute()
+        project.license.ignoreFailures = false
+        project.license.exclude "**/*.properties"
+        createPropertiesFile()
+        licenseTask.execute()
+    }
+
+    @Test
+    public void shouldNotFailOnFileThatDoesNotFitIncludesPattern_1() {
+        project.license.ignoreFailures = false
+        licenseTask.ext.year = 2012
+        project.license.include "**/header.properties"
+        // Should be included
+        createPropertiesFileWithHeader()
+        // Should be ignored
+        createPropertiesFile()
+        licenseTask.execute()
+    }
+
+    @Test
+    public void shouldNotFailOnFileThatDoesNotFitIncludesPattern_2() {
+        project.license.ignoreFailures = false
+        licenseTask.ext.year = 2012
+        project.license.includes(["**/header.properties"])
+        // Should be included
+        createPropertiesFileWithHeader()
+        // Should be ignored
+        createPropertiesFile()
+        licenseTask.execute()
+    }
+
+    @Test
+    public void shouldCorrectlyMixIncludesAndExcludes() {
+        project.license.ignoreFailures = false
+        licenseTask.ext.year = 2012
+        project.license.includes(["**/*.properties"])
+        project.license.excludes(["**/test.properties"])
+        // Should be included
+        createPropertiesFileWithHeader()
+        // Should be ignored (not matching include)
+        createJavaFile()
+        // Should be ignored (matching include and exclude)
+        createPropertiesFile()
+        licenseTask.execute()
     }
 
     @Test

@@ -179,6 +179,7 @@ class LicensePlugin implements Plugin<Project> {
             inheritedProperties = { extension.ext.properties }
             inheritedMappings = { extension.internalMappings }
             excludes = { extension.excludePatterns }
+            includes = { extension.includePatterns }
         }
     }
 

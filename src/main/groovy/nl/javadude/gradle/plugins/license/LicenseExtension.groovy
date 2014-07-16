@@ -41,6 +41,11 @@ class LicenseExtension {
     Collection<String> excludePatterns = new HashSet<String>()
 
     /**
+     * Path patterns to include while applying licenses or reporting missing licenses
+     */
+    Collection<String> includePatterns = new HashSet<String>()
+
+    /**
      * Whether or not to allow the build to continue if there are warnings.
      */
     boolean ignoreFailures
@@ -86,6 +91,14 @@ class LicenseExtension {
 
     public void excludes(Collection<String> patterns) {
       excludePatterns.addAll(patterns)
+    }
+
+    public void include(String pattern) {
+      includePatterns.add(pattern)
+    }
+
+    public void includes(Collection<String> patterns) {
+      includePatterns.addAll(patterns)
     }
 
 }
