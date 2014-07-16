@@ -69,7 +69,9 @@ Here is a general overview of the options:
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
 - exclude(String pattern) -- Add an ANT style pattern to exclude files from license absence reporting and license application
-- exclude(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
+- excludes(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
+- include(String pattern) -- Add an ANT style pattern to include files into license absence reporting and license application
+- includes(Collection<String> patterns) -- Add ANT style patterns to include files into license absence reporting and license application
 
 ### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
@@ -108,16 +110,40 @@ license {
 licenseMain.ext.year = 2012
 ```
 
-### Exclude files from license absence reporting and license application
-By default all files in the sourceSets configured are required to carry a license. In order to exclude certain file(-types), you can add exclusion patterns.
+### Include/Exclude files from license absence reporting and license application
+By default all files in the sourceSets configured are required to carry a license. Just like with Gradle `SourceSet` you can use include/exclude patterns to control this behaviour.
 
-The following sample will exclude all properties, txt and conf files.
+The semantics are:
+- no `includes` or `excludes`: All files in the sourceSets will be included
+- `excludes` provided: All files except those matching the exclude patterns are included
+- `includes` provided: Only the files matching the include patterns are included
+- both `includes` and `excludes` provided: All files matching the include patterns, except those matching the exclude patterns are included.
+
+For instance:
 ```
 license {
     exclude "**/*.properties"
     excludes(["**/*.txt", "**/*.conf"])
 }
 ```
+This will exclude all `*.properties`, `*.txt` and `*.conf` files.
+
+```
+license {
+    include "**/*.groovy"
+    includes(["**/*.java", "**/*.properties"])
+}
+```
+This will include only all `*.groovy`, `*.java` and `*.properties` files.
+
+```
+license {
+    include "**/*.java"
+    exclude "**/*Test.java"
+}
+```
+This will include all `*.java` files, except the `*Test.java` files.
+
 
 ## License Reporting
 The downloadLicense task has a set of properties, most can be set in the extension:
