@@ -13,7 +13,7 @@ In your _build.gradle_ file add:
         }
 
         dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.9.0'
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0'
         }
     }
 
@@ -181,6 +181,11 @@ downloadLicenses {
 ```
 
 # Changelog
+
+## v0.10.0
+- Fixed build to enforce Java6 only for local builds, not on BuildHive
+- Added `exclude` / `excludes` to extension (Fixes [#39](https://github.com/hierynomus/license-gradle-plugin/issues/39))
+- Added `include` / `includes` to extension (Fixes [#45](https://github.com/hierynomus/license-gradle-plugin/issues/45))
 
 ## v0.9.0
 - Fixed build to force Java6 (Fixes [#35](https://github.com/hierynomus/license-gradle-plugin/issues/35))
