@@ -2,16 +2,26 @@ defaultTasks 'build'
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: 'maven-publish'
 apply plugin: 'license'
+apply plugin: 'com.jfrog.bintray'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+    }
+}
 
 group = 'nl.javadude.gradle.plugins'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-repositories { mavenCentral() }
+repositories { jcenter() }
 
 idea {
     module {
@@ -32,6 +42,13 @@ dependencies {
     testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
 }
 
+// This disables the pedantic doclint feature of JDK8
+if (JavaVersion.current().isJava8Compatible()) {
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -46,67 +63,83 @@ license {
     ignoreFailures true
 }
 
-artifacts { archives sourcesJar, javadocJar }
 
-signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
+def pomConfig = {
+    name project.name
+    description project.project_description
+    url project.project_url
+    inceptionYear '2011'
+
+    scm { url project.project_scm }
+
+    licenses {
+        license([:]) {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+
+    developers {
+        developer {
+            id 'hierynomus'
+            name 'Jeroen van Erp'
+            url 'http://www.javadude.nl/'
+            email 'jeroen@javadude.nl'
+            roles { role 'Developer' }
+        }
+    }
+
+    contributors {
+        contributor {
+            name 'Tim Harsch'
+            email 'harschware@yahoo.com'
+        }
+        contributor {
+            name 'Justin Ryan'
+            email 'jryan@netflix.com'
+        }
+    }
 }
 
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
 
-uploadArchives {
-    dependsOn signArchives
-    doFirst {
-        repositories.mavenDeployer {
-            uniqueVersion = false
-            beforeDeployment { org.gradle.api.artifacts.maven.MavenDeployment deployment -> signing.signPom(deployment) }
-
-            //repository(url: "file://localhost/${rootProject.rootDir}/repo")
-
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            pom.withXml {
+                asNode().children().last() + pomConfig
             }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
+        }
+    }
+}
 
-            pom.project {
-                name 'license-gradle-plugin'
-                description 'Applies a header to files, typically a license'
-                url 'https://github.com/hierynomus/gradle-plugins'
-                inceptionYear '2011'
+// Both 'bintrayUsername' and 'bintrayApiKey' must defined in the ~/.gradle/gradle.properties
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = 'invalid'
+if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = 'invalid'
 
-                scm { url 'https://github.com/hierynomus/gradle-plugins' }
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'hierynomus'
-                        name 'Jeroen van Erp'
-                        url 'http://www.javadude.nl/'
-                        email 'jeroen@javadude.nl'
-                        roles { role 'Developer' }
-                    }
-                }
-
-                contributors {
-                    contributor {
-                        name 'Tim Harsch'
-                        email 'harschware@yahoo.com'
-                    }
-                    contributor {
-                        name 'Justin Ryan'
-                        email 'jryan@netflix.com'
-                    }
-                }
-            }
+bintray {
+    user = project.bintrayUsername
+    key = project.bintrayApiKey
+    publications = ['mavenCustom']
+    pkg {
+        repo = project.project_bintray_repo
+        userOrg = project.project_bintray_org
+        name = project.name
+        desc = project.project_description
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'plugin']
+        websiteUrl = project.project_url
+        issueTrackerUrl = project.project_issues_url
+        vcsUrl = project.project_scm
+        publicDownloadNumbers = true
+        version {
+            vcsTag = project.version
+            attributes = [
+                    'gradle-plugin': ['com.github.hierynomus.license', project.group, project.name].join(':')
+            ]
         }
     }
 }
