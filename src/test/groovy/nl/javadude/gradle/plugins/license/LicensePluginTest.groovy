@@ -99,7 +99,7 @@ class LicensePluginTest {
     @Test
     public void shouldConfigureManuallyConfiguredTask() {
         project.apply plugin: 'java'
-        def task = project.tasks.add('licenseManual', License)
+        def task = project.tasks.create('licenseManual', License)
         
         assertThat task.header.name, is("LICENSE")
     }
@@ -107,7 +107,7 @@ class LicensePluginTest {
     @Test
     public void manualTaskShouldInheritFromExtension() {
         project.apply plugin: 'java'
-        def task = project.tasks.add('licenseManual', License)
+        def task = project.tasks.create('licenseManual', License)
 
         assertThat project.license.ignoreFailures, is(false) // Default
         assertThat task.ignoreFailures, is(false)
@@ -121,7 +121,7 @@ class LicensePluginTest {
     @Test
     public void shouldRunLicenseDuringCheck() {
         project.apply plugin: 'java'
-        def task = project.tasks.add('licenseManual', License)
+        def task = project.tasks.create('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['license'])
@@ -133,7 +133,7 @@ class LicensePluginTest {
     @Test
     public void shouldRunLicenseFromBaseTasks() {
         project.apply plugin: 'java'
-        def task = project.tasks.add('licenseManual', License)
+        def task = project.tasks.create('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['license'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['licenseMain'])

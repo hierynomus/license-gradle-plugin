@@ -39,7 +39,9 @@ dependencies {
     compile 'com.google.guava:guava:17.0'
     compile gradleApi()
     testCompile 'junit:junit:4.11'
-    testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
 }
 
 // This disables the pedantic doclint feature of JDK8
@@ -62,7 +64,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 license {
     ignoreFailures true
 }
-
 
 def pomConfig = {
     name project.name
@@ -130,7 +131,7 @@ bintray {
         name = project.name
         desc = project.project_description
         licenses = ['Apache-2.0']
-        labels = ['gradle', 'plugin']
+        labels = ['gradle', 'plugin', 'license']
         websiteUrl = project.project_url
         issueTrackerUrl = project.project_issues_url
         vcsUrl = project.project_scm
