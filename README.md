@@ -6,12 +6,14 @@ This plugin will also report on the licenses of your dependencies.
 ## Usage
 From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.org and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
 
+
 ### Gradle 2.1
 In your _build.gradle_ file add:
 ```
 plugins {
     id "com.github.hierynomus.license" version "0.11.0"
 }
+```
 
 ### Gradle 1.x/2.0, latest license-gradle-plugin
 In your _build.gradle_ file add:
@@ -205,6 +207,10 @@ downloadLicenses {
 ```
 
 # Changelog
+
+## v0.11.0
+- Added support for uploading to bintray (Fixes [#46](https://github.com/hierynomus/license-gradle-plugin/issues/46) and [#47](https://github.com/hierynomus/license-gradle-plugin/issues/47))
+- Upgraded to Gradle 2.0
 
 ## v0.10.0
 - Fixed build to enforce Java6 only for local builds, not on BuildHive
