@@ -127,7 +127,6 @@ bintray {
     publications = ['mavenCustom']
     pkg {
         repo = project.project_bintray_repo
-        userOrg = project.project_bintray_org
         name = project.name
         desc = project.project_description
         licenses = ['Apache-2.0']

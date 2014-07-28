@@ -17,7 +17,6 @@
 
 package nl.javadude.gradle.plugins.license
 
-import com.google.common.collect.Lists
 import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
 import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
@@ -68,7 +67,7 @@ public class License extends SourceTask implements VerificationTask {
     File header
 
     @OutputFiles
-    Iterable<File> altered = Lists.newArrayList()
+    Iterable<File> altered = new ArrayList<File>()
 
     // Backing AbstraceLicenseMojo
     FileCollection validHeaders;
