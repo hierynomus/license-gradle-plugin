@@ -68,6 +68,7 @@ class LicensePlugin implements Plugin<Project> {
         extension.with {
             // Default for extension
             header = project.file("LICENSE")
+            headerURI = null
             ignoreFailures = false
             dryRun = false
             skipExistingHeaders = false
@@ -171,6 +172,7 @@ class LicensePlugin implements Plugin<Project> {
             // Defaults for task, which will delegate to project's License extension
             // These can still be explicitly set by the user on the individual tasks
             header = { extension.header }
+            headerURI = { extension.headerURI }
             ignoreFailures = { extension.ignoreFailures }
             dryRun = { extension.dryRun }
             skipExistingHeaders = { extension.skipExistingHeaders }

@@ -67,6 +67,14 @@ public class License extends SourceTask implements VerificationTask {
     @InputFile
     File header
 
+    /**
+     * In leiu of a header file on the local filesystem, this property lets you provide a URL that could be
+     * in the classpath or on a remote system. When configured across a few projects, it would mean that a
+     * header file doesn't have to be in each project.
+     */
+    @Input
+    URI headerURI
+
     @OutputFiles
     Iterable<File> altered = Lists.newArrayList()
 
@@ -92,7 +100,9 @@ public class License extends SourceTask implements VerificationTask {
         Map<String, String> initial = combineVariables();
         Map<String, String> combinedMappings = combinedMappings();
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings)
+        def uri = getHeaderURI() ?: getHeader().toURI()
+
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings)
             .execute(callback);
 
         altered = callback.getAffected()

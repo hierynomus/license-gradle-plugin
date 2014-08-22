@@ -1,6 +1,7 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.ConventionTask
 import org.gradle.api.tasks.*
 
 import static nl.javadude.gradle.plugins.license.DownloadLicensesExtension.license
@@ -8,7 +9,7 @@ import static nl.javadude.gradle.plugins.license.DownloadLicensesExtension.licen
 /**
  * Task for downloading dependency licenses and generating reports.
  */
-public class DownloadLicenses extends DefaultTask {
+public class DownloadLicenses extends ConventionTask {
 
     /**
      * Custom license mapping that overrides existent if needed.

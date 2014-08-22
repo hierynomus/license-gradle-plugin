@@ -31,6 +31,11 @@ class LicenseExtension {
     File header
 
     /**
+     * URI to header to apply to files
+     */
+    URI headerURI
+
+    /**
      * Source sets to perform search on, will default to all sourceSets in the project
      */
     Collection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
