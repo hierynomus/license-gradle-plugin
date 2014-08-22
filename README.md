@@ -4,6 +4,32 @@ This plugin will scan and adapt your source files to include a provided header, 
 This plugin will also report on the licenses of your dependencies.
 
 ## Usage
+From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.org and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
+
+
+### Gradle 2.1
+In your _build.gradle_ file add:
+```
+plugins {
+    id "com.github.hierynomus.license" version "0.11.0"
+}
+```
+
+### Gradle 1.x/2.0, latest license-gradle-plugin
+In your _build.gradle_ file add:
+```
+    buildscript {
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+        }
+    }
+```
+
+### Gradle 1.x/2.0, gradle-license-plugin 0.10.0 (and earlier)
 In your _build.gradle_ file add:
 
 ```
@@ -13,7 +39,7 @@ In your _build.gradle_ file add:
         }
 
         dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.9.0'
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0'
         }
     }
 
@@ -68,6 +94,10 @@ Here is a general overview of the options:
 - mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
 - mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
 - mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
+- exclude(String pattern) -- Add an ANT style pattern to exclude files from license absence reporting and license application
+- excludes(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
+- include(String pattern) -- Add an ANT style pattern to include files into license absence reporting and license application
+- includes(Collection<String> patterns) -- Add ANT style patterns to include files into license absence reporting and license application
 
 ### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
@@ -105,6 +135,42 @@ license {
 // or
 licenseMain.ext.year = 2012
 ```
+
+### Include/Exclude files from license absence reporting and license application
+By default all files in the sourceSets configured are required to carry a license. Just like with Gradle `SourceSet` you can use include/exclude patterns to control this behaviour.
+
+The semantics are:
+- no `includes` or `excludes`: All files in the sourceSets will be included
+- `excludes` provided: All files except those matching the exclude patterns are included
+- `includes` provided: Only the files matching the include patterns are included
+- both `includes` and `excludes` provided: All files matching the include patterns, except those matching the exclude patterns are included.
+
+For instance:
+```
+license {
+    exclude "**/*.properties"
+    excludes(["**/*.txt", "**/*.conf"])
+}
+```
+This will exclude all `*.properties`, `*.txt` and `*.conf` files.
+
+```
+license {
+    include "**/*.groovy"
+    includes(["**/*.java", "**/*.properties"])
+}
+```
+This will include only all `*.groovy`, `*.java` and `*.properties` files.
+
+```
+license {
+    include "**/*.java"
+    exclude "**/*Test.java"
+}
+```
+This will include all `*.java` files, except the `*Test.java` files.
+
+
 ## License Reporting
 The downloadLicense task has a set of properties, most can be set in the extension:
 
@@ -141,6 +207,15 @@ downloadLicenses {
 ```
 
 # Changelog
+
+## v0.11.0
+- Added support for uploading to bintray (Fixes [#46](https://github.com/hierynomus/license-gradle-plugin/issues/46) and [#47](https://github.com/hierynomus/license-gradle-plugin/issues/47))
+- Upgraded to Gradle 2.0
+
+## v0.10.0
+- Fixed build to enforce Java6 only for local builds, not on BuildHive
+- Added `exclude` / `excludes` to extension (Fixes [#39](https://github.com/hierynomus/license-gradle-plugin/issues/39))
+- Added `include` / `includes` to extension (Fixes [#45](https://github.com/hierynomus/license-gradle-plugin/issues/45))
 
 ## v0.9.0
 - Fixed build to force Java6 (Fixes [#35](https://github.com/hierynomus/license-gradle-plugin/issues/35))

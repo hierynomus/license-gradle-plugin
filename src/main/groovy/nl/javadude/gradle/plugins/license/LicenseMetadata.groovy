@@ -1,7 +1,6 @@
 package nl.javadude.gradle.plugins.license
 
 import groovy.transform.Canonical
-import groovy.transform.EqualsAndHashCode
 
 /**
  * License metadata. Includes name and text url.

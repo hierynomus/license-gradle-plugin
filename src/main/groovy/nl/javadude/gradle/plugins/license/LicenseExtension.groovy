@@ -21,7 +21,7 @@ import org.gradle.api.tasks.SourceSet
 
 /**
  * Extension in the license namespace, which drives the License tasks.
- * 
+ *
  * @author jryan
  */
 class LicenseExtension {
@@ -41,13 +41,23 @@ class LicenseExtension {
     Collection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
 
     /**
+     * Path patterns to exclude while applying licenses or reporting missing licenses
+     */
+    Collection<String> excludePatterns = new HashSet<String>()
+
+    /**
+     * Path patterns to include while applying licenses or reporting missing licenses
+     */
+    Collection<String> includePatterns = new HashSet<String>()
+
+    /**
      * Whether or not to allow the build to continue if there are warnings.
      */
     boolean ignoreFailures
 
     /**
      * Whether to create new files which have changes or to make them inline
-     * 
+     *
      */
     boolean dryRun;
 
@@ -60,7 +70,7 @@ class LicenseExtension {
      * @link {AbstractLicenseMojo.useDefaultMappings}
      */
     boolean useDefaultMappings
-    
+
     boolean strictCheck
 
     Map<String, String> internalMappings = new HashMap<String, String>();
@@ -78,6 +88,22 @@ class LicenseExtension {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure();
         internalMappings.putAll(tmpMap);
+    }
+
+    public void exclude(String pattern) {
+      excludePatterns.add(pattern)
+    }
+
+    public void excludes(Collection<String> patterns) {
+      excludePatterns.addAll(patterns)
+    }
+
+    public void include(String pattern) {
+      includePatterns.add(pattern)
+    }
+
+    public void includes(Collection<String> patterns) {
+      includePatterns.addAll(patterns)
     }
 
 }

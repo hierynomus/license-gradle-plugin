@@ -17,7 +17,6 @@
 
 package nl.javadude.gradle.plugins.license
 
-import com.google.common.collect.Lists
 import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
 import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
@@ -63,7 +62,7 @@ public class License extends SourceTask implements VerificationTask {
     boolean useDefaultMappings
     
     boolean strictCheck
-    
+
     @InputFile
     File header
 
@@ -76,7 +75,7 @@ public class License extends SourceTask implements VerificationTask {
     URI headerURI
 
     @OutputFiles
-    Iterable<File> altered = Lists.newArrayList()
+    Iterable<File> altered = new ArrayList<File>()
 
     // Backing AbstraceLicenseMojo
     FileCollection validHeaders;
@@ -86,6 +85,12 @@ public class License extends SourceTask implements VerificationTask {
 
     @TaskAction
     protected void process() {
+        // Plain weird, but this ensures that the lazy closure from the extension is properly wired into the excludes field of the SourceTask.
+      logger.info("$path: ${getExcludes()}")
+      logger.info("$path: ${getIncludes()}")
+        excludes = getExcludes()
+        includes = getIncludes()
+
         if (!enabled) {
             didWork = false;
             return;
