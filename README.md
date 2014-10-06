@@ -113,6 +113,8 @@ license {
 }
 // or
 license.mapping 'javascript' 'JAVADOC_STYLE'
+// or
+license.mapping('javascript', 'JAVADOC_STYLE')
 // or directly on the task
 licenseMain.mapping 'javascript' 'JAVADOC_STYLE'
 ```
