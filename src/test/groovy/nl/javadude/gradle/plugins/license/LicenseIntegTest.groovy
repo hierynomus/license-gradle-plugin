@@ -99,6 +99,18 @@ class LicenseIntegTest {
     }
 
     @Test
+    public void canAddMappingForDoubleExtension() {
+      File freemarker = createFreemarkerShellFile()
+
+      project.license.mapping("sh.ftl",'SCRIPT_STYLE')
+
+      licenseTask.execute()
+      assert licenseTask.altered.size() == 1
+      assert Iterables.get(licenseTask.altered, 0).equals(freemarker)
+
+    }
+
+    @Test
     public void shouldFindMultipleFiles() {
         createPropertiesFile()
         createJavaFile()
@@ -269,6 +281,14 @@ key2 = value2
         Files.createParentDirs(file);
         file << '''keyA = valueB
 keyB = valueB
+'''
+    }
+
+    public File createFreemarkerShellFile() {
+        File file = project.file("src/main/resources/prop.sh.ftl")
+        Files.createParentDirs(file);
+        file << '''#!/bin/bash
+echo "Hello world!"
 '''
     }
 
