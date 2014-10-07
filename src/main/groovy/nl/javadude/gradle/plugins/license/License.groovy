@@ -78,10 +78,8 @@ public class License extends SourceTask implements VerificationTask {
     @TaskAction
     protected void process() {
         // Plain weird, but this ensures that the lazy closure from the extension is properly wired into the excludes field of the SourceTask.
-      logger.info("$path: ${getExcludes()}")
-      logger.info("$path: ${getIncludes()}")
-        excludes = getExcludes()
-        includes = getIncludes()
+        this.excludes = getExcludes()
+        this.includes = getIncludes()
 
         if (!enabled) {
             didWork = false;
