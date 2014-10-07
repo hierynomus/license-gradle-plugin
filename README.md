@@ -1,4 +1,7 @@
 # License Gradle Plugin
+
+[![Build Status](https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master)](https://travis-ci.org/hierynomus/license-gradle-plugin)
+
 This plugin will scan and adapt your source files to include a provided header, e.g. a LICENSE file.  By default it will scan every source set and report warnings. It will also create format tasks, which will properly format and apply the specified header. A bulk of the logic comes from the maven-license-plugin.
 
 This plugin will also report on the licenses of your dependencies.
