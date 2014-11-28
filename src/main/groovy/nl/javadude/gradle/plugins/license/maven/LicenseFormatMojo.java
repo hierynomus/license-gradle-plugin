@@ -18,27 +18,37 @@ package nl.javadude.gradle.plugins.license.maven;
 
 import com.google.code.mojo.license.document.Document;
 import com.google.code.mojo.license.header.Header;
+import com.google.code.mojo.license.header.HeaderParser;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 /**
  * Reformat files with a missing header to add it
- * 
+ *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public final class LicenseFormatMojo implements CallbackWithFailure {
+
+    /**
+     * For accessing the {@link com.google.code.mojo.license.document.Document#parser} object
+     */
+    private static final String DOCUMENT_PARSER_FIELD_NAME = "parser";
+
     Logger logger = Logging.getLogger(LicenseCheckMojo.class);
     File basedir;
-    
-    public LicenseFormatMojo(File basedir, boolean dryRun, boolean skipExistingHeaders) {
+
+    public LicenseFormatMojo(File basedir, boolean dryRun, boolean skipExistingHeaders, boolean insertNewline) {
         this.basedir = basedir;
         this.dryRun = dryRun;
         this.skipExistingHeaders = skipExistingHeaders;
+        this.insertNewline = insertNewline;
     }
 
     /**
@@ -50,6 +60,11 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
      * Whether to skip file where a header has been detected
      */
     protected boolean skipExistingHeaders = false;
+
+    /**
+     * Whether to insert a new line after the header content
+     */
+    protected boolean insertNewline = false;
 
     public final Collection<File> missingHeaders = new ConcurrentLinkedQueue<File>();
 
@@ -64,6 +79,23 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
         }
         logger.lifecycle("Updating license header in: {}", DocumentFactory.getRelativeFile(basedir, document));
         document.updateHeader(header);
+        if(insertNewline) {
+            try {
+                // Bypass the 'private' modifier
+                Field documentParserField = document.getClass().getDeclaredField(DOCUMENT_PARSER_FIELD_NAME);
+                documentParserField.setAccessible(true);
+                // Fetch the 'parser' object
+                HeaderParser documentHeaderParser = (HeaderParser) documentParserField.get(document);
+                // Calculate the position for the new line
+                String headerContent = header.applyDefinitionAndSections(documentHeaderParser.getHeaderDefinition(), documentHeaderParser.getFileContent().isUnix());
+                int position =  documentHeaderParser.getBeginPosition() + headerContent.length();
+                // Insert the new line
+                String newline = System.getProperty("line.separator");
+                documentHeaderParser.getFileContent().insert(position, newline);
+            } catch (Exception e) { // NoSuchFieldException | IllegalAccessException
+                throw new GradleException("An error occurred while attempting to insert a new line after header -- couldn't modify the license content field!", e);
+            }
+        }
         missingHeaders.add(document.getFile());
         if (!dryRun) {
             document.save();

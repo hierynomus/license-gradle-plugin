@@ -62,6 +62,11 @@ class LicenseExtension {
     boolean skipExistingHeaders;
 
     /**
+     * Whether to insert a new line after the header content
+     */
+    boolean insertNewline;
+
+    /**
      * @link {AbstractLicenseMojo.useDefaultMappings}
      */
     boolean useDefaultMappings

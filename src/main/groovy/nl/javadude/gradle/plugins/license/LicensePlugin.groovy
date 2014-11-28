@@ -174,6 +174,7 @@ class LicensePlugin implements Plugin<Project> {
             ignoreFailures = { extension.ignoreFailures }
             dryRun = { extension.dryRun }
             skipExistingHeaders = { extension.skipExistingHeaders }
+            insertNewline = { extension.insertNewline }
             useDefaultMappings = { extension.useDefaultMappings }
             strictCheck = { extension.strictCheck }
             inheritedProperties = { extension.ext.properties }

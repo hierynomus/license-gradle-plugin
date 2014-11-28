@@ -54,6 +54,11 @@ public class License extends SourceTask implements VerificationTask {
      */
     boolean skipExistingHeaders = false;
 
+    /**
+     * Whether to insert a new line after the header content
+     */
+    boolean insertNewline = false;
+
     // TODO useDefaultExcludes, not necessary because we're using source sets
 
     /**
@@ -89,7 +94,7 @@ public class License extends SourceTask implements VerificationTask {
         if (isCheck()) {
             callback = new LicenseCheckMojo(getProject().rootDir, isSkipExistingHeaders())
         } else {
-            callback = new LicenseFormatMojo(getProject().rootDir, isDryRun(), isSkipExistingHeaders())
+            callback = new LicenseFormatMojo(getProject().rootDir, isDryRun(), isSkipExistingHeaders(), isInsertNewline())
         }
 
         Map<String, String> initial = combineVariables();
