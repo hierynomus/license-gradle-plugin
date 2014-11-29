@@ -93,7 +93,10 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
                 String newline = System.getProperty("line.separator");
                 documentHeaderParser.getFileContent().insert(position, newline);
             } catch (Exception e) { // NoSuchFieldException | IllegalAccessException
-                throw new GradleException("An error occurred while attempting to insert a new line after header -- couldn't modify the license content field!", e);
+                throw new GradleException(String.format(
+                        "An error occurred while attempting to insert a new line after header -- couldn't properly access / manipulate the %s field!",
+                        document.getClass().getCanonicalName() + "#" + DOCUMENT_PARSER_FIELD_NAME
+                ), e);
             }
         }
         missingHeaders.add(document.getFile());
