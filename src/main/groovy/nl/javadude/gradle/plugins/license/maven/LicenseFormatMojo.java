@@ -86,6 +86,8 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
                 documentParserField.setAccessible(true);
                 // Fetch the 'parser' object
                 HeaderParser documentHeaderParser = (HeaderParser) documentParserField.get(document);
+                // Reset the 'private' modifier
+                documentParserField.setAccessible(false);
                 // Calculate the position for the new line
                 String headerContent = header.applyDefinitionAndSections(documentHeaderParser.getHeaderDefinition(), documentHeaderParser.getFileContent().isUnix());
                 int position =  documentHeaderParser.getBeginPosition() + headerContent.length();
