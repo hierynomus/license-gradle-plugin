@@ -9,7 +9,8 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.google.guava:guava:15.0'
+    compile 'com.google.guava:guava:17.0'
+    compile 'com.android.tools.build:gradle:0.11.1'
     compile gradleApi()
 }
 
