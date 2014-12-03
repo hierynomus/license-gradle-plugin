@@ -4,13 +4,7 @@ import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -31,9 +25,6 @@ import com.google.code.mojo.license.header.AdditionalHeaderDefinition;
 import com.google.code.mojo.license.header.Header;
 import com.google.code.mojo.license.header.HeaderDefinition;
 import com.google.code.mojo.license.header.HeaderType;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.base.Function;
 
 import com.mycila.xmltool.XMLDoc;
 
@@ -174,11 +165,10 @@ public class AbstractLicenseMojo {
                         : new HashMap<String, String>();
                         
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
-        Set<String> validHeaderTypes = Sets.newHashSet(Lists.transform(headerTypes, new Function<HeaderType, String>() {
-            public String apply(HeaderType headerType) {
-                return headerType.name();
-            }
-        }));
+        Set<String> validHeaderTypes = new HashSet<String>();
+        for (HeaderType headerType : headerTypes) {
+            validHeaderTypes.add(headerType.name());
+        }
 
         for (Map.Entry<String, String> entry : mapping.entrySet()) {
             String headerType = entry.getValue().toUpperCase();
