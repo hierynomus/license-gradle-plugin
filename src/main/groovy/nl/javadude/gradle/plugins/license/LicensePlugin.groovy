@@ -262,7 +262,7 @@ class LicensePlugin implements Plugin<Project> {
         // This follows the other check task pattern
         project.plugins.withType(AppPlugin) {
             extension.sourceSets.all { AndroidSourceSet sourceSet ->
-                def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name)
+                def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name.capitalize())
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
 
                 License checkTask = project.tasks.create(sourceSetTaskName, License)
@@ -271,7 +271,7 @@ class LicensePlugin implements Plugin<Project> {
                 baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
-                def sourceSetFormatTaskName = (taskBaseName + 'FormatAndroid'+ sourceSet.name)
+                def sourceSetFormatTaskName = (taskBaseName + 'FormatAndroid'+ sourceSet.name.capitalize())
                 License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
                 formatTask.check = false
                 configureForAndroidSourceSet(sourceSet, formatTask)
