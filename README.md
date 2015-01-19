@@ -7,7 +7,7 @@ This plugin will scan and adapt your source files to include a provided header, 
 This plugin will also report on the licenses of your dependencies.
 
 ## Usage
-From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.org and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
+From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.com and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
 
 
 ### Gradle 2.1
