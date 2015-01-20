@@ -71,6 +71,16 @@ license {
     ignoreFailures true
 }
 
+test {
+  afterSuite { descriptor, result ->
+    def indicator = "\u001B[32m✓\u001b[0m"
+    if (result.failedTestCount > 0) {
+      indicator = "\u001B[31m✘\u001b[0m"
+    }
+    logger.lifecycle("$indicator Test ${descriptor.name}; Executed: ${result.testCount}/\u001B[32m${result.successfulTestCount}\u001B[0m/\u001B[31m${result.failedTestCount}\u001B[0m")
+  }
+}
+
 def pomConfig = {
     name project.name
     description project.project_description
