@@ -175,6 +175,17 @@ license {
 ```
 This will include all `*.java` files, except the `*Test.java` files.
 
+### Running on a non-java project
+
+By default, applying the plugin will generate license tasks for all source sets defined by the java plugin. You can also run the license task on an arbitrary file tree, if you don't have the java plugin, or your files are outside a java source tree.
+
+```
+task licenseFormatSql (type:nl.javadude.gradle.plugins.license.License) {
+    source = fileTree(dir:"source").include ("**/*.sql")
+}
+licenseFormat.dependsOn licenseFormatSql
+```
+
 
 ## License Reporting
 The downloadLicense task has a set of properties, most can be set in the extension:
