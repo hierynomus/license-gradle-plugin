@@ -68,7 +68,7 @@ The license task has a properties, most can be set in the extension:
 - ignoreFailures -- Prevent tasks from stopping the build, defaults to false
 - dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
 - skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
-- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_mappings for the complete list
+- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types for the complete list
 - strictCheck -- Be extra strict in the formatting of existing headers, defaults to false
 - sourceSets -- List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
 - mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
@@ -91,7 +91,7 @@ Here is a general overview of the options:
 - ignoreFailures -- Prevent tasks from stopping the build, defaults to false
 - dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
 - skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
-- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_mappings for the complete list
+- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types for the complete list
 - strictCheck -- Be extra strict in the formatting of existing headers, defaults to false
 - sourceSets -- List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
 - mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
@@ -103,7 +103,7 @@ Here is a general overview of the options:
 - includes(Collection<String> patterns) -- Add ANT style patterns to include files into license absence reporting and license application
 
 ### File Types
-Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in <a href="http://code.google.com/p/maven-license-plugin/wiki/SupportedFormats">SupportedFormats</a> page of the parent project.
+Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in the parent project at http://code.mycila.com/license-maven-plugin/#supported-comment-types.
 
 ### Recognizing other file types.
 An extensive list of formats and mappings are available by default, see the SupportedFormats link above. Occasionally a project might need to add a mapping to a unknown file type to an existing comment style.
@@ -174,6 +174,17 @@ license {
 }
 ```
 This will include all `*.java` files, except the `*Test.java` files.
+
+### Running on a non-java project
+
+By default, applying the plugin will generate license tasks for all source sets defined by the java plugin. You can also run the license task on an arbitrary file tree, if you don't have the java plugin, or your files are outside a java source tree.
+
+```
+task licenseFormatSql (type:nl.javadude.gradle.plugins.license.License) {
+    source = fileTree(dir:"source").include ("**/*.sql")
+}
+licenseFormat.dependsOn licenseFormatSql
+```
 
 
 ## License Reporting
