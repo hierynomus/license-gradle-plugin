@@ -63,6 +63,11 @@ public class License extends SourceTask implements VerificationTask {
     
     boolean strictCheck
 
+    /**
+     * The encoding used to open files
+     */
+    String encoding
+
     @InputFile
     File header
 
@@ -95,7 +100,7 @@ public class License extends SourceTask implements VerificationTask {
         Map<String, String> initial = combineVariables();
         Map<String, String> combinedMappings = combinedMappings();
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings)
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings, getEncoding())
             .execute(callback);
 
         altered = callback.getAffected()

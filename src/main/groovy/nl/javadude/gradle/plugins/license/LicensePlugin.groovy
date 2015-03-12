@@ -88,6 +88,7 @@ class LicensePlugin implements Plugin<Project> {
             skipExistingHeaders = false
             useDefaultMappings = true
             strictCheck = false
+            encoding = System.properties['file.encoding']
             conventionMapping.with {
                 sourceSets = { [] }
             }
@@ -194,6 +195,7 @@ class LicensePlugin implements Plugin<Project> {
             inheritedMappings = { extension.internalMappings }
             excludes = { extension.excludePatterns }
             includes = { extension.includePatterns }
+            encoding = { extension.encoding }
         }
     }
 

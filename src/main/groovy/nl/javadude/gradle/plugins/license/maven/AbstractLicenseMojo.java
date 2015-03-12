@@ -39,7 +39,7 @@ public class AbstractLicenseMojo {
     protected String[] keywords = new String[] { "copyright" };
     protected String[] headerDefinitions = new String[0]; // TODO Not sure how a user would specify
     protected HeaderSection[] headerSections = new HeaderSection[0];
-    protected String encoding = System.getProperty("file.encoding");
+    protected String encoding;
     protected float concurrencyFactor = 1.5f;
     protected Map<String, String> mapping;
     
@@ -50,9 +50,9 @@ public class AbstractLicenseMojo {
     File header;
     FileCollection source;
 
-    public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial,
-                    boolean dryRun, boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck,
-                    File header, FileCollection source, Map<String, String> mapping) {
+    public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial, boolean dryRun,
+			boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck, File header, FileCollection source,
+			Map<String, String> mapping, String encoding) {
         super();
         this.validHeaders = validHeaders;
         this.rootDir = rootDir;
@@ -64,6 +64,7 @@ public class AbstractLicenseMojo {
         this.header = header;
         this.source = source;
         this.mapping = mapping;
+        this.encoding = encoding;
     }
 
     protected void execute(final Callback callback) throws MalformedURLException {
