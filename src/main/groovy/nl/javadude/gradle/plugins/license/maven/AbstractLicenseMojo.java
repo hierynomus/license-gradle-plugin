@@ -64,7 +64,7 @@ public class AbstractLicenseMojo {
         this.header = header;
         this.source = source;
         this.mapping = mapping;
-	this.encoding = encoding;
+        this.encoding = encoding;
     }
 
     protected void execute(final Callback callback) throws MalformedURLException {
