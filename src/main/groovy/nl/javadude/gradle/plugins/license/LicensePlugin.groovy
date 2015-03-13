@@ -250,7 +250,10 @@ class LicensePlugin implements Plugin<Project> {
 
     private void configureAndroid() {
         configureExtensionRule(AppPlugin)
-        configureAndroidSourceSetRule()
+        project.afterEvaluate {
+            // Since we're going to look at the extension, we need to run late enough to let the user configure it
+            configureAndroidSourceSetRule()
+        }
         configureTaskRule()
         
     }

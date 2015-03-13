@@ -25,7 +25,7 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.assertThat
-import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertFalse
 
 class AndroidLicensePluginTest {
     Project project
@@ -33,13 +33,17 @@ class AndroidLicensePluginTest {
     @Before
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
-        project.apply plugin: 'license'
+        def plugin = project.plugins.apply(LicensePlugin)
+        project.apply plugin: 'com.android.application'
+
+        // Otherwise we'd need a project.evaluate() which would trigger Android SDK detection
+        plugin.configureAndroidSourceSetRule()
     }
 
     @Test
     public void shouldAddLicenseTask() {
         def tasks = project.tasks.withType(License.class).findAll { true }
-        assertTrue tasks.isEmpty()
+        assertFalse tasks.isEmpty()
     }
 
     @Test
@@ -71,48 +75,41 @@ class AndroidLicensePluginTest {
     
     @Test
     public void shouldFindTwoLicenseTaskPerSourceSet() {
-        project.apply plugin: 'com.android.application'
         def tasks = project.tasks.withType(License.class).findAll { true }
         assertThat tasks.size(), is(8) // [main,androidTest, release, debug].count * 2
     }
 
     @Test
     public void shouldFindMainLicenseTask() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.getByName("licenseAndroidMain")
         assertThat task, instanceOf(License.class)
     }
     
     @Test
     public void shouldFindDebugLicenseTask() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.getByName("licenseAndroidDebug")
         assertThat task, instanceOf(License.class)
     }
     
     @Test
     public void shouldFindReleaseLicenseTask() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.getByName("licenseAndroidRelease")
         assertThat task, instanceOf(License.class)
     }
     
     @Test
     public void shouldFindTestLicenseTask() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.getByName("licenseAndroidAndroidTest")
         assertThat task, instanceOf(License.class)
     }
     
     @Test
     public void extensionShouldHaveSourceSetsWithJava() {
-        project.apply plugin: 'com.android.application'
         assertThat project.license.sourceSets.size(), equalTo(project.sourceSets.size())
     }
     
     @Test
     public void shouldConfigureLicenseForTasks() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks['licenseAndroidMain']
         
         assertThat task.header.name, is("LICENSE")
@@ -120,7 +117,6 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldConfigureManuallyConfiguredTask() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.create('licenseManual', License)
         
         assertThat task.header.name, is("LICENSE")
@@ -128,7 +124,6 @@ class AndroidLicensePluginTest {
 
     @Test
     public void manualTaskShouldInheritFromExtension() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.create('licenseManual', License)
 
         assertThat project.license.ignoreFailures, is(false) // Default
@@ -142,7 +137,6 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldRunLicenseDuringCheck() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.create('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
@@ -154,7 +148,6 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldRunLicenseFromBaseTasks() {
-        project.apply plugin: 'com.android.application'
         def task = project.tasks.create('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['license'].getDependsOn()
@@ -174,8 +167,6 @@ class AndroidLicensePluginTest {
     
     @Test
     public void canAddMappingsAtMultipleLevels() {
-        project.apply plugin: 'com.android.application'
-
         def task = project.tasks['licenseAndroidMain']
         project.license.mapping {
             map1='VALUE1'
@@ -189,4 +180,3 @@ class AndroidLicensePluginTest {
         assert mappings.containsKey('map2')
     }
 }
-

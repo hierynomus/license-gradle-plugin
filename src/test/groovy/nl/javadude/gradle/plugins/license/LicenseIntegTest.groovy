@@ -37,7 +37,8 @@ class LicenseIntegTest {
         projectDir = Files.createTempDir()
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         project.apply plugin: 'java'
-        project.apply plugin: 'license'
+        def plugin = project.plugins.apply(LicensePlugin)
+        plugin.configureSourceSetRule()
 
         project.license.ignoreFailures = true
 
