@@ -1,4 +1,4 @@
 language: groovy
 
 jdk:
-  - openjdk6
+  - openjdk7
