@@ -19,7 +19,7 @@ package nl.javadude.gradle.plugins.license
 
 import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.AppPlugin
-    
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -68,14 +68,25 @@ class LicensePlugin implements Plugin<Project> {
             withType(JavaBasePlugin) {
                 configureJava()
             }
-            
-            withType(AppPlugin) {
+
+            withOptionalPlugin('com.android.build.gradle.AppPlugin') {
                 configureAndroid()
             }
 
         }
         
         
+    }
+    void withOptionalPlugin(String pluginClassName, Action<? extends Plugin> configureAction) {
+        try {
+
+            def pluginClass = LicensePlugin.class.forName(pluginClassName)
+            // Will most likely throw a ClassNotFoundException
+            project.plugins.withType(pluginClass, configureAction)
+
+        } catch(ClassNotFoundException nfe) {
+            // do nothing
+        }
     }
 
     protected LicenseExtension createExtension() {

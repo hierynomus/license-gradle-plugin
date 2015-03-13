@@ -5,6 +5,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'license'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'optional-base'
 
 buildscript {
     repositories {
@@ -13,6 +14,7 @@ buildscript {
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
     }
 }
 
@@ -40,7 +42,7 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.android.tools.build:gradle:1.0.+'
+    compile 'com.android.tools.build:gradle:1.0.+', optional
     compile gradleApi()
 
     testCompile 'junit:junit:4.11'

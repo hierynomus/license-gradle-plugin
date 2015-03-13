@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 configurations.compile.transitive = false
