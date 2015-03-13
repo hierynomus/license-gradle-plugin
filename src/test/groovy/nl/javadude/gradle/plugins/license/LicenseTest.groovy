@@ -29,7 +29,9 @@ class LicenseTest {
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
         project.apply plugin: 'java'
-        project.apply plugin: 'license'
+        def plugin = project.plugins.apply(LicensePlugin)
+        plugin.configureSourceSetRule()
+
     }
 
     @Test

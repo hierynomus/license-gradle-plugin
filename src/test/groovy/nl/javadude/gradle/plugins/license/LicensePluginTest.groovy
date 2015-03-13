@@ -33,7 +33,9 @@ class LicensePluginTest {
     @Before
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
-        project.apply plugin: 'license'
+        def plugin = project.plugins.apply(LicensePlugin)
+        plugin.configureSourceSetRule()
+
     }
 
     @Test
