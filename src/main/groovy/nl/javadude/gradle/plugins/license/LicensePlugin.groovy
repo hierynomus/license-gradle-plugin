@@ -61,8 +61,6 @@ class LicensePlugin implements Plugin<Project> {
         extension = createExtension()
         downloadLicensesExtension = createDownloadLicensesExtension()
 
-        
-        
         project.plugins.with {
             
             withType(JavaBasePlugin) {
@@ -74,8 +72,6 @@ class LicensePlugin implements Plugin<Project> {
             }
 
         }
-        
-        
     }
 
     protected LicenseExtension createExtension() {
@@ -202,7 +198,10 @@ class LicensePlugin implements Plugin<Project> {
     private void configureJava() {
         
         configureExtensionRule(JavaBasePlugin)
-        configureSourceSetRule()
+        project.afterEvaluate {
+            // Since we're going to look at the extension, we need to run late enough to let the user configure it
+            configureSourceSetRule()
+        }
         configureTaskRule()
         
     }
