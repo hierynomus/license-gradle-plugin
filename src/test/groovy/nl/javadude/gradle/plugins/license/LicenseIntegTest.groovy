@@ -37,7 +37,8 @@ class LicenseIntegTest {
         projectDir = Files.createTempDir()
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         project.apply plugin: 'java'
-        project.apply plugin: 'license'
+        def plugin = project.plugins.apply(LicensePlugin)
+        plugin.configureSourceSetRule()
 
         project.license.ignoreFailures = true
 
@@ -96,6 +97,18 @@ class LicenseIntegTest {
 
         assert licenseTask.altered.size()  == 1
         assert Iterables.get(licenseTask.altered, 0).equals(propFile)
+    }
+
+    @Test
+    public void canAddMappingForDoubleExtension() {
+      File freemarker = createFreemarkerShellFile()
+
+      project.license.mapping("sh.ftl",'SCRIPT_STYLE')
+
+      licenseTask.execute()
+      assert licenseTask.altered.size() == 1
+      assert Iterables.get(licenseTask.altered, 0).equals(freemarker)
+
     }
 
     @Test
@@ -269,6 +282,14 @@ key2 = value2
         Files.createParentDirs(file);
         file << '''keyA = valueB
 keyB = valueB
+'''
+    }
+
+    public File createFreemarkerShellFile() {
+        File file = project.file("src/main/resources/prop.sh.ftl")
+        Files.createParentDirs(file);
+        file << '''#!/bin/bash
+echo "Hello world!"
 '''
     }
 

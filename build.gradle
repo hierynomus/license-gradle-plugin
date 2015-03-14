@@ -5,6 +5,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'license'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'optional-base'
 
 buildscript {
     repositories {
@@ -13,13 +14,14 @@ buildscript {
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
     }
 }
 
 group = 'nl.javadude.gradle.plugins'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories { jcenter() }
 
@@ -30,15 +32,21 @@ idea {
     }
 }
 
+configurations.compile.transitive = false
+
 dependencies {
+    compile "org.codehaus.plexus:plexus-utils:2.0.5"
+    compile "com.mycila.xmltool:xmltool:3.3"
     // Using compile instead of groovy, so that it goes into the pom
     compile ('com.mycila.maven-license-plugin:maven-license-plugin:1.10.b1') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.google.guava:guava:17.0'
+    compile 'com.android.tools.build:gradle:1.0.+', optional
     compile gradleApi()
+
     testCompile 'junit:junit:4.11'
+    testCompile 'com.google.guava:guava:17.0'
     testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
@@ -63,6 +71,16 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 license {
     ignoreFailures true
+}
+
+test {
+  afterSuite { descriptor, result ->
+    def indicator = "\u001B[32m✓\u001b[0m"
+    if (result.failedTestCount > 0) {
+      indicator = "\u001B[31m✘\u001b[0m"
+    }
+    logger.lifecycle("$indicator Test ${descriptor.name}; Executed: ${result.testCount}/\u001B[32m${result.successfulTestCount}\u001B[0m/\u001B[31m${result.failedTestCount}\u001B[0m")
+  }
 }
 
 def pomConfig = {
@@ -147,6 +165,6 @@ bintray {
 if (!System.env.containsKey("JENKINS_URL")) {
     def javaVersion = System.properties['java.version']
     if (JavaVersion.toVersion(javaVersion) != project.targetCompatibility) {
-        throw new GradleException("Expected Java version ${project.targetCompatibility} but running with $javaVersion")
+//        throw new GradleException("Expected Java version ${project.targetCompatibility} but running with $javaVersion")
     }
 }

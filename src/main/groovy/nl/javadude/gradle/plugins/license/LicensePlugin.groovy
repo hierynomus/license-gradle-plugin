@@ -17,6 +17,9 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.android.build.gradle.api.AndroidSourceSet
+import com.android.build.gradle.AppPlugin
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -33,7 +36,7 @@ class LicensePlugin implements Plugin<Project> {
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY = "dependency-license"
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE = "license-dependency"
     static final String DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE = "runtime"
-
+    
     protected Project project
     protected LicenseExtension extension
     protected DownloadLicensesExtension downloadLicensesExtension
@@ -44,11 +47,11 @@ class LicensePlugin implements Plugin<Project> {
     protected Task baseCheckTask
     protected Task baseFormatTask
     protected Task downloadLicenseTask
-
+    
     void apply(Project project) {
         this.project = project
         project.plugins.apply(ReportingBasePlugin)
-        project.plugins.apply(JavaBasePlugin) // First plugin which offers sourceSets
+
 
         // Create a single task to run all license checks and reformattings
         baseCheckTask = project.task(taskBaseName)
@@ -58,9 +61,28 @@ class LicensePlugin implements Plugin<Project> {
         extension = createExtension()
         downloadLicensesExtension = createDownloadLicensesExtension()
 
-        configureExtensionRule()
-        configureSourceSetRule()
-        configureTaskRule()
+        project.plugins.with {
+            
+            withType(JavaBasePlugin) {
+                configureJava()
+            }
+
+            withOptionalPlugin('com.android.build.gradle.AppPlugin') {
+                configureAndroid()
+            }
+
+        }
+    }
+    void withOptionalPlugin(String pluginClassName, Action<? extends Plugin> configureAction) {
+        try {
+
+            def pluginClass = LicensePlugin.class.forName(pluginClassName)
+            // Will most likely throw a ClassNotFoundException
+            project.plugins.withType(pluginClass, configureAction)
+
+        } catch(ClassNotFoundException nfe) {
+            // do nothing
+        }
     }
 
     protected LicenseExtension createExtension() {
@@ -74,7 +96,12 @@ class LicensePlugin implements Plugin<Project> {
             skipExistingHeaders = false
             useDefaultMappings = true
             strictCheck = false
+            encoding = System.properties['file.encoding']
+            conventionMapping.with {
+                sourceSets = { [] }
+            }
         }
+        
 
         logger.info("Adding license extension");
         return extension
@@ -112,14 +139,9 @@ class LicensePlugin implements Plugin<Project> {
     /**
      * Establish defaults for extension, which will be all sourceSets
      */
-    protected void configureExtensionRule() {
-        
-        // Reasonable default values, incase the next block doesn't find anything, e.g. lack of 
-        extension.conventionMapping.with {
-            sourceSets = { [] }
-        }
+    protected void configureExtensionRule(Class type) {
 
-        project.plugins.withType(JavaBasePlugin) {
+        project.plugins.withType(type) {
             // Defaults to use having all the sourceSets
             extension.conventionMapping.sourceSets = { project.sourceSets }
         }
@@ -182,7 +204,19 @@ class LicensePlugin implements Plugin<Project> {
             inheritedMappings = { extension.internalMappings }
             excludes = { extension.excludePatterns }
             includes = { extension.includePatterns }
+            encoding = { extension.encoding }
         }
+    }
+
+    private void configureJava() {
+        
+        configureExtensionRule(JavaBasePlugin)
+        project.afterEvaluate {
+            // Since we're going to look at the extension, we need to run late enough to let the user configure it
+            configureSourceSetRule()
+        }
+        configureTaskRule()
+        
     }
 
     /**
@@ -225,6 +259,74 @@ class LicensePlugin implements Plugin<Project> {
 
         // Default to all source files from SourceSet
         task.source = sourceSet.allSource
+    }
+
+    private void configureAndroid() {
+        configureExtensionRule(AppPlugin)
+        project.afterEvaluate {
+            // Since we're going to look at the extension, we need to run late enough to let the user configure it
+            configureAndroidSourceSetRule()
+        }
+        configureTaskRule()
+        
+    }
+    
+
+    /**
+     * Dynamically create a task for each sourceSet, and register with check
+     */
+    private void configureAndroidSourceSetRule() {
+        // This follows the other check task pattern
+        project.plugins.withType(AppPlugin) {
+            extension.sourceSets.all { AndroidSourceSet sourceSet ->
+                def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name.capitalize())
+                logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
+
+                License checkTask = project.tasks.create(sourceSetTaskName, License)
+                checkTask.check = true
+                configureForAndroidSourceSet(sourceSet, checkTask)
+                baseCheckTask.dependsOn checkTask
+
+                // Add independent license task, which will perform format
+                def sourceSetFormatTaskName = (taskBaseName + 'FormatAndroid'+ sourceSet.name.capitalize())
+                License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
+                formatTask.check = false
+                configureForAndroidSourceSet(sourceSet, formatTask)
+                baseFormatTask.dependsOn formatTask
+
+                // Add independent clean task to remove headers
+                // TODO
+            }
+
+            // Add license checking into check lifecycle, since its a type of code quality plugin
+        
+            project.tasks['check'].dependsOn baseCheckTask
+
+        }
+    }
+
+    protected void configureForAndroidSourceSet(AndroidSourceSet sourceSet, License task) {
+        task.with {
+            // Explicitly set description
+            description = "Scanning license on ${sourceSet.name} files"
+        }
+
+        sourceSet.properties.each { key, val ->
+            logger.debug("[AndroidLicensePlugin] sourceSet.$key:$val");
+        }
+        
+        ArrayList androidSource = new ArrayList<File>();
+        
+        for (File file : sourceSet.java.sourceFiles) {
+            androidSource.add(file);
+        }
+        
+        for (File file : sourceSet.res.sourceFiles) {
+            androidSource.add(file);
+        }
+        
+        task.source = project.files(androidSource)
+
     }
 
 }

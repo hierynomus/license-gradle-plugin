@@ -5,13 +5,7 @@ import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -32,9 +26,6 @@ import com.google.code.mojo.license.header.AdditionalHeaderDefinition;
 import com.google.code.mojo.license.header.Header;
 import com.google.code.mojo.license.header.HeaderDefinition;
 import com.google.code.mojo.license.header.HeaderType;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.base.Function;
 
 import com.mycila.xmltool.XMLDoc;
 
@@ -49,7 +40,7 @@ public class AbstractLicenseMojo {
     protected String[] keywords = new String[] { "copyright" };
     protected String[] headerDefinitions = new String[0]; // TODO Not sure how a user would specify
     protected HeaderSection[] headerSections = new HeaderSection[0];
-    protected String encoding = System.getProperty("file.encoding");
+    protected String encoding;
     protected float concurrencyFactor = 1.5f;
     protected Map<String, String> mapping;
     
@@ -62,7 +53,7 @@ public class AbstractLicenseMojo {
 
     public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial,
                     boolean dryRun, boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck,
-                    URI header, FileCollection source, Map<String, String> mapping) {
+                    URI header, FileCollection source, Map<String, String> mapping, String encoding) {
         super();
         this.validHeaders = validHeaders;
         this.rootDir = rootDir;
@@ -74,6 +65,7 @@ public class AbstractLicenseMojo {
         this.header = header;
         this.source = source;
         this.mapping = mapping;
+        this.encoding = encoding;
     }
 
     protected void execute(final Callback callback) throws MalformedURLException {
@@ -175,11 +167,10 @@ public class AbstractLicenseMojo {
                         : new HashMap<String, String>();
                         
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
-        Set<String> validHeaderTypes = Sets.newHashSet(Lists.transform(headerTypes, new Function<HeaderType, String>() {
-            public String apply(HeaderType headerType) {
-                return headerType.name();
-            }
-        }));
+        Set<String> validHeaderTypes = new HashSet<String>();
+        for (HeaderType headerType : headerTypes) {
+            validHeaderTypes.add(headerType.name());
+        }
 
         for (Map.Entry<String, String> entry : mapping.entrySet()) {
             String headerType = entry.getValue().toUpperCase();

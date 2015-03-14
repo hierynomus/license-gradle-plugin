@@ -63,6 +63,11 @@ public class License extends SourceTask implements VerificationTask {
     
     boolean strictCheck
 
+    /**
+     * The encoding used to open files
+     */
+    String encoding
+
     @InputFile
     File header
 
@@ -86,10 +91,8 @@ public class License extends SourceTask implements VerificationTask {
     @TaskAction
     protected void process() {
         // Plain weird, but this ensures that the lazy closure from the extension is properly wired into the excludes field of the SourceTask.
-      logger.info("$path: ${getExcludes()}")
-      logger.info("$path: ${getIncludes()}")
-        excludes = getExcludes()
-        includes = getIncludes()
+        this.excludes = getExcludes()
+        this.includes = getIncludes()
 
         if (!enabled) {
             didWork = false;
@@ -107,7 +110,7 @@ public class License extends SourceTask implements VerificationTask {
 
         def uri = getHeaderURI() ?: getHeader().toURI()
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings)
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding())
             .execute(callback);
 
         altered = callback.getAffected()
@@ -135,6 +138,7 @@ public class License extends SourceTask implements VerificationTask {
         Map<String, String> combinedMappings = new HashMap<String, String>();
         if (isUseDefaultMappings()) {
             // Sprinkle in some other well known types, which maven-license-plugin doesn't have
+            combinedMappings.put('gradle', 'JAVADOC_STYLE')
             combinedMappings.put('json', 'JAVADOC_STYLE')
             combinedMappings.put('scala', 'JAVADOC_STYLE')
             combinedMappings.put('gsp', 'DYNASCRIPT_STYLE')
