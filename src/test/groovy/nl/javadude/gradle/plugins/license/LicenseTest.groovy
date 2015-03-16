@@ -18,25 +18,46 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
 class LicenseTest {
-    Project project
+
+    License task
 
     @Before
     public void setupProject() {
-        project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
+        Project project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
         project.apply plugin: 'java'
         def plugin = project.plugins.apply(LicensePlugin)
         plugin.configureSourceSetRule()
+        task = project.tasks['licenseMain']
 
     }
 
     @Test
-    public void shouldRunTask() {
-        project.tasks['licenseMain'].execute()
+    public void shouldRunTaskWithoutException() {
+        task.execute()
+    }
+
+    @Test
+    public void shoudUseUriHeader() {
+        def uri = new URI("https://www.gnu.org/licenses/lgpl.txt")
+        def file = new File('LICENSE')
+
+        // When
+        task.header = file
+
+        // Then
+        assert task.getURI().getPath().endsWith("LICENSE")
+
+        // When
+        task.headerURI = uri
+
+        // Then
+        assert task.getURI() == uri
     }
 }
 

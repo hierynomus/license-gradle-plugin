@@ -4,6 +4,7 @@ import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -47,12 +48,12 @@ public class AbstractLicenseMojo {
     boolean skipExistingHeaders;
     boolean useDefaultMappings;
     boolean strictCheck;
-    File header;
+    URI header;
     FileCollection source;
 
-    public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial, boolean dryRun,
-			boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck, File header, FileCollection source,
-			Map<String, String> mapping, String encoding) {
+    public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial,
+                    boolean dryRun, boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck,
+                    URI header, FileCollection source, Map<String, String> mapping, String encoding) {
         super();
         this.validHeaders = validHeaders;
         this.rootDir = rootDir;
@@ -70,7 +71,7 @@ public class AbstractLicenseMojo {
     protected void execute(final Callback callback) throws MalformedURLException {
         Map<String, String> props = mergeProperties();
 
-        final Header h = new Header(header.toURI().toURL(), props, headerSections);
+        final Header h = new Header(header.toURL(), props, headerSections);
         logger.debug("Header {}:\n{}", h.getLocation(), h);
 
         if (this.validHeaders == null)

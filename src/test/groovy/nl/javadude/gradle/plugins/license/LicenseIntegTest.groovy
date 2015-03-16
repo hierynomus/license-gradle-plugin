@@ -260,6 +260,18 @@ key2 = value2
         assert licenseTask.altered.size() == 1
     }
 
+    @Test
+    public void shouldApplyFromClasspath() {
+        File propFile = createPropertiesFile()
+
+        licenseTask.headerURI = License.class.getResource("/license/silly.txt").toURI()
+
+        licenseTask.execute()
+
+        assert licenseTask.altered.size() == 1
+        propFile.text.startsWith("# It’s mine, I tell you, mine!")
+    }
+
     public File createLicenseFile() {
         File file = project.file("LICENSE")
         Files.createParentDirs(file);

@@ -10,7 +10,7 @@ This plugin will also report on the licenses of your dependencies.
 From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.com and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
 
 
-### Gradle 2.1
+### Gradle 2.1 and above
 In your _build.gradle_ file add:
 ```
 plugins {
@@ -65,6 +65,7 @@ This will also add a task to manage the downloading and reporting of licenses of
 The license task has a properties, most can be set in the extension:
 
 - header -- Specify location of header to use in comparisons, default to project.file('LICENSE')
+- headerURI -- Specify location of header as a URI, see section below on Header Locations for examples
 - ignoreFailures -- Prevent tasks from stopping the build, defaults to false
 - dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
 - skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
@@ -88,6 +89,7 @@ license {
 Here is a general overview of the options:
 
 - header -- Specify location of header to use in comparisons, default to project.file('LICENSE')
+- headerURI -- Specify location of header as a URI.
 - ignoreFailures -- Prevent tasks from stopping the build, defaults to false
 - dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
 - skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
@@ -101,6 +103,37 @@ Here is a general overview of the options:
 - excludes(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
 - include(String pattern) -- Add an ANT style pattern to include files into license absence reporting and license application
 - includes(Collection<String> patterns) -- Add ANT style patterns to include files into license absence reporting and license application
+
+### Header Locations
+
+The plugin can load a reference license file from the local file system with the _header_ property.
+
+```
+    license { header = file('LGPL.txt') }
+```
+
+To load a license from a URI directly it can be _headerURI_ property.
+
+```
+    license { headerURI = new URI("https://www.gnu.org/licenses/lgpl.txt") }
+```
+
+The problem with that approach is that we're requiring a network call to run the task. Another option is
+to load the license from the classpath. This is most commonly seen from a plugin which is configuring this
+plugin. First you'd bundle a _LICENSE.TXT_ file into the _src/main/resources/META-INF_ directory. Then you'd
+configure this plugin like the below code.
+
+```
+    license { headerURI = myPlugin.class.getResource("/META-INF/LICENSE.TXT").toURI() }
+```
+
+In regards to the header, tasks can be configured individually or in bulk also,
+
+```
+    licenseFormatMain.header = file('APL.txt')
+    // or
+    tasks.withType(License) { header = file('LGPL.txt') }
+```
 
 ### File Types
 Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in the parent project at http://code.mycila.com/license-maven-plugin/#supported-comment-types.

@@ -68,8 +68,18 @@ public class License extends SourceTask implements VerificationTask {
      */
     String encoding
 
+    @Optional
     @InputFile
     File header
+
+    /**
+     * In leiu of a header file on the local filesystem, this property lets you provide a URL that could be
+     * in the classpath or on a remote system. When configured across a few projects, it would mean that a
+     * header file doesn't have to be in each project.
+     */
+    @Optional
+    @Input
+    URI headerURI
 
     @OutputFiles
     Iterable<File> altered = new ArrayList<File>()
@@ -100,7 +110,9 @@ public class License extends SourceTask implements VerificationTask {
         Map<String, String> initial = combineVariables();
         Map<String, String> combinedMappings = combinedMappings();
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), getHeader(), source, combinedMappings, getEncoding())
+        URI uri = getURI()
+
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding())
             .execute(callback);
 
         altered = callback.getAffected()
@@ -110,6 +122,14 @@ public class License extends SourceTask implements VerificationTask {
             throw new GradleException("License violations were found: ${callback.affected.join(',')}}")
         }
 
+    }
+
+    URI getURI() {
+        def uri = getHeaderURI() ?: getHeader().toURI()
+        if (!uri) {
+            throw new GradleException("A headerUri or header has to be provided to the License task")
+        }
+        uri
     }
 
     // Setup up variables
