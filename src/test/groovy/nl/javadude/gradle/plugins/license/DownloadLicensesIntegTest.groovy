@@ -56,6 +56,23 @@ class DownloadLicensesIntegTest extends Specification {
         ant.delete(dir: projectDir)
     }
 
+    def "Test that poms with xlint args are handled"() {
+        setup:
+        project.dependencies {
+            compile "com.sun.mail:javax.mail:1.5.4"
+        }
+
+        when:
+        downloadLicenses.execute()
+  
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+        dependenciesInReport(xml4LicenseByDependencyReport(f)) == 2
+        licensesInReport(xml4DependencyByLicenseReport(f)) == 2
+        
+    }
+
     def "Test that report generating in multi module build doesn't include unrelated subprojects dependencies"() {
         setup:
         subproject.dependencies {
