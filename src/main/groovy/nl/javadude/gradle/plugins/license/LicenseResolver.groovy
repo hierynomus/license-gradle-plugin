@@ -188,7 +188,7 @@ class LicenseResolver {
         Configuration pomConfiguration = project.configurations.detachedConfiguration(d)
 
         File pStream = pomConfiguration.resolve().asList().first()
-        GPathResult xml = new XmlSlurper().parse(pStream)
+        GPathResult xml = new XmlSlurper(true, false).parse(pStream)
         DependencyMetadata pomData = new DependencyMetadata(dependency: initialDependency)
 
         xml.licenses.license.each {
