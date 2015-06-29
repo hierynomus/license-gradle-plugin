@@ -154,6 +154,8 @@ public class License extends SourceTask implements VerificationTask {
             combinedMappings.put('gsp', 'DYNASCRIPT_STYLE')
             combinedMappings.put('groovy', 'SLASHSTAR_STYLE')
             combinedMappings.put('clj', 'SEMICOLON_STYLE')
+            combinedMappings.put('yaml', 'SCRIPT_STYLE')
+            combinedMappings.put('yml', 'SCRIPT_STYLE')
         }
         if (getInheritedMappings() != null) {
             combinedMappings.putAll(getInheritedMappings());
