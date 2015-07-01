@@ -538,6 +538,31 @@ class DownloadLicensesIntegTest extends Specification {
         dependencyWithLicensePresent(xmlByDependency, "dep3.jar", "dep3.jar", "No license found")
     }
 
+    def "Test that we can exclude with dynamic version"() {
+       setup:
+       project.dependencies {
+          compile 'com.google.guava:guava:15.0'
+          compile 'com.sun.mail:javax.mail:1.5.+'
+       }
+
+       project.downloadLicenses {
+          excludeDependencies = ["com.google.guava:guava:+", "com.sun.mail:javax.mail:1.5.+"]
+       }
+
+       when:
+       downloadLicenses.execute()
+
+       then:
+       File f = getLicenseReportFolder()
+       assertLicenseReportsExist(f)
+
+       def xmlByDependency = xml4LicenseByDependencyReport(f)
+       def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+       dependenciesInReport(xmlByDependency) == 1
+       licensesInReport(xmlByLicense) == 1
+    }
+
     def "Test that we can exclude particular external dependencies from report"() {
         setup:
         project.dependencies {
