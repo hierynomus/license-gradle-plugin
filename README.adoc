@@ -71,7 +71,7 @@ This will also add a task to manage the downloading and reporting of licenses of
 == License Task
 The license task has a properties, most can be set in the extension:
 
-[cols="h,"]
+[cols="h,d"]
 |====
 |header |Specify location of header to use in comparisons, default to project.file('LICENSE')
 |headerURI |Specify location of header as a URI, see section below on Header Locations for examples
