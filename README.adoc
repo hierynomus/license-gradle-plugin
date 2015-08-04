@@ -78,7 +78,7 @@ The license task has a properties, most can be set in the extension:
 |ignoreFailures |Prevent tasks from stopping the build, defaults to false
 |dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
-|useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types for the complete list
+|useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
 |sourceSets |List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
@@ -99,21 +99,24 @@ license {
 
 Here is a general overview of the options:
 
-- header -- Specify location of header to use in comparisons, default to project.file('LICENSE')
-- headerURI -- Specify location of header as a URI.
-- ignoreFailures -- Prevent tasks from stopping the build, defaults to false
-- dryRun -- Show what would happen if the task was run, defaults to false but also inherits from --dryRun
-- skipExistingHeaders -- Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
-- useDefaultMappings -- Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types for the complete list
-- strictCheck -- Be extra strict in the formatting of existing headers, defaults to false
-- sourceSets -- List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
-- mapping(String ext, String style) -- Adds a mapping between a file extension and a style type
-- mapping(Map<String,String> mappings) -- Adds mappings between file extensions and style types
-- mapping(Closure) -- Adds mappings between file extensions and a style types, see example below
-- exclude(String pattern) -- Add an ANT style pattern to exclude files from license absence reporting and license application
-- excludes(Collection<String> patterns) -- Add ANT style patterns to exclude files from license absence reporting and license application
-- include(String pattern) -- Add an ANT style pattern to include files into license absence reporting and license application
-- includes(Collection<String> patterns) -- Add ANT style patterns to include files into license absence reporting and license application
+[cols="h,d"]
+|====
+|header |Specify location of header to use in comparisons, default to `project.file('LICENSE')`
+|headerURI |Specify location of header as a URI.
+|ignoreFailures |Prevent tasks from stopping the build, defaults to false
+|dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
+|skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
+|useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
+|strictCheck |Be extra strict in the formatting of existing headers, defaults to false
+|sourceSets |List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
+|mapping(String ext, String style) |Adds a mapping between a file extension and a style type
+|mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
+|mapping(Closure) |Adds mappings between file extensions and a style types, see example below
+|exclude(String pattern) |Add an ANT style pattern to exclude files from license absence reporting and license application
+|excludes(Collection<String> patterns) |Add ANT style patterns to exclude files from license absence reporting and license application
+|include(String pattern) |Add an ANT style pattern to include files into license absence reporting and license application
+|includes(Collection<String> patterns) |Add ANT style patterns to include files into license absence reporting and license application
+|====
 
 === Header Locations
 
@@ -176,7 +179,6 @@ Defining new comment types is not currently supported, but file a bug and it can
 === Variable substitution
 Variables in the format `${}` format will be substituted, as long as their values are provided in the extension or the task.
 
-[source,groovy]
 ----
     Copyright (C) ${year} ${name} <${email}>
 ----
@@ -250,11 +252,14 @@ licenseFormat.dependsOn licenseFormatSql
 == License Reporting
 The downloadLicense task has a set of properties, most can be set in the extension:
 
-- includeProjectDependencies -- true if you want to include the transitive dependencies of your project dependencies
-- licenses -- a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
-- aliases -- a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
-- excludeDependencies -- a List of dependencies that are to be excluded from reporting
-- dependencyConfiguration -- Gradle dependency configuration to report on (defaults to "runtime").
+[cols="h,d"]
+|====
+|includeProjectDependencies |true if you want to include the transitive dependencies of your project dependencies
+|licenses |a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
+|aliases |a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
+|excludeDependencies |a List of dependencies that are to be excluded from reporting
+|dependencyConfiguration |Gradle dependency configuration to report on (defaults to "runtime").
+|====
 
 A 'license()' method is made available by the License Extension that takes two Strings, the first is the license name, the second is the URL to the license.
 
