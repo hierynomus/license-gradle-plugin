@@ -76,7 +76,7 @@ The license task has a properties, most can be set in the extension:
 |header |Specify location of header to use in comparisons, default to project.file('LICENSE')
 |headerURI |Specify location of header as a URI, see section below on Header Locations for examples
 |ignoreFailures |Prevent tasks from stopping the build, defaults to false
-|dryRun |Show what would happen if the task was run, defaults to false but also inherits from --dryRun
+|dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types for the complete list
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
