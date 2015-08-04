@@ -9,7 +9,7 @@ This plugin will scan and adapt your source files to include a provided header, 
 This plugin will also report on the licenses of your dependencies.
 
 == Usage
-From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.com and will be available through the [http://plugins.gradle.org/](Gradle plugin exchange). This means that there are a few different usage scenarios listed below.
+From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.com[] and will be available through the http://plugins.gradle.org/[Gradle plugin exchange]. This means that there are a few different usage scenarios listed below.
 
 
 === Gradle 2.1 and above
@@ -283,18 +283,17 @@ downloadLicenses {
 == Changelog
 
 === v0.11.0
-- Added support for uploading to bintray (Fixes [#46](https://github.com/hierynomus/license-gradle-plugin/issues/46) and [#47](https://github.com/hierynomus/license-gradle-plugin/issues/47))
+- Added support for uploading to bintray (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/46[#46] and https://github.com/hierynomus/license-gradle-plugin/issues/47[#47])
 - Upgraded to Gradle 2.0
 
 === v0.10.0
 - Fixed build to enforce Java6 only for local builds, not on BuildHive
-- Added `exclude` / `excludes` to extension (Fixes [#39](https://github.com/hierynomus/license-gradle-plugin/issues/39))
-- Added `include` / `includes` to extension (Fixes [#45](https://github.com/hierynomus/license-gradle-plugin/issues/45))
+- Added `exclude` / `excludes` to extension (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/39[#39])
+- Added `include` / `includes` to extension (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/45[#45])
 
 === v0.9.0
-- Fixed build to force Java6 (Fixes [#35](https://github.com/hierynomus/license-gradle-plugin/issues/35))
-- Added example test for [#38](https://github.com/hierynomus/license-gradle-plugin/issues/38)
+- Fixed build to force Java6 (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/35[#35])
+- Added example test for https://github.com/hierynomus/license-gradle-plugin/issues/38[#38]
 
 === v0.8.0
-- Merged pull-requests [#31](https://github.com/hierynomus/license-gradle-plugin/pull/31), [#33](https://github.com/hierynomus/license-gradle-plugin/pull/33), [#42](https://github.com/hierynomus/license-gradle-plugin/pull/42)
-- 
+- Merged pull-requests https://github.com/hierynomus/license-gradle-plugin/pull/31[#31], https://github.com/hierynomus/license-gradle-plugin/pull/33[#33], https://github.com/hierynomus/license-gradle-plugin/pull/42[#42]
