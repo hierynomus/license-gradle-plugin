@@ -187,7 +187,14 @@ class LicenseResolver {
         Dependency d = project.dependencies.create("$dependencyDesc@pom")
         Configuration pomConfiguration = project.configurations.detachedConfiguration(d)
 
-        File pStream = pomConfiguration.resolve().asList().first()
+        File pStream
+        try {
+            pStream = pomConfiguration.resolve().asList().first()
+        } catch (ResolveException) {
+            logger.warn("Unable to retrieve license for $dependencyDesc")
+            return noLicenseMetaData(dependencyDesc)
+        }
+
         XmlSlurper slurper = new XmlSlurper(true, false)
         slurper.setErrorHandler(new org.xml.sax.helpers.DefaultHandler())
         GPathResult xml = slurper.parse(pStream)
