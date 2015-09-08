@@ -62,7 +62,6 @@ class LicensePlugin implements Plugin<Project> {
         downloadLicensesExtension = createDownloadLicensesExtension()
 
         project.plugins.with {
-            
             withType(JavaBasePlugin) {
                 configureJava()
             }
@@ -70,9 +69,11 @@ class LicensePlugin implements Plugin<Project> {
             withOptionalPlugin('com.android.build.gradle.AppPlugin') {
                 configureAndroid()
             }
-
         }
+
+        configureTaskRule()
     }
+
     void withOptionalPlugin(String pluginClassName, Action<? extends Plugin> configureAction) {
         try {
 
@@ -209,14 +210,11 @@ class LicensePlugin implements Plugin<Project> {
     }
 
     private void configureJava() {
-        
         configureExtensionRule(JavaBasePlugin)
         project.afterEvaluate {
             // Since we're going to look at the extension, we need to run late enough to let the user configure it
             configureSourceSetRule()
         }
-        configureTaskRule()
-        
     }
 
     /**
@@ -267,10 +265,7 @@ class LicensePlugin implements Plugin<Project> {
             // Since we're going to look at the extension, we need to run late enough to let the user configure it
             configureAndroidSourceSetRule()
         }
-        configureTaskRule()
-        
     }
-    
 
     /**
      * Dynamically create a task for each sourceSet, and register with check
