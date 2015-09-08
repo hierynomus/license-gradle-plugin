@@ -30,6 +30,8 @@ In your _build.gradle_ file add:
             classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
         }
     }
+
+    apply plugin: 'license'
 ```
 
 ### Gradle 1.x/2.0, gradle-license-plugin 0.10.0 (and earlier)
