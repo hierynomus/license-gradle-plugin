@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Action
@@ -67,7 +68,11 @@ class LicensePlugin implements Plugin<Project> {
             }
 
             withOptionalPlugin('com.android.build.gradle.AppPlugin') {
-                configureAndroid()
+                configureAndroid(AppPlugin)
+            }
+
+            withOptionalPlugin('com.android.build.gradle.LibraryPlugin') {
+                configureAndroid(LibraryPlugin)
             }
         }
 
@@ -259,20 +264,20 @@ class LicensePlugin implements Plugin<Project> {
         task.source = sourceSet.allSource
     }
 
-    private void configureAndroid() {
-        configureExtensionRule(AppPlugin)
+    private void configureAndroid(Class pluginType) {
+        configureExtensionRule(pluginType)
         project.afterEvaluate {
             // Since we're going to look at the extension, we need to run late enough to let the user configure it
-            configureAndroidSourceSetRule()
+            configureAndroidSourceSetRule(pluginType)
         }
     }
 
     /**
      * Dynamically create a task for each sourceSet, and register with check
      */
-    private void configureAndroidSourceSetRule() {
+    private void configureAndroidSourceSetRule(Class pluginType) {
         // This follows the other check task pattern
-        project.plugins.withType(AppPlugin) {
+        project.plugins.withType(pluginType) {
             extension.sourceSets.all { AndroidSourceSet sourceSet ->
                 def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name.capitalize())
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
