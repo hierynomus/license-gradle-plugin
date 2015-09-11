@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.android.build.gradle.AppPlugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
@@ -37,7 +38,7 @@ class AndroidLicensePluginTest {
         project.apply plugin: 'com.android.application'
 
         // Otherwise we'd need a project.evaluate() which would trigger Android SDK detection
-        plugin.configureAndroidSourceSetRule()
+        plugin.configureAndroidSourceSetRule(AppPlugin)
     }
 
     @Test
