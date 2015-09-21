@@ -77,7 +77,7 @@ class LicensePlugin implements Plugin<Project> {
     void withOptionalPlugin(String pluginClassName, Action<? extends Plugin> configureAction) {
         try {
 
-            def pluginClass = LicensePlugin.class.forName(pluginClassName)
+            def pluginClass = Class.forName(pluginClassName)
             // Will most likely throw a ClassNotFoundException
             project.plugins.withType(pluginClass, configureAction)
 
