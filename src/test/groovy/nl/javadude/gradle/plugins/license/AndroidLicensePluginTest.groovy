@@ -17,27 +17,48 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 import static org.hamcrest.CoreMatchers.*
-import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertThat
 
+@RunWith(Parameterized.class)
 class AndroidLicensePluginTest {
     Project project
+    String pluginName
+    Class pluginClass
+
+    @Parameterized.Parameters(name =  "Plugin {0}")
+    public static Collection<Object[]> pluginTypes() {
+        Object[][] params = [
+            [ 'com.android.application', AppPlugin ],
+            [ 'com.android.library', LibraryPlugin ]
+        ];
+        return Arrays.asList(params);
+    }
+
+    public AndroidLicensePluginTest(pluginName, pluginClass) {
+        this.pluginName = pluginName
+        this.pluginClass = pluginClass
+    }
 
     @Before
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
         def plugin = project.plugins.apply(LicensePlugin)
-        project.apply plugin: 'com.android.application'
+        project.apply plugin: pluginName
 
         // Otherwise we'd need a project.evaluate() which would trigger Android SDK detection
-        plugin.configureAndroidSourceSetRule()
+        plugin.configureAndroidSourceSetRule(pluginClass)
     }
 
     @Test
