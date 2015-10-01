@@ -73,12 +73,17 @@ class DownloadLicensesIntegTest extends Specification {
         
     }
 
-    def "Test that report generating in multi module build doesn't include unrelated subprojects dependencies"() {
+    def "Test that report generating in multi module build include subprojects dependencies"() {
         setup:
         subproject.dependencies {
             compile "org.jboss.logging:jboss-logging:3.1.3.GA"
             compile "com.google.guava:guava:15.0"
         }
+
+        downloadLicenses.licenses = [
+                "com.google.guava:guava:15.0": license("MY_LICENSE", "MY_URL"),
+                "org.jboss.logging:jboss-logging:3.1.3.GA": license("MY_LICENSE", "MY_URL")
+        ]
 
         when:
         downloadLicenses.execute()
@@ -87,8 +92,17 @@ class DownloadLicensesIntegTest extends Specification {
         File f = getLicenseReportFolder()
         assertLicenseReportsExist(f)
 
-        dependenciesInReport(xml4LicenseByDependencyReport(f)) == 0
-        licensesInReport(xml4DependencyByLicenseReport(f)) == 0
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+        dependenciesInReport(xmlByDependency) == 2
+        licensesInReport(xmlByLicense) == 1
+
+        dependencyWithLicensePresent(xmlByDependency, "org.jboss.logging:jboss-logging:3.1.3.GA", "jboss-logging-3.1.3.GA.jar", "MY_LICENSE")
+        dependencyWithLicensePresent(xmlByDependency, "com.google.guava:guava:15.0", "guava-15.0.jar", "MY_LICENSE")
+
+        dependencyWithLicenseUrlPresent(xmlByDependency, "org.jboss.logging:jboss-logging:3.1.3.GA", "MY_URL")
+        dependencyWithLicenseUrlPresent(xmlByDependency, "com.google.guava:guava:15.0", "MY_URL")
     }
 
     def "Test that report in multi module build includes transitive prj dependencies, prj dependencies included and specified"() {
