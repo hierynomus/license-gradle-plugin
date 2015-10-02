@@ -1,9 +1,6 @@
 package nl.javadude.gradle.plugins.license
 
-import com.google.common.collect.HashMultimap
 import groovy.xml.MarkupBuilder
-
-import static com.google.common.base.Strings.isNullOrEmpty
 
 /**
  * License file reporter.
@@ -49,6 +46,10 @@ class LicenseReporter {
         }
     }
 
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty()
+    }
+
     /**
      * Generate xml report grouping by licenses.
      *
@@ -57,10 +58,10 @@ class LicenseReporter {
      */
     public void generateXMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
         MarkupBuilder xml = getMarkupBuilder(fileName, xmlOutputDir)
-        HashMultimap<LicenseMetadata, String> licensesMap = getLicenseMap(dependencyMetadataSet)
+        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
         xml.licenses() {
-            licensesMap.asMap().each {
+            licensesMap.each {
                 entry ->
                     def attributes = [name: entry.key.licenseName]
 
@@ -159,7 +160,7 @@ class LicenseReporter {
      */
     public void generateHTMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
         MarkupBuilder html = getMarkupBuilder(fileName, htmlOutputDir)
-        HashMultimap<LicenseMetadata, String> licensesMap = getLicenseMap(dependencyMetadataSet)
+        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
         html.html {
             head {
@@ -212,7 +213,7 @@ class LicenseReporter {
                         th(){ h3("Dependency") }
                     }
 
-                    licensesMap.asMap().each {
+                    licensesMap.each {
                         entry ->
                             tr {
                                 td(entry.key.licenseName, class: 'licenseName')
@@ -237,13 +238,16 @@ class LicenseReporter {
     }
 
     // Utility
-    private HashMultimap<LicenseMetadata, String> getLicenseMap(Set<DependencyMetadata> dependencyMetadataSet) {
-        HashMultimap<LicenseMetadata, String> licensesMap = HashMultimap.create()
+    private Map<LicenseMetadata, Set<String>> getLicenseMap(Set<DependencyMetadata> dependencyMetadataSet) {
+        Map<LicenseMetadata, Set<String>> licensesMap = new HashMap<LicenseMetadata, Set<String>>()
 
         dependencyMetadataSet.each {
             dependencyMetadata ->
-                dependencyMetadata.licenseMetadataList.each {
-                    license -> licensesMap.put(license, dependencyMetadata.dependencyFileName)
+                dependencyMetadata.licenseMetadataList.each { license ->
+                    if (!licensesMap.containsKey(license)) {
+                        licensesMap.put(license, new HashSet<String>())
+                    }
+                    licensesMap.get(license).add(dependencyMetadata.dependencyFileName)
                 }
         }
 
