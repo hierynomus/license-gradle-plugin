@@ -18,7 +18,6 @@
 package nl.javadude.gradle.plugins.license
 
 import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -278,7 +277,7 @@ class LicensePlugin implements Plugin<Project> {
     private void configureAndroidSourceSetRule(Class pluginType) {
         // This follows the other check task pattern
         project.plugins.withType(pluginType) {
-            extension.sourceSets.all { AndroidSourceSet sourceSet ->
+            extension.sourceSets.all { sourceSet ->
                 def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name.capitalize())
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
 
@@ -305,7 +304,7 @@ class LicensePlugin implements Plugin<Project> {
         }
     }
 
-    protected void configureForAndroidSourceSet(AndroidSourceSet sourceSet, License task) {
+    protected void configureForAndroidSourceSet(sourceSet, task) {
         task.with {
             // Explicitly set description
             description = "Scanning license on ${sourceSet.name} files"
