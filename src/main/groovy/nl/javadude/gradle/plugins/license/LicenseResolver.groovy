@@ -9,8 +9,6 @@ import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
-import static com.google.common.base.Strings.isNullOrEmpty
-import static com.google.common.collect.Sets.newHashSet
 import static DependencyMetadata.noLicenseMetaData
 
 /**
@@ -39,10 +37,10 @@ class LicenseResolver {
      * @return set with licenses
      */
     public Set<DependencyMetadata> provideLicenseMap4Dependencies() {
-        Set<DependencyMetadata> licenseSet = newHashSet()
+        Set<DependencyMetadata> licenseSet = new HashSet<DependencyMetadata>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
-        Set<Project> projects = newHashSet()
+        Set<Project> projects = new HashSet<Project>()
         projects.add(project)
         projects.addAll(project.subprojects)
 
@@ -125,7 +123,7 @@ class LicenseResolver {
      */
     Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
 
-        Set<ResolvedArtifact> dependenciesToHandle = newHashSet()
+        Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
         if (project.configurations.any { it.name == dependencyConfiguration }) {
@@ -151,7 +149,7 @@ class LicenseResolver {
     }
 
     Set<String> provideFileDependencies(Project project, List<String> dependenciesToIgnore) {
-        Set<String> fileDependencies = newHashSet()
+        Set<String> fileDependencies = new HashSet<String>()
 
         if (project.configurations.any { it.name == dependencyConfiguration }) {
             Configuration configuration = project.configurations.getByName(dependencyConfiguration)
@@ -232,7 +230,7 @@ class LicenseResolver {
 
         if (pomData.hasLicense()) {
             pomData
-        } else if (!isNullOrEmpty(xml.parent.text())) {
+        } else if (xml.parent.text() != null && !xml.parent().text().isEmpty()) {
             String parentGroup = xml.parent.groupId.text().trim()
             String parentName = xml.parent.artifactId.text().trim()
             String parentVersion = xml.parent.version.text().trim()
