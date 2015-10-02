@@ -17,8 +17,6 @@
 
 package nl.javadude.gradle.plugins.license
 
-import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.AppPlugin
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -66,12 +64,10 @@ class LicensePlugin implements Plugin<Project> {
                 configureJava()
             }
 
-            withOptionalPlugin('com.android.build.gradle.AppPlugin') {
-                configureAndroid(AppPlugin)
-            }
-
-            withOptionalPlugin('com.android.build.gradle.LibraryPlugin') {
-                configureAndroid(LibraryPlugin)
+            ['com.android.build.gradle.AppPlugin', 'com.android.build.gradle.LibraryPlugin'].each { c ->
+                withOptionalPlugin(c) {
+                    configureAndroid(Class.forName(c))
+                }
             }
         }
 
