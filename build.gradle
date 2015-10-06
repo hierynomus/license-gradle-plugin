@@ -1,10 +1,21 @@
+// First, apply the publishing plugin
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+  }
+}
+
 defaultTasks 'build'
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'maven-publish'
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'license'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'optional-base'
 
 buildscript {
@@ -13,12 +24,11 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
     }
 }
 
-group = 'nl.javadude.gradle.plugins'
+group = 'com.hierynomus.gradle.plugins'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -121,43 +131,15 @@ def pomConfig = {
     }
 }
 
-publishing {
-    publications {
-        mavenCustom(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-
-            pom.withXml {
-                asNode().children().last() + pomConfig
-            }
-        }
-    }
-}
-
-// Both 'bintrayUsername' and 'bintrayApiKey' must defined in the ~/.gradle/gradle.properties
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = 'invalid'
-if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = 'invalid'
-
-bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
-    publications = ['mavenCustom']
-    pkg {
-        repo = project.project_bintray_repo
-        name = project.name
-        desc = project.project_description
-        licenses = ['Apache-2.0']
-        labels = ['gradle', 'plugin', 'license']
-        websiteUrl = project.project_url
-        issueTrackerUrl = project.project_issues_url
-        vcsUrl = project.project_scm
-        publicDownloadNumbers = true
-        version {
-            vcsTag = project.version
-            attributes = [
-                    'gradle-plugin': ['com.github.hierynomus.license', project.group, project.name].join(':')
-            ]
+pluginBundle {
+    website = project.project_url
+    vcsUrl = project.project_scm
+    description = project.project_description
+    plugins {
+        jythonPlugin {
+            id = "com.github.hierynomus.license"
+            displayName = "License plugin for Gradle"
+            tags = [ "gradle", "plugin", "license" ]
         }
     }
 }
