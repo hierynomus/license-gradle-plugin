@@ -29,6 +29,7 @@ buildscript {
 }
 
 group = 'nl.javadude.gradle.plugins'
+version = "0.12.0-SNAPSHOT"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -132,9 +133,9 @@ def pomConfig = {
 }
 
 pluginBundle {
-    website = project.project_url
-    vcsUrl = project.project_scm
-    description = project.project_description
+    website = "https://github.com/hierynomus/license-gradle-plugin"
+    vcsUrl = "https://github.com/hierynomus/license-gradle-plugin.git"
+    description = "Applies a header to files, typically a license"
     plugins {
         jythonPlugin {
             id = "com.github.hierynomus.license"
