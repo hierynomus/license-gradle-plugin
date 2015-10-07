@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.11.0
+:license_plugin_version: 0.12.0
 
 image::https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[]
 
