@@ -295,11 +295,11 @@ downloadLicenses {
 == Changelog
 
 === v0.12.0 (2015-10-07)
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#56[#56]: Added Android support
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#72[#72]: Fix SAX parser to ignore namespaces
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#82[#82]: Also now works for Android LibraryPlugin
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#83[#83]: Fix for Android plugin detection
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#84[#84]: Support for unified license reports in multi-module builds (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/40[#40] and https://github.com/hierynomus/license-gradle-plugin/issues/50[#50])
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/56[#56]: Added Android support
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/72[#72]: Fix SAX parser to ignore namespaces
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/82[#82]: Also now works for Android LibraryPlugin
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/83[#83]: Fix for Android plugin detection
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/84[#84]: Support for unified license reports in multi-module builds (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/40[#40] and https://github.com/hierynomus/license-gradle-plugin/issues/50[#50])
 - Fixed https://github.com/hierynomus/license-gradle-plugin/issues/48[#48]: Added '.gradle' as standard extension
 - Fixed https://github.com/hierynomus/license-gradle-plugin/issues/70[#70]: Added '.yaml' and '.yml' as standard extension
 - Fixed https://github.com/hierynomus/license-gradle-plugin/issues/85[#85]: Removed source dependency on (optional) Android plugin.
