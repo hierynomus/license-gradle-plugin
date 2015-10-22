@@ -35,7 +35,7 @@ class LicenseReporter {
                                 def attributes = [name: l.licenseName]
 
                                 // Miss attribute if it's empty
-                                if (!isNullOrEmpty(l.licenseTextUrl)) {
+                                if (l.licenseTextUrl) {
                                     attributes << [url: l.licenseTextUrl]
                                 }
 
@@ -44,10 +44,6 @@ class LicenseReporter {
                     }
             }
         }
-    }
-
-    private static boolean isNullOrEmpty(String s) {
-        return s == null || s.isEmpty()
     }
 
     /**
@@ -66,7 +62,7 @@ class LicenseReporter {
                     def attributes = [name: entry.key.licenseName]
 
                     // Miss attribute if it's empty
-                    if(!isNullOrEmpty(entry.key.licenseTextUrl)) {
+                    if(entry.key.licenseTextUrl) {
                         attributes << [url:  entry.key.licenseTextUrl]
                     }
                     license(attributes) {
@@ -140,7 +136,7 @@ class LicenseReporter {
                                     td(entry.dependencyFileName, class: 'licenseName')
                                     td(license.licenseName, class: 'licenseName')
                                     td(class: 'license') {
-                                        if (!isNullOrEmpty(license.licenseTextUrl)) {
+                                        if (license.licenseTextUrl) {
                                             a(href: license.licenseTextUrl, "Show license agreement")
                                         }
                                     }
@@ -218,7 +214,7 @@ class LicenseReporter {
                             tr {
                                 td(entry.key.licenseName, class: 'licenseName')
                                 td(class: 'license') {
-                                    if (!isNullOrEmpty(entry.key.licenseTextUrl)) {
+                                    if (entry.key.licenseTextUrl) {
                                         a(href: entry.key.licenseTextUrl, "License agreement")
                                     }
                                 }
