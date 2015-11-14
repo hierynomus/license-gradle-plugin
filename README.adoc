@@ -1,8 +1,8 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.11.0
+:license_plugin_version: 0.12.1
 
-image::https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[]
+image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
 This plugin will scan and adapt your source files to include a provided header, e.g. a LICENSE file.  By default it will scan every source set and report warnings. It will also create format tasks, which will properly format and apply the specified header. A bulk of the logic comes from the maven-license-plugin.
 
@@ -27,17 +27,18 @@ In your `build.gradle` file add:
 
 [source,groovy,subs="verbatim,attributes"]
 ----
-    buildscript {
-        repositories {
-            jcenter()
-        }
-
-        dependencies {
-            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:{license_plugin_version}'
-        }
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
     }
+  }
+  dependencies {
+    classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:{license_plugin_version}"
+  }
+}
 
-    apply plugin: 'license'
+apply plugin: "com.github.hierynomus.license"
 ----
 
 === Gradle 1.x/2.0, gradle-license-plugin 0.10.0 (and earlier)
@@ -293,11 +294,18 @@ downloadLicenses {
 
 == Changelog
 
-=== v0.12.0 (??-??-2015)
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#82[#82]: Also now works for Android LibraryPlugin
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#83[#83]: Fix for Android plugin detection
-- Merged https://github.com/hierynomus/license-gradle-plugin/pull/#84[#84]: Support for unified license reports in multi-module builds (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/40[#40] and https://github.com/hierynomus/license-gradle-plugin/issues/50[#50])
-- Fixed https://github.com/hierynomus/license-gradle-plugin/issues/85[#85]. Removed source dependency on (optional) Android plugin.
+=== v0.12.1 (2015-10-26)
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/87[#87]: Fix downloadLicenses fails with `module notation '::' is invalid`
+
+=== v0.12.0 (2015-10-07)
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/56[#56]: Added Android support
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/72[#72]: Fix SAX parser to ignore namespaces
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/82[#82]: Also now works for Android LibraryPlugin
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/83[#83]: Fix for Android plugin detection
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/84[#84]: Support for unified license reports in multi-module builds (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/40[#40] and https://github.com/hierynomus/license-gradle-plugin/issues/50[#50])
+- Fixed https://github.com/hierynomus/license-gradle-plugin/issues/48[#48]: Added '.gradle' as standard extension
+- Fixed https://github.com/hierynomus/license-gradle-plugin/issues/70[#70]: Added '.yaml' and '.yml' as standard extension
+- Fixed https://github.com/hierynomus/license-gradle-plugin/issues/85[#85]: Removed source dependency on (optional) Android plugin.
 
 === v0.11.0
 - Added support for uploading to bintray (Fixes https://github.com/hierynomus/license-gradle-plugin/issues/46[#46] and https://github.com/hierynomus/license-gradle-plugin/issues/47[#47])

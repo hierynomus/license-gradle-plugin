@@ -230,7 +230,7 @@ class LicenseResolver {
 
         if (pomData.hasLicense()) {
             pomData
-        } else if (xml.parent.text() != null && !xml.parent().text().isEmpty()) {
+        } else if (xml.parent.text()) {
             String parentGroup = xml.parent.groupId.text().trim()
             String parentName = xml.parent.artifactId.text().trim()
             String parentVersion = xml.parent.version.text().trim()
