@@ -56,6 +56,11 @@ class LicensePlugin implements Plugin<Project> {
         baseFormatTask = project.task("${taskBaseName}Format")
         downloadLicenseTask = project.tasks.create(downloadLicenseTaskName, DownloadLicenses)
 
+        baseCheckTask.group = baseFormatTask.group = downloadLicenseTask.group = "License"
+        baseCheckTask.description = "Checks for header consistency."
+        baseFormatTask.description = "Applies the license found in the header file in files missing the header."
+        downloadLicenseTask.description = "Generates reports on your runtime dependencies."
+
         extension = createExtension()
         downloadLicensesExtension = createDownloadLicensesExtension()
 
