@@ -17,7 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
-import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSetContainer
 
 /**
  * Extension in the license namespace, which drives the License tasks.
@@ -38,7 +38,7 @@ class LicenseExtension {
     /**
      * Source sets to perform search on, will default to all sourceSets in the project
      */
-    Collection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
+    SourceSetContainer sourceSets
 
     /**
      * Path patterns to exclude while applying licenses or reporting missing licenses
