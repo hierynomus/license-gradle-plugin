@@ -253,7 +253,7 @@ licenseFormat.dependsOn licenseFormatSql
 ----
 
 == License Reporting
-The downloadLicense task has a set of properties, most can be set in the extension:
+The `downloadLicense` task has a set of properties, most can be set in the extension:
 
 [cols="h,d"]
 |====
