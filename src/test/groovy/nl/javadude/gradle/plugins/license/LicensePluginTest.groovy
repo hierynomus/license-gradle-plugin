@@ -168,5 +168,14 @@ class LicensePluginTest {
         assert mappings.containsKey('map1')
         assert mappings.containsKey('map2')
     }
+
+    @Test
+    public void shouldAllowACollection() {
+        project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
+        project.apply plugin: 'java'
+        def plugin = project.plugins.apply(LicensePlugin)
+        plugin.extension.sourceSets = [project.sourceSets.main]
+        plugin.configureSourceSetRule()
+    }
 }
 
