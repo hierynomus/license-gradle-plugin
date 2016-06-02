@@ -15,7 +15,7 @@ apply plugin: 'license'
 apply plugin: 'groovy'
 
 cleanLicense {
-force = true
+  force = true
 }
 
 registerLicense('txt', licenseFormat('##', '#', '##'))
