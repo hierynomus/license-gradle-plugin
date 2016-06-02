@@ -205,7 +205,16 @@ class LicenseResolver {
 
         XmlSlurper slurper = new XmlSlurper(true, false)
         slurper.setErrorHandler(new org.xml.sax.helpers.DefaultHandler())
-        GPathResult xml = slurper.parse(pStream)
+
+        GPathResult xml
+        try {
+            xml = slurper.parse(pStream)
+        } catch (org.xml.sax.SAXParseException e) {
+            // Fatal errors are still throw by DefaultHandler, so handle them here.
+            logger.warn("Unable to parse POM file for $dependencyDesc")
+            return noLicenseMetaData(dependencyDesc)
+        }
+
         DependencyMetadata pomData = new DependencyMetadata(dependency: initialDependency)
 
         xml.licenses.license.each {

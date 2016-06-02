@@ -73,6 +73,24 @@ class DownloadLicensesIntegTest extends Specification {
         
     }
 
+    def "Test that malformed transitive poms are ignored"() {
+        setup:
+        project.dependencies {
+            // This depends on "org.codehouse.plexus:plexus:1.0.4" whose POM is malformed.
+            compile "org.apache.maven:maven-ant-tasks:2.1.3"
+        }
+
+        when:
+        downloadLicenses.execute()
+
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        dependenciesInReport(xmlByDependency) == 24
+    }
+
     def "Test that report generating in multi module build include subprojects dependencies"() {
         setup:
         subproject.dependencies {
