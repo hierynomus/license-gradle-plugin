@@ -37,6 +37,11 @@ public class DownloadLicenses extends ConventionTask {
     @Input boolean includeProjectDependencies
 
     /**
+     * Ignore fatal errors when parsing POMs of transitive dependencies.
+     */
+    @Input boolean ignoreFatalParseErrors
+
+    /**
      * List of dependencies that will be omitted in the report.
      */
     @Input List<String> excludeDependencies
@@ -88,6 +93,7 @@ public class DownloadLicenses extends ConventionTask {
         def dependencyLicensesSet = {
             def licenseResolver = new LicenseResolver(project: project,
                                                       includeProjectDependencies: getIncludeProjectDependencies(),
+                                                      ignoreFatalParseErrors: getIgnoreFatalParseErrors(),
                                                       aliases: aliases.collectEntries {
                                                           new MapEntry(resolveAliasKey(it.key), it.value)
                                                       },

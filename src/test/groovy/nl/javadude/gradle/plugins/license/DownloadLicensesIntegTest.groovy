@@ -73,12 +73,13 @@ class DownloadLicensesIntegTest extends Specification {
         
     }
 
-    def "Test that malformed transitive poms are ignored"() {
+    def "Test that ignoring fatal pom parse errors works"() {
         setup:
         project.dependencies {
             // This depends on "org.codehouse.plexus:plexus:1.0.4" whose POM is malformed.
             compile "org.apache.maven:maven-ant-tasks:2.1.3"
         }
+        downloadLicenses.ignoreFatalParseErrors = true
 
         when:
         downloadLicenses.execute()

@@ -38,6 +38,11 @@ class DownloadLicensesExtension {
     boolean includeProjectDependencies
 
     /**
+     * Ignore fatal errors when parsing POMs of transitive dependencies.
+     */
+    boolean ignoreFatalParseErrors
+
+    /**
      * File name for reports by dependency.
      */
     String reportByDependencyFileName

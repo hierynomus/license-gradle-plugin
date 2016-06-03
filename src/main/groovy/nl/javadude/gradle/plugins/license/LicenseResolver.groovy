@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.TaskExecutionException
 
 import static DependencyMetadata.noLicenseMetaData
 
@@ -27,6 +28,7 @@ class LicenseResolver {
     private List<String> dependenciesToIgnore
     private boolean includeProjectDependencies
     private String dependencyConfiguration
+    private boolean ignoreFatalParseErrors
 
     /**
      * Provide set with dependencies metadata.
@@ -212,7 +214,11 @@ class LicenseResolver {
         } catch (org.xml.sax.SAXParseException e) {
             // Fatal errors are still throw by DefaultHandler, so handle them here.
             logger.warn("Unable to parse POM file for $dependencyDesc")
-            return noLicenseMetaData(dependencyDesc)
+            if (ignoreFatalParseErrors) {
+                return noLicenseMetaData(dependencyDesc)
+            } else {
+                throw new TaskExecutionException(e.getMessage())
+            }
         }
 
         DependencyMetadata pomData = new DependencyMetadata(dependency: initialDependency)
