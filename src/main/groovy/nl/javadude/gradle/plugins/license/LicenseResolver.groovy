@@ -127,8 +127,8 @@ class LicenseResolver {
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
         if (project.configurations.any { it.name == dependencyConfiguration }) {
-            def runtimeConfiguration = project.configurations.getByName(dependencyConfiguration)
-            runtimeConfiguration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
+            def configuration = project.configurations.getByName(dependencyConfiguration)
+            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
                 if(!dependenciesToIgnore.contains(dependencyDesc)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
