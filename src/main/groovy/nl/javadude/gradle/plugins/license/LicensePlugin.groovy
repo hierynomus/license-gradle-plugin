@@ -1,13 +1,13 @@
 /* License added by: GRADLE-LICENSE-PLUGIN
  *
  * Copyright (C)2011 - Jeroen van Erp <jeroen@javadude.nl>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ class LicensePlugin implements Plugin<Project> {
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY = "dependency-license"
     static final String DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE = "license-dependency"
     static final String DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE = "runtime"
-    
+
     protected Project project
     protected LicenseExtension extension
     protected DownloadLicensesExtension downloadLicensesExtension
@@ -45,7 +45,7 @@ class LicensePlugin implements Plugin<Project> {
     protected Task baseCheckTask
     protected Task baseFormatTask
     protected Task downloadLicenseTask
-    
+
     void apply(Project project) {
         this.project = project
         project.plugins.apply(ReportingBasePlugin)
@@ -107,7 +107,7 @@ class LicensePlugin implements Plugin<Project> {
                 sourceSets = { [] }
             }
         }
-        
+
 
         logger.info("Adding license extension");
         return extension
@@ -157,7 +157,7 @@ class LicensePlugin implements Plugin<Project> {
 
     /**
      * We'll be creating the tasks by default based on the source sets, but users could define their
-     * own, and we'd still want it configured. 
+     * own, and we'd still want it configured.
      * TODO: Confirm that user defined tasks will get this configuration, it'd have to be lazily evaluated
      * @param task
      */
@@ -281,7 +281,7 @@ class LicensePlugin implements Plugin<Project> {
         // This follows the other check task pattern
         project.plugins.withType(pluginType) {
             extension.sourceSets.all { sourceSet ->
-                def sourceSetTaskName = (taskBaseName + 'Android' + sourceSet.name.capitalize())
+                def sourceSetTaskName = "${taskBaseName}Android${sourceSet.name.capitalize()}"
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
 
                 License checkTask = project.tasks.create(sourceSetTaskName, License)
@@ -290,7 +290,7 @@ class LicensePlugin implements Plugin<Project> {
                 baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
-                def sourceSetFormatTaskName = (taskBaseName + 'FormatAndroid'+ sourceSet.name.capitalize())
+                def sourceSetFormatTaskName = "${taskBaseName}FormatAndroid${sourceSet.name.capitalize()}"
                 License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
                 formatTask.check = false
                 configureForAndroidSourceSet(sourceSet, formatTask)
@@ -301,7 +301,7 @@ class LicensePlugin implements Plugin<Project> {
             }
 
             // Add license checking into check lifecycle, since its a type of code quality plugin
-        
+
             project.tasks['check'].dependsOn baseCheckTask
 
         }
@@ -316,17 +316,17 @@ class LicensePlugin implements Plugin<Project> {
         sourceSet.properties.each { key, val ->
             logger.debug("[AndroidLicensePlugin] sourceSet.$key:$val");
         }
-        
+
         ArrayList androidSource = new ArrayList<File>();
-        
+
         for (File file : sourceSet.java.sourceFiles) {
             androidSource.add(file);
         }
-        
+
         for (File file : sourceSet.res.sourceFiles) {
             androidSource.add(file);
         }
-        
+
         task.source = project.files(androidSource)
 
     }
