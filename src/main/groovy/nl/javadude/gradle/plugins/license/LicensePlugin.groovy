@@ -129,6 +129,7 @@ class LicensePlugin implements Plugin<Project> {
             reportByDependency = true
             reportByLicenseType = true
             includeProjectDependencies = false
+            ignoreFatalParseErrors = false
             reportByDependencyFileName = DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY
             reportByLicenseFileName = DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE
             excludeDependencies = []
@@ -183,6 +184,7 @@ class LicensePlugin implements Plugin<Project> {
             reportByDependencyFileName = { downloadLicensesExtension.reportByDependencyFileName }
             reportByLicenseFileName = { downloadLicensesExtension.reportByLicenseFileName }
             includeProjectDependencies = {downloadLicensesExtension.includeProjectDependencies}
+            ignoreFatalParseErrors = {downloadLicensesExtension.ignoreFatalParseErrors}
             licenses = { downloadLicensesExtension.licenses }
             aliases = {downloadLicensesExtension.aliases }
             xml = { downloadLicensesExtension.report.xml.enabled }

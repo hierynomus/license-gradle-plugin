@@ -258,6 +258,7 @@ The `downloadLicense` task has a set of properties, most can be set in the exten
 [cols="h,d"]
 |====
 |includeProjectDependencies |true if you want to include the transitive dependencies of your project dependencies
+|ignoreFatalParseErrors |true if you want to ignore fatal errors when parsing POMs of transitive dependencies
 |licenses |a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
 |aliases |a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
 |excludeDependencies |a List of dependencies that are to be excluded from reporting

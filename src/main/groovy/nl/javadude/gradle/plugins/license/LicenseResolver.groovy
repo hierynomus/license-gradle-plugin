@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.TaskExecutionException
 
 import static DependencyMetadata.noLicenseMetaData
 
@@ -27,6 +28,7 @@ class LicenseResolver {
     private List<String> dependenciesToIgnore
     private boolean includeProjectDependencies
     private String dependencyConfiguration
+    private boolean ignoreFatalParseErrors
 
     /**
      * Provide set with dependencies metadata.
@@ -127,8 +129,8 @@ class LicenseResolver {
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
         if (project.configurations.any { it.name == dependencyConfiguration }) {
-            def runtimeConfiguration = project.configurations.getByName(dependencyConfiguration)
-            runtimeConfiguration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
+            def configuration = project.configurations.getByName(dependencyConfiguration)
+            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
                 if(!dependenciesToIgnore.contains(dependencyDesc)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
@@ -205,7 +207,20 @@ class LicenseResolver {
 
         XmlSlurper slurper = new XmlSlurper(true, false)
         slurper.setErrorHandler(new org.xml.sax.helpers.DefaultHandler())
-        GPathResult xml = slurper.parse(pStream)
+
+        GPathResult xml
+        try {
+            xml = slurper.parse(pStream)
+        } catch (org.xml.sax.SAXParseException e) {
+            // Fatal errors are still throw by DefaultHandler, so handle them here.
+            logger.warn("Unable to parse POM file for $dependencyDesc")
+            if (ignoreFatalParseErrors) {
+                return noLicenseMetaData(dependencyDesc)
+            } else {
+                throw new TaskExecutionException(e.getMessage())
+            }
+        }
+
         DependencyMetadata pomData = new DependencyMetadata(dependency: initialDependency)
 
         xml.licenses.license.each {
