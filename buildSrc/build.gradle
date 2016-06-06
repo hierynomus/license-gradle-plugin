@@ -13,8 +13,9 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.android.tools.build:gradle:1.0.+'
     compile gradleApi()
+
+    compileOnly 'com.android.tools.build:gradle:2.0.+'
 }
 
 sourceSets {
