@@ -29,7 +29,7 @@ buildscript {
 }
 
 group = 'nl.javadude.gradle.plugins'
-version = "0.13.0-SNAPSHOT"
+version = "0.13.0"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
