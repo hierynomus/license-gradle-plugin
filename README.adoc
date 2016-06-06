@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.12.1
+:license_plugin_version: 0.13.0
 
 image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
@@ -91,7 +91,7 @@ The license task has a properties, most can be set in the extension:
 
 === License Extension
 A license extension is added to the project, which can be used to configure all license tasks. E.g.
- 
+
 [source,groovy,subs="verbatim,attributes"]
 ----
 license {
@@ -272,7 +272,7 @@ A 'license()' method is made available by the License Extension that takes two S
 downloadLicenses {
     ext.apacheTwo = license('Apache License, Version 2.0', 'http://opensource.org/licenses/Apache-2.0')
     ext.bsd = license('BSD License', 'http://www.opensource.org/licenses/bsd-license.php')
-    
+
     includeProjectDependencies = true
     licenses = [
         (group('com.myproject.foo')) : license('My Company License'),
@@ -288,12 +288,17 @@ downloadLicenses {
     excludeDependencies = [
         'com.some-other-project.bar:foobar:1.0'
     ]
-    
+
     dependencyConfiguration = 'compile'
 }
 ----
 
 == Changelog
+
+=== v0.13.0 (2016-06-06)
+- Upgraded Gradle build version to 2.13
+- Upgraded Android Tools version to 2.0+
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/106[#106]: Added boolean parameter to ignore broken poms while searching for licenses
 
 === v0.12.1 (2015-10-26)
 - Merged https://github.com/hierynomus/license-gradle-plugin/pull/87[#87]: Fix downloadLicenses fails with `module notation '::' is invalid`
