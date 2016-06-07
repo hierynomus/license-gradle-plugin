@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.13.0
+:license_plugin_version: 0.13.1
 
 image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
@@ -295,6 +295,8 @@ downloadLicenses {
 
 == Changelog
 
+=== v0.13.1 (2016-06-07)
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/109[#109]: Fixed compatibility with older Android plugins
 === v0.13.0 (2016-06-06)
 - Upgraded Gradle build version to 2.13
 - Upgraded Android Tools version to 2.0+
