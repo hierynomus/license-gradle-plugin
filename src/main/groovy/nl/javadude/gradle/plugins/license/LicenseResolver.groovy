@@ -8,7 +8,6 @@ import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.api.tasks.TaskExecutionException
 
 import static DependencyMetadata.noLicenseMetaData
 
@@ -217,7 +216,7 @@ class LicenseResolver {
             if (ignoreFatalParseErrors) {
                 return noLicenseMetaData(dependencyDesc)
             } else {
-                throw new TaskExecutionException(e.getMessage())
+                throw e
             }
         }
 

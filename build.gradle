@@ -16,7 +16,6 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'license'
-apply plugin: 'optional-base'
 
 buildscript {
     repositories {
@@ -53,8 +52,11 @@ dependencies {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile 'com.android.tools.build:gradle:2.0.+', optional
     compile gradleApi()
+
+    def androidGradlePlugin = 'com.android.tools.build:gradle:2.0.+'
+    compileOnly androidGradlePlugin
+    testCompile androidGradlePlugin
 
     testCompile 'junit:junit:4.11'
     testCompile 'com.google.guava:guava:17.0'
