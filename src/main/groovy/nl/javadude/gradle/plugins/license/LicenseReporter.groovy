@@ -24,7 +24,9 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateXMLReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        MarkupBuilder xml = getMarkupBuilder(fileName, xmlOutputDir)
+        PrintWriter writer = new PrintWriter(new File(xmlOutputDir, fileName))
+        MarkupBuilder xml = new MarkupBuilder(writer)
+
         xml.dependencies() {
             dependencyMetadataSet.each {
                 entry ->
@@ -44,6 +46,8 @@ class LicenseReporter {
                     }
             }
         }
+
+        writer.close()
     }
 
     /**
@@ -53,7 +57,8 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateXMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        MarkupBuilder xml = getMarkupBuilder(fileName, xmlOutputDir)
+        PrintWriter writer = new PrintWriter(new File(xmlOutputDir, fileName))
+        MarkupBuilder xml = new MarkupBuilder(writer)
         Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
         xml.licenses() {
@@ -72,6 +77,8 @@ class LicenseReporter {
                     }
             }
         }
+
+        writer.close()
     }
 
     /**
@@ -81,7 +88,8 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateHTMLReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        MarkupBuilder html = getMarkupBuilder(fileName, htmlOutputDir)
+        PrintWriter writer = new PrintWriter(new File(htmlOutputDir, fileName))
+        MarkupBuilder html = new MarkupBuilder(writer)
 
         html.html {
             head {
@@ -146,6 +154,8 @@ class LicenseReporter {
                 }
             }
         }
+
+        writer.close()
     }
 
     /**
@@ -155,7 +165,8 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateHTMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        MarkupBuilder html = getMarkupBuilder(fileName, htmlOutputDir)
+        PrintWriter writer = new PrintWriter(new File(htmlOutputDir, fileName))
+        MarkupBuilder html = new MarkupBuilder(writer)
         Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
         html.html {
@@ -231,6 +242,8 @@ class LicenseReporter {
                 }
             }
         }
+
+        writer.close()
     }
 
     // Utility
@@ -249,13 +262,4 @@ class LicenseReporter {
 
         licensesMap
     }
-
-    private MarkupBuilder getMarkupBuilder(String fileName, File outputDir) {
-        File licenseReport = new File(outputDir, fileName)
-        licenseReport.createNewFile()
-        def writer = new FileWriter(licenseReport)
-
-        new MarkupBuilder(writer)
-    }
-
 }
