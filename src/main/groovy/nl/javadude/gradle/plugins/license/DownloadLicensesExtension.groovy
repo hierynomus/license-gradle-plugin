@@ -58,6 +58,12 @@ class DownloadLicensesExtension {
     boolean html
 
     /**
+     * Generate json report.
+     */
+    boolean json
+
+
+    /**
      * The dependency configuration to report on.
      */
     String dependencyConfiguration

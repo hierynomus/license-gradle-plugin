@@ -52,6 +52,11 @@ public class DownloadLicenses extends ConventionTask {
     @OutputDirectory File htmlDestination
 
     /**
+     * Output directory for json reports.
+     */
+    @OutputDirectory File jsonDestination
+
+    /**
      * File name for reports by dependency.
      */
     @Input String reportByDependencyFileName
@@ -70,6 +75,11 @@ public class DownloadLicenses extends ConventionTask {
      * Is html reports are enabled.
      */
     @Input boolean html
+
+    /**
+     * Are json reports enabled.
+     */
+    @Input boolean json
 
     /**
      * The dependency configuration to report on.
@@ -98,7 +108,7 @@ public class DownloadLicenses extends ConventionTask {
         }.memoize()
 
         // Lazy reporter resolving
-        def reporter = { new LicenseReporter(xmlOutputDir: getXmlDestination(), htmlOutputDir: getHtmlDestination()) }
+        def reporter = { new LicenseReporter(xmlOutputDir: getXmlDestination(), htmlOutputDir: getHtmlDestination(), jsonOutputDir: getJsonDestination()) }
 
         // Generate report that groups dependencies
         if (isReportByDependency()) {
@@ -109,6 +119,10 @@ public class DownloadLicenses extends ConventionTask {
             if(isXml()) {
                 reporter().generateXMLReport4DependencyToLicense(
                         dependencyLicensesSet(), getReportByDependencyFileName() + ".xml")
+            }
+            if(isJson()) {
+                reporter().generateJSONReport4DependencyToLicense(
+                        dependencyLicensesSet(), getReportByDependencyFileName() + ".json")
             }
         }
 
@@ -121,6 +135,10 @@ public class DownloadLicenses extends ConventionTask {
             if( isXml()) {
                 reporter().generateXMLReport4LicenseToDependency(
                         dependencyLicensesSet(), getReportByLicenseFileName() + ".xml")
+            }
+            if(isJson()) {
+                reporter().generateJSONReport4LicenseToDependency(
+                        dependencyLicensesSet(), getReportByLicenseFileName() + ".json")
             }
         }
     }

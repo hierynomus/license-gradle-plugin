@@ -1,6 +1,7 @@
 package nl.javadude.gradle.plugins.license
 
 import groovy.xml.MarkupBuilder
+import groovy.json.*
 
 /**
  * License file reporter.
@@ -16,6 +17,11 @@ class LicenseReporter {
      * Output directory for xml reports.
      */
     File xmlOutputDir
+
+    /**
+     * Output directory for json reports.
+     */
+    File jsonOutputDir
 
     /**
      * Generate xml report grouping by dependencies.
@@ -72,6 +78,63 @@ class LicenseReporter {
                     }
             }
         }
+    }
+
+    /**
+     * Generate json report grouping by dependencies.
+     *
+     * @param dependencyMetadataSet set with dependencies
+     * @param fileName report file name
+     */
+    public void generateJSONReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
+        def json = new JsonBuilder();
+
+        json {
+            dependencies dependencyMetadataSet.collect {
+                entry ->
+                    return [
+                        name: entry.dependency,
+                        file: entry.dependencyFileName,
+                        licenses: entry.licenseMetadataList.collect {
+                            l -> return [
+                                name: l.licenseName,
+                                url: l.licenseTextUrl
+                            ]
+                        }
+                    ]
+            }
+        }
+
+
+        FileWriter fw = getWriter(fileName, jsonOutputDir);
+        json.writeTo(fw)
+        fw.flush()
+    }
+
+    /**
+     * Generate json report grouping by licenses.
+     *
+     * @param dependencyMetadataSet set with dependencies
+     * @param fileName report file name
+     */
+    public void generateJSONReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
+        def json = new JsonBuilder();
+        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
+
+        json{
+            licences licensesMap.collect {
+                key, value ->
+                    return [
+                        name: key.licenseName,
+                        url: key.licenseTextUrl,
+                        dependencies: value
+                    ]
+            }
+        }
+
+        FileWriter fw = getWriter(fileName, jsonOutputDir);
+        json.writeTo(fw)
+        fw.flush() // obviously writeTo doesn't do the job --vishna
     }
 
     /**
@@ -251,11 +314,15 @@ class LicenseReporter {
     }
 
     private MarkupBuilder getMarkupBuilder(String fileName, File outputDir) {
-        File licenseReport = new File(outputDir, fileName)
+        new MarkupBuilder(getWriter(fileName, outputDir))
+    }
+
+    private FileWriter getWriter(String fileName, File outputDir) {
+        File licenseReport = new File((File)outputDir, fileName)
         licenseReport.createNewFile()
         def writer = new FileWriter(licenseReport)
 
-        new MarkupBuilder(writer)
+        return writer
     }
 
 }
