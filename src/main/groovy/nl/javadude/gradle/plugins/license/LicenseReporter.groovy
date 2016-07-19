@@ -1,6 +1,7 @@
 package nl.javadude.gradle.plugins.license
 
 import groovy.xml.MarkupBuilder
+import groovy.json.*
 
 /**
  * License file reporter.
@@ -18,36 +19,40 @@ class LicenseReporter {
     File xmlOutputDir
 
     /**
+     * Output directory for json reports.
+     */
+    File jsonOutputDir
+
+    /**
      * Generate xml report grouping by dependencies.
      *
      * @param dependencyMetadataSet set with dependencies
      * @param fileName report file name
      */
     public void generateXMLReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        PrintWriter writer = new PrintWriter(new File(xmlOutputDir, fileName))
-        MarkupBuilder xml = new MarkupBuilder(writer)
+        new File(xmlOutputDir, fileName).withPrintWriter { writer ->
+            MarkupBuilder xml = new MarkupBuilder(writer)
 
-        xml.dependencies() {
-            dependencyMetadataSet.each {
-                entry ->
-                    dependency(name: entry.dependency) {
-                        file(entry.dependencyFileName)
-                        entry.licenseMetadataList.each {
-                            l ->
-                                def attributes = [name: l.licenseName]
+            xml.dependencies() {
+                dependencyMetadataSet.each {
+                    entry ->
+                        dependency(name: entry.dependency) {
+                            file(entry.dependencyFileName)
+                            entry.licenseMetadataList.each {
+                                l ->
+                                    def attributes = [name: l.licenseName]
 
-                                // Miss attribute if it's empty
-                                if (l.licenseTextUrl) {
-                                    attributes << [url: l.licenseTextUrl]
-                                }
+                                    // Miss attribute if it's empty
+                                    if (l.licenseTextUrl) {
+                                        attributes << [url: l.licenseTextUrl]
+                                    }
 
-                                license(attributes)
+                                    license(attributes)
+                            }
                         }
-                    }
+                }
             }
         }
-
-        writer.close()
     }
 
     /**
@@ -57,28 +62,82 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateXMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        PrintWriter writer = new PrintWriter(new File(xmlOutputDir, fileName))
-        MarkupBuilder xml = new MarkupBuilder(writer)
-        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
+        new File(xmlOutputDir, fileName).withPrintWriter { writer ->
+            MarkupBuilder xml = new MarkupBuilder(writer)
+            Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
-        xml.licenses() {
-            licensesMap.each {
-                entry ->
-                    def attributes = [name: entry.key.licenseName]
+            xml.licenses() {
+                licensesMap.each {
+                    entry ->
+                        def attributes = [name: entry.key.licenseName]
 
-                    // Miss attribute if it's empty
-                    if(entry.key.licenseTextUrl) {
-                        attributes << [url:  entry.key.licenseTextUrl]
-                    }
-                    license(attributes) {
-                        entry.value.each {
-                            d -> dependency(d)
+                        // Miss attribute if it's empty
+                        if(entry.key.licenseTextUrl) {
+                            attributes << [url:  entry.key.licenseTextUrl]
                         }
-                    }
+                        license(attributes) {
+                            entry.value.each {
+                                d -> dependency(d)
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    /**
+     * Generate json report grouping by dependencies.
+     *
+     * @param dependencyMetadataSet set with dependencies
+     * @param fileName report file name
+     */
+    public void generateJSONReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
+        def json = new JsonBuilder();
+
+        json {
+            dependencies dependencyMetadataSet.collect {
+                entry ->
+                    return [
+                        name: entry.dependency,
+                        file: entry.dependencyFileName,
+                        licenses: entry.licenseMetadataList.collect {
+                            l -> return [
+                                name: l.licenseName,
+                                url: l.licenseTextUrl
+                            ]
+                        }
+                    ]
             }
         }
 
-        writer.close()
+        new File(jsonOutputDir, fileName).withWriter { fw ->
+            json.writeTo(fw)
+        }
+    }
+
+    /**
+     * Generate json report grouping by licenses.
+     *
+     * @param dependencyMetadataSet set with dependencies
+     * @param fileName report file name
+     */
+    public void generateJSONReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
+        def json = new JsonBuilder();
+        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
+
+        json{
+            licences licensesMap.collect {
+                key, value ->
+                    return [
+                        name: key.licenseName,
+                        url: key.licenseTextUrl,
+                        dependencies: value
+                    ]
+            }
+        }
+        new File(jsonOutputDir, fileName).withWriter { fw ->
+            json.writeTo(fw)
+        }
     }
 
     /**
@@ -88,15 +147,15 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateHTMLReport4DependencyToLicense(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        PrintWriter writer = new PrintWriter(new File(htmlOutputDir, fileName))
-        MarkupBuilder html = new MarkupBuilder(writer)
+        new File(htmlOutputDir, fileName).withPrintWriter { writer ->
+            MarkupBuilder html = new MarkupBuilder(writer)
 
-        html.html {
-            head {
-                title("HTML License report")
-            }
-            style(
-             '''table {
+            html.html {
+                head {
+                    title("HTML License report")
+                }
+                style(
+                        '''table {
                   width: 85%;
                   border-collapse: collapse;
                   text-align: center;
@@ -127,35 +186,34 @@ class LicenseReporter {
                     width:15%
                 }
                 ''')
-            body {
-                table(align: 'center') {
-                    tr {
-                        th(){ h3("Dependency") }
-                        th(){ h3("Jar") }
-                        th(){ h3("License name") }
-                        th(){ h3("License text URL") }
-                    }
+                body {
+                    table(align: 'center') {
+                        tr {
+                            th(){ h3("Dependency") }
+                            th(){ h3("Jar") }
+                            th(){ h3("License name") }
+                            th(){ h3("License text URL") }
+                        }
 
-                    dependencyMetadataSet.each {
-                        entry ->
-                            entry.licenseMetadataList.each { license ->
-                                tr {
-                                    td(entry.dependency, class: 'dependencies')
-                                    td(entry.dependencyFileName, class: 'licenseName')
-                                    td(license.licenseName, class: 'licenseName')
-                                    td(class: 'license') {
-                                        if (license.licenseTextUrl) {
-                                            a(href: license.licenseTextUrl, "Show license agreement")
+                        dependencyMetadataSet.each {
+                            entry ->
+                                entry.licenseMetadataList.each { license ->
+                                    tr {
+                                        td(entry.dependency, class: 'dependencies')
+                                        td(entry.dependencyFileName, class: 'licenseName')
+                                        td(license.licenseName, class: 'licenseName')
+                                        td(class: 'license') {
+                                            if (license.licenseTextUrl) {
+                                                a(href: license.licenseTextUrl, "Show license agreement")
+                                            }
                                         }
                                     }
                                 }
-                            }
+                        }
                     }
                 }
             }
         }
-
-        writer.close()
     }
 
     /**
@@ -165,16 +223,16 @@ class LicenseReporter {
      * @param fileName report file name
      */
     public void generateHTMLReport4LicenseToDependency(Set<DependencyMetadata> dependencyMetadataSet, String fileName) {
-        PrintWriter writer = new PrintWriter(new File(htmlOutputDir, fileName))
-        MarkupBuilder html = new MarkupBuilder(writer)
-        Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
+        new File(htmlOutputDir, fileName).withPrintWriter { writer ->
+            MarkupBuilder html = new MarkupBuilder(writer)
+            Map<LicenseMetadata, Set<String>> licensesMap = getLicenseMap(dependencyMetadataSet)
 
-        html.html {
-            head {
-                title("HTML License report")
-            }
-            style(
-             '''table {
+            html.html {
+                head {
+                    title("HTML License report")
+                }
+                style(
+                        '''table {
                   width: 85%;
                   border-collapse: collapse;
                   text-align: center;
@@ -212,38 +270,37 @@ class LicenseReporter {
                     width:15%
                 }
                 ''')
-            body {
-                table(align: 'center') {
-                    tr {
-                        th(){ h3("License") }
-                        th(){ h3("License text URL") }
-                        th(){ h3("Dependency") }
-                    }
+                body {
+                    table(align: 'center') {
+                        tr {
+                            th(){ h3("License") }
+                            th(){ h3("License text URL") }
+                            th(){ h3("Dependency") }
+                        }
 
-                    licensesMap.each {
-                        entry ->
-                            tr {
-                                td(entry.key.licenseName, class: 'licenseName')
-                                td(class: 'license') {
-                                    if (entry.key.licenseTextUrl) {
-                                        a(href: entry.key.licenseTextUrl, "License agreement")
+                        licensesMap.each {
+                            entry ->
+                                tr {
+                                    td(entry.key.licenseName, class: 'licenseName')
+                                    td(class: 'license') {
+                                        if (entry.key.licenseTextUrl) {
+                                            a(href: entry.key.licenseTextUrl, "License agreement")
+                                        }
                                     }
-                                }
-                                td(class: "dependencies") {
-                                    ul() {
-                                        entry.value.each {
-                                            dependency ->
-                                                li(dependency)
+                                    td(class: "dependencies") {
+                                        ul() {
+                                            entry.value.each {
+                                                dependency ->
+                                                    li(dependency)
+                                            }
                                         }
                                     }
                                 }
-                            }
+                        }
                     }
                 }
             }
         }
-
-        writer.close()
     }
 
     // Utility

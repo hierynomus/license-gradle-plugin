@@ -737,7 +737,7 @@ class DownloadLicensesIntegTest extends Specification {
         then:
         File f = getLicenseReportFolder()
         f.exists()
-        f.listFiles().length == 4
+        f.listFiles().length == 6
     }
 
     def "Test that plugin generate no reports when all report types are disabled"() {
@@ -828,8 +828,10 @@ class DownloadLicensesIntegTest extends Specification {
             project.downloadLicenses.report {
                 xml.enabled = true
                 html.enabled = false
+                json.enabled = true
                 xml.destination = this.outputDir
                 html.destination = this.outputDir
+                json.destination = this.outputDir
             }
             licenses = ["testDependency.jar": license("Apache 2")]
         }
@@ -867,7 +869,7 @@ class DownloadLicensesIntegTest extends Specification {
 
     def assertLicenseReportsExist(File f) {
         f.exists()
-        f.listFiles().length == 2
+        f.listFiles().length == 4
     }
 
     def dependenciesInReport(GPathResult xmlByDependency) {
