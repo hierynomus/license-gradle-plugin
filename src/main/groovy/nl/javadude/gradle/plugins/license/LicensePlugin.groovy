@@ -123,6 +123,7 @@ class LicensePlugin implements Plugin<Project> {
 
         def html = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
         def xml = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+        def json = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
 
         downloadLicensesExtension.with {
             // Default for extension
@@ -135,7 +136,7 @@ class LicensePlugin implements Plugin<Project> {
             excludeDependencies = []
             licenses = [:]
             aliases = [:]
-            report = new DownloadLicensesReportExtension(html: html, xml: xml)
+            report = new DownloadLicensesReportExtension(html: html, xml: xml, json: json)
             dependencyConfiguration = DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE
         }
 
@@ -189,9 +190,11 @@ class LicensePlugin implements Plugin<Project> {
             aliases = {downloadLicensesExtension.aliases }
             xml = { downloadLicensesExtension.report.xml.enabled }
             html = { downloadLicensesExtension.report.html.enabled }
+            json = { downloadLicensesExtension.report.json.enabled }
             excludeDependencies = { downloadLicensesExtension.excludeDependencies }
             xmlDestination = { downloadLicensesExtension.report.xml.destination }
             htmlDestination = { downloadLicensesExtension.report.html.destination }
+            jsonDestination = { downloadLicensesExtension.report.json.destination }
             dependencyConfiguration = { downloadLicensesExtension.dependencyConfiguration }
         }
     }
