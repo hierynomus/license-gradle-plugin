@@ -74,8 +74,7 @@ class LicensePluginTest {
 
     @Test
     public void extensionShouldNotHaveSourceSets() {
-        assertThat project.license.sourceSets, is(notNullValue())
-        assertThat project.license.sourceSets.size(), equalTo(0)
+        assertThat project.license.sourceSets, is(nullValue())
     }
 
     @Test

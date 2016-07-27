@@ -103,9 +103,6 @@ class LicensePlugin implements Plugin<Project> {
             useDefaultMappings = true
             strictCheck = false
             encoding = System.properties['file.encoding']
-            conventionMapping.with {
-                sourceSets = { [] }
-            }
         }
 
 
