@@ -283,7 +283,7 @@ class LicensePlugin implements Plugin<Project> {
     private void configureAndroidSourceSetRule(Class pluginType) {
         // This follows the other check task pattern
         project.plugins.withType(pluginType) {
-            extension.sourceSets.all { sourceSet ->
+            extension.sourceSets.each { sourceSet ->
                 def sourceSetTaskName = "${taskBaseName}Android${sourceSet.name.capitalize()}"
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
 
