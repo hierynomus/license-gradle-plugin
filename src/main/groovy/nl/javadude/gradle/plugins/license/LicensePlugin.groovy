@@ -233,7 +233,7 @@ class LicensePlugin implements Plugin<Project> {
     private void configureSourceSetRule() {
         // This follows the other check task pattern
         project.plugins.withType(JavaBasePlugin) {
-            extension.sourceSets.all { SourceSet sourceSet ->
+            extension.sourceSets.each { SourceSet sourceSet ->
                 def sourceSetTaskName = sourceSet.getTaskName(taskBaseName, null)
                 logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
 
