@@ -1,13 +1,13 @@
 /* License added by: GRADLE-LICENSE-PLUGIN
  *
  * Copyright 2011 Justin Ryan <jryan@netflix.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import org.gradle.api.DomainObjectCollection
 import org.gradle.api.tasks.SourceSet
 
 /**
@@ -38,7 +39,7 @@ class LicenseExtension {
     /**
      * Source sets to perform search on, will default to all sourceSets in the project
      */
-    Collection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
+    DomainObjectCollection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
 
     /**
      * Path patterns to exclude while applying licenses or reporting missing licenses

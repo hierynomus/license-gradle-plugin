@@ -18,6 +18,7 @@
 package nl.javadude.gradle.plugins.license
 
 import org.gradle.api.Action
+import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -104,7 +105,7 @@ class LicensePlugin implements Plugin<Project> {
             strictCheck = false
             encoding = System.properties['file.encoding']
             conventionMapping.with {
-                sourceSets = { [] }
+                sourceSets = { [] as DomainObjectCollection<SourceSet> }
             }
         }
 
@@ -233,7 +234,7 @@ class LicensePlugin implements Plugin<Project> {
     private void configureSourceSetRule() {
         // This follows the other check task pattern
         project.plugins.withType(JavaBasePlugin) {
-            extension.sourceSets.each { SourceSet sourceSet ->
+            extension.sourceSets.all { SourceSet sourceSet ->
                 def sourceSetTaskName = sourceSet.getTaskName(taskBaseName, null)
                 logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
 
@@ -283,7 +284,7 @@ class LicensePlugin implements Plugin<Project> {
     private void configureAndroidSourceSetRule(Class pluginType) {
         // This follows the other check task pattern
         project.plugins.withType(pluginType) {
-            extension.sourceSets.each { sourceSet ->
+            extension.sourceSets.all { sourceSet ->
                 def sourceSetTaskName = "${taskBaseName}Android${sourceSet.name.capitalize()}"
                 logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
 
