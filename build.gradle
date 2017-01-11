@@ -3,10 +3,12 @@ buildscript {
   repositories {
     maven {
       url "https://plugins.gradle.org/m2/"
+      jcenter()
     }
   }
   dependencies {
     classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
   }
 }
 
@@ -16,16 +18,6 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'license'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
-    }
-}
 
 group = 'nl.javadude.gradle.plugins'
 version = "0.13.2-SNAPSHOT"
