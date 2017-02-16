@@ -740,6 +740,26 @@ class DownloadLicensesIntegTest extends Specification {
         f.listFiles().length == 6
     }
 
+    def "Test that changing the project.buildDir places the reports correctly"() {
+        when:
+        project.dependencies {
+            compile 'com.google.guava:guava:14.0'
+        }
+        project.downloadLicenses {
+            reportByDependency = true
+            reportByLicenseType = true
+            project.downloadLicenses.report {
+                xml.enabled = true
+            }
+        }
+        project.buildDir = "generated"
+
+        downloadLicenses.execute()
+
+        then:
+        getLicenseReportFolder()
+    }
+
     def "Test that plugin generate no reports when all report types are disabled"() {
         setup:
         downloadLicenses.reportByDependency = false

@@ -50,9 +50,11 @@ dependencies {
     compileOnly androidGradlePlugin
     testCompile androidGradlePlugin
 
+    testCompile gradleTestKit()
+    testCompile 'com.netflix.nebula:nebula-test:4.4.3'
     testCompile 'junit:junit:4.11'
     testCompile 'com.google.guava:guava:17.0'
-    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
 }

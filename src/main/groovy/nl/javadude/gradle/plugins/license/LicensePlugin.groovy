@@ -122,9 +122,9 @@ class LicensePlugin implements Plugin<Project> {
     protected DownloadLicensesExtension createDownloadLicensesExtension() {
         downloadLicensesExtension = project.extensions.create(downloadLicenseTaskName, DownloadLicensesExtension)
 
-        def html = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
-        def xml = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
-        def json = new LicensesReport(enabled: true, destination: new File("${project.reporting.baseDir.path}/license"))
+        def html = new LicensesReport(enabled: true, destination: { -> "${project.reporting.baseDir.path}/license" })
+        def xml = new LicensesReport(enabled: true, destination: { -> "${project.reporting.baseDir.path}/license" })
+        def json = new LicensesReport(enabled: true, destination: { -> "${project.reporting.baseDir.path}/license" })
 
         downloadLicensesExtension.with {
             // Default for extension
@@ -193,9 +193,9 @@ class LicensePlugin implements Plugin<Project> {
             html = { downloadLicensesExtension.report.html.enabled }
             json = { downloadLicensesExtension.report.json.enabled }
             excludeDependencies = { downloadLicensesExtension.excludeDependencies }
-            xmlDestination = { downloadLicensesExtension.report.xml.destination }
-            htmlDestination = { downloadLicensesExtension.report.html.destination }
-            jsonDestination = { downloadLicensesExtension.report.json.destination }
+            xmlDestination = { new File("${downloadLicensesExtension.report.xml.destination}") }
+            htmlDestination = { new File("${downloadLicensesExtension.report.html.destination}") }
+            jsonDestination = { new File("${downloadLicensesExtension.report.json.destination}") }
             dependencyConfiguration = { downloadLicensesExtension.dependencyConfiguration }
         }
     }
