@@ -19,6 +19,7 @@ package nl.javadude.gradle.plugins.license
 
 import com.google.common.collect.Iterables
 import com.google.common.io.Files
+import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
@@ -213,6 +214,35 @@ key2 = value2
         def expected = '''/**
  * This is a sample license created in ${year}
  */
+public class Test {
+        static { System.out.println("Hello") }
+}
+'''
+        assert javaFile.getText().equals(expected);
+    }
+
+
+    @Test
+    public void canApplyCustomHeaderDefinitionFormatting() {
+        File javaFile = createJavaFile()
+
+        HeaderDefinitionBuilder customDefinition = HeaderDefinitionBuilder.headerDefinition("custom")
+            .withFirstLine("// custom start")
+            .withEndLine("// custom end")
+            .withBeforeEachLine("// ")
+            .withFirstLineDetectionDetectionPattern("//")
+            .withLastLineDetectionDetectionPattern("//")
+
+        licenseFormatTask.headerDefinitions.add customDefinition
+        licenseFormatTask.mapping("java", "custom")
+
+        licenseFormatTask.execute()
+
+        assert licenseFormatTask.altered.size()  == 1
+        assert Iterables.get(licenseFormatTask.altered, 0).equals(javaFile)
+        def expected = '''// custom start
+// This is a sample license created in ${year}
+// custom end
 public class Test {
         static { System.out.println("Hello") }
 }
