@@ -119,6 +119,8 @@ Here is a general overview of the options:
 |excludes(Collection<String> patterns) |Add ANT style patterns to exclude files from license absence reporting and license application
 |include(String pattern) |Add an ANT style pattern to include files into license absence reporting and license application
 |includes(Collection<String> patterns) |Add ANT style patterns to include files into license absence reporting and license application
+|headerDefinition(HeaderDefinitionBuilder headerDefinition) |Add a custom header definition that will be added to the defaults.
+|headerDefinitions(Closure) | Add a custom header definition that will be added to the defaults.
 |====
 
 === Header Locations
@@ -197,6 +199,41 @@ license {
 }
 // or
 licenseMain.ext.year = 2012
+----
+
+=== Creating your own header definition
+In some cases the default header definitions can not be used for a specific project
+so the ability to specify your own is beneficial.
+
+Adding a new header definition is done through the licence extension
+
+
+ String type
+  String firstLine
+  String beforeEachLine
+  String endLine
+  boolean allowBlankLines = false
+
+  String skipLinePattern
+  String firstLineDetectionPattern
+  String lastLineDetectionPattern
+  boolean isMultiline = false
+
+[source,groovy]
+----
+license {
+    headerDefinitions {
+        custom_definition {
+          firstLine = "//"
+          endLine   = "//"
+          firstLineDetectionPattern = "//"
+          lastLineDetectionPattern  = "//"
+          allowBlankLines = false
+          skipLinePattern = "//"
+          isMultiline = false
+        }
+    }
+}
 ----
 
 === Include/Exclude files from license absence reporting and license application
