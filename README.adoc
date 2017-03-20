@@ -207,18 +207,6 @@ so the ability to specify your own is beneficial.
 
 Adding a new header definition is done through the licence extension
 
-
- String type
-  String firstLine
-  String beforeEachLine
-  String endLine
-  boolean allowBlankLines = false
-
-  String skipLinePattern
-  String firstLineDetectionPattern
-  String lastLineDetectionPattern
-  boolean isMultiline = false
-
 [source,groovy]
 ----
 license {
