@@ -205,7 +205,7 @@ licenseMain.ext.year = 2012
 In some cases the default header definitions can not be used for a specific project
 so the ability to specify your own is beneficial.
 
-Adding a new header definition is done through the licence extension
+Adding a new header definition is done through the license extension
 
 [source,groovy]
 ----
