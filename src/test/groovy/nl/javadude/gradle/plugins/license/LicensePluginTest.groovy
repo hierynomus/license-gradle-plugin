@@ -17,6 +17,7 @@
 
 package nl.javadude.gradle.plugins.license
 
+import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
@@ -167,6 +168,37 @@ class LicensePluginTest {
         def mappings = task.combinedMappings()
         assert mappings.containsKey('map1')
         assert mappings.containsKey('map2')
+    }
+
+    @Test
+    void canAddExtraHeaderDefinition()
+    {
+        HeaderDefinitionBuilder headerDefinitionBuilder = HeaderDefinitionBuilder.headerDefinition("custom_definition")
+        project.license {
+            headerDefinition headerDefinitionBuilder
+        }
+
+        LicenseExtension extension = project.extensions.getByType(LicenseExtension)
+
+        assertThat(extension.headerDefinitions.isEmpty(), is(false))
+        assertThat(extension.headerDefinitions.size(), is(1))
+        assertThat(extension.headerDefinitions.getByName("custom_definition"), is(headerDefinitionBuilder))
+    }
+
+    @Test
+    void canAddMultipleHeaderDefinitions()
+    {
+        project.license {
+            headerDefinition HeaderDefinitionBuilder.headerDefinition("some_style")
+            headerDefinition HeaderDefinitionBuilder.headerDefinition("some_other_style")
+        }
+
+        LicenseExtension extension = project.extensions.getByType(LicenseExtension)
+
+        assertThat(extension.headerDefinitions.isEmpty(), is(false))
+        assertThat(extension.headerDefinitions.size(), is(2))
+        assertThat(extension.headerDefinitions.getByName("some_style"), is(notNullValue()))
+        assertThat(extension.headerDefinitions.getByName("some_other_style"), is(notNullValue()))
     }
 }
 
