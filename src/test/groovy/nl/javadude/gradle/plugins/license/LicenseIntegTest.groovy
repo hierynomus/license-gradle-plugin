@@ -225,24 +225,29 @@ public class Test {
     @Test
     public void canApplyCustomHeaderDefinitionFormatting() {
         File javaFile = createJavaFile()
-
-        HeaderDefinitionBuilder customDefinition = HeaderDefinitionBuilder.headerDefinition("custom")
-            .withFirstLine("// custom start")
-            .withEndLine("// custom end")
-            .withBeforeEachLine("// ")
-            .withFirstLineDetectionDetectionPattern("//")
-            .withLastLineDetectionDetectionPattern("//")
+        createLicenseFile '''Put a gun against his head,
+Pulled my trigger, now he's dead.
+Mama, life had just begun,
+'''
+        HeaderDefinitionBuilder customDefinition = HeaderDefinitionBuilder.headerDefinition("bohemian_rhapsody")
+            .withFirstLine("Mama, just killed a man,")
+            .withEndLine("But now I've gone and thrown it all away.")
+            .withBeforeEachLine(" ")
+            .withFirstLineDetectionDetectionPattern("Mama")
+            .withLastLineDetectionDetectionPattern("away")
 
         licenseFormatTask.headerDefinitions.add customDefinition
-        licenseFormatTask.mapping("java", "custom")
+        licenseFormatTask.mapping("java", "bohemian_rhapsody")
 
         licenseFormatTask.execute()
 
         assert licenseFormatTask.altered.size()  == 1
         assert Iterables.get(licenseFormatTask.altered, 0).equals(javaFile)
-        def expected = '''// custom start
-// This is a sample license created in ${year}
-// custom end
+        def expected = '''Mama, just killed a man,
+ Put a gun against his head,
+ Pulled my trigger, now he's dead.
+ Mama, life had just begun,
+But now I've gone and thrown it all away.
 public class Test {
         static { System.out.println("Hello") }
 }
@@ -302,12 +307,15 @@ key2 = value2
         propFile.text.startsWith("# It’s mine, I tell you, mine!")
     }
 
-    public File createLicenseFile() {
+    public File createLicenseFile(String content) {
         File file = project.file("LICENSE")
         Files.createParentDirs(file);
-        file << '''This is a sample license created in ${year}
-'''
+        file.text = content
         file
+    }
+
+    public File createLicenseFile() {
+        createLicenseFile '''This is a sample license created in ${year}'''
     }
 
     public File createJavaFile() {
