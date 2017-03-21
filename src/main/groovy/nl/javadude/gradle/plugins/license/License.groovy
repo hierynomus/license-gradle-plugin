@@ -169,8 +169,7 @@ public class License extends SourceTask implements VerificationTask {
         return combinedMappings
     }
 
-    List<HeaderDefinition> buildHeaderDefinitions()
-    {
+    List<HeaderDefinition> buildHeaderDefinitions() {
         List<HeaderDefinition> definitions = new ArrayList<>();
         getHeaderDefinitions().all { headerDefinition ->
             logger.debug("Adding extra header definition ${headerDefinition.toString()}")

@@ -3,8 +3,7 @@ package nl.javadude.gradle.plugins.license.header
 import com.google.code.mojo.license.header.HeaderDefinition
 import org.gradle.api.Named
 
-class HeaderDefinitionBuilder implements Named
-{
+class HeaderDefinitionBuilder implements Named {
   String type
   String firstLine
   String beforeEachLine
@@ -16,78 +15,65 @@ class HeaderDefinitionBuilder implements Named
   String lastLineDetectionPattern
   boolean isMultiline = false
 
-  static HeaderDefinitionBuilder headerDefinition(String name)
-  {
+  static HeaderDefinitionBuilder headerDefinition(String name) {
     return new HeaderDefinitionBuilder(name)
   }
 
-  HeaderDefinitionBuilder(String type)
-  {
+  HeaderDefinitionBuilder(String type) {
     this.type = type
   }
 
-  HeaderDefinitionBuilder withFirstLine(String firstLine)
-  {
+  HeaderDefinitionBuilder withFirstLine(String firstLine) {
     this.firstLine = firstLine
     return this
   }
 
-  HeaderDefinitionBuilder withBeforeEachLine(String beforeEachLine)
-  {
+  HeaderDefinitionBuilder withBeforeEachLine(String beforeEachLine) {
     this.beforeEachLine = beforeEachLine
     return this
   }
 
-  HeaderDefinitionBuilder withEndLine(String endLine)
-  {
+  HeaderDefinitionBuilder withEndLine(String endLine) {
     this.endLine = endLine
     return this
   }
 
-  HeaderDefinitionBuilder withNoBlankLines()
-  {
+  HeaderDefinitionBuilder withNoBlankLines() {
     this.allowBlankLines = false
     return this
   }
 
-  HeaderDefinitionBuilder withBlankLines()
-  {
+  HeaderDefinitionBuilder withBlankLines() {
     this.allowBlankLines = true
     return this
   }
 
-  HeaderDefinitionBuilder withSkipLinePattern(String skipLinePattern)
-  {
+  HeaderDefinitionBuilder withSkipLinePattern(String skipLinePattern) {
     this.skipLinePattern = skipLinePattern
     return this
   }
 
-  HeaderDefinitionBuilder withFirstLineDetectionDetectionPattern(String firstLineDetectionPattern)
-  {
+  HeaderDefinitionBuilder withFirstLineDetectionDetectionPattern(String firstLineDetectionPattern) {
     this.firstLineDetectionPattern = firstLineDetectionPattern
     return this
   }
 
-  HeaderDefinitionBuilder withLastLineDetectionDetectionPattern(String lastLineDetectionPattern)
-  {
+  HeaderDefinitionBuilder withLastLineDetectionDetectionPattern(String lastLineDetectionPattern) {
     this.lastLineDetectionPattern = lastLineDetectionPattern
     return this
   }
 
-  HeaderDefinitionBuilder multiline()
-  {
+  HeaderDefinitionBuilder multiline() {
     this.isMultiline = true
     return this
   }
 
-  HeaderDefinitionBuilder noMultiLine()
-  {
+  HeaderDefinitionBuilder noMultiLine() {
     this.isMultiline = false
     return this
   }
 
-  HeaderDefinition build()
-  {
+  HeaderDefinition build() {
     return new HeaderDefinition(type,
       firstLine,
       beforeEachLine,
@@ -100,8 +86,7 @@ class HeaderDefinitionBuilder implements Named
   }
 
   @Override
-  String toString()
-  {
+  String toString() {
     return "{" +
       "type='" + type + '\'' +
       ", firstLine='" + firstLine + '\'' +
@@ -116,8 +101,7 @@ class HeaderDefinitionBuilder implements Named
   }
 
   @Override
-  String getName()
-  {
+  String getName() {
     return type
   }
 }

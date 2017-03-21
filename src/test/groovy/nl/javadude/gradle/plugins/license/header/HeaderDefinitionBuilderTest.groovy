@@ -7,8 +7,8 @@ import org.junit.rules.ExpectedException
 import static org.hamcrest.CoreMatchers.is
 import static org.junit.Assert.assertThat
 
-class HeaderDefinitionBuilderTest
-{
+class HeaderDefinitionBuilderTest {
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none()
 
@@ -23,77 +23,65 @@ class HeaderDefinitionBuilderTest
     .withBlankLines()
 
   @Test
-  void setsType()
-  {
+  void setsType() {
     assertThat builder.build().type, is("freddie")
   }
 
   @Test
-  void setsFirstLine()
-  {
+  void setsFirstLine() {
     assertThat builder.build().firstLine, is("5 September 1946")
   }
 
   @Test
-  void setsEndLine()
-  {
+  void setsEndLine() {
     assertThat builder.build().endLine, is("24 November 1991")
   }
 
   @Test
-  void setsBeforeEachLine()
-  {
+  void setsBeforeEachLine() {
     assertThat builder.build().beforeEachLine, is("Rock")
   }
 
   @Test
-  void setsFirstLineDetectionPattern()
-  {
+  void setsFirstLineDetectionPattern() {
     assertThat builder.build().isFirstHeaderLine("First day"), is(true)
   }
 
   @Test
-  void setsLastLineDetectionPattern()
-  {
+  void setsLastLineDetectionPattern() {
     assertThat builder.build().isLastHeaderLine("Last day"), is(true)
   }
 
   @Test
-  void setsMultiline()
-  {
+  void setsMultiline() {
     assertThat builder.build().isMultiLine(), is(true)
   }
 
   @Test
-  void disablesMultiline()
-  {
+  void disablesMultiline() {
     builder.noMultiLine()
 
     assertThat builder.build().isMultiLine(), is(false)
   }
 
   @Test
-  void allowsBlankLines()
-  {
+  void allowsBlankLines() {
     assertThat builder.build().allowBlankLines(), is(true)
   }
 
   @Test
-  void noBlankLines()
-  {
+  void noBlankLines() {
     builder.withNoBlankLines()
     assertThat builder.build().allowBlankLines(), is(false)
   }
 
   @Test
-  void setsSkipLines()
-  {
+  void setsSkipLines() {
     assertThat builder.build().isSkipLine("HIV"), is(true)
   }
 
   @Test
-  void validatesOnBuild()
-  {
+  void validatesOnBuild() {
     expectedException.expect(IllegalStateException)
     expectedException.expectMessage("missing for header definition")
 
