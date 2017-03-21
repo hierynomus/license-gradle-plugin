@@ -17,9 +17,10 @@
 
 package nl.javadude.gradle.plugins.license
 
+import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import org.gradle.api.DomainObjectCollection
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.SourceSet
-
 /**
  * Extension in the license namespace, which drives the License tasks.
  *
@@ -75,6 +76,11 @@ class LicenseExtension {
     boolean strictCheck
 
     /**
+     * Additional header definitions
+     */
+    NamedDomainObjectContainer<HeaderDefinitionBuilder> headerDefinitions
+
+    /**
      * The encoding used for opening files. It is the system encoding by default
      */
     String encoding
@@ -112,4 +118,11 @@ class LicenseExtension {
       includePatterns.addAll(patterns)
     }
 
+    def headerDefinitions(final Closure configureHeaderDefinition) {
+      headerDefinitions.configure(configureHeaderDefinition);
+    }
+
+    void headerDefinition(HeaderDefinitionBuilder definition) {
+      headerDefinitions.add(definition);
+    }
 }

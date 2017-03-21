@@ -17,14 +17,16 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.google.code.mojo.license.header.HeaderDefinition
+import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import nl.javadude.gradle.plugins.license.maven.AbstractLicenseMojo
 import nl.javadude.gradle.plugins.license.maven.CallbackWithFailure
 import nl.javadude.gradle.plugins.license.maven.LicenseCheckMojo
 import nl.javadude.gradle.plugins.license.maven.LicenseFormatMojo
 import org.gradle.api.GradleException
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
-
 /**
  * Task to back License. Using convention of naming Task types with just their name, which makes calls
  * like tasks.withType(License) nicer, consistent with most internal Gradle tasks.
@@ -73,7 +75,7 @@ public class License extends SourceTask implements VerificationTask {
     File header
 
     /**
-     * In leiu of a header file on the local filesystem, this property lets you provide a URL that could be
+     * In lieu of a header file on the local filesystem, this property lets you provide a URL that could be
      * in the classpath or on a remote system. When configured across a few projects, it would mean that a
      * header file doesn't have to be in each project.
      */
@@ -89,6 +91,9 @@ public class License extends SourceTask implements VerificationTask {
 
     Map<String, String> inheritedProperties;
     Map<String, String> inheritedMappings;
+
+    // Container for all custom header definitions
+    NamedDomainObjectContainer<HeaderDefinitionBuilder> headerDefinitions;
 
     @TaskAction
     protected void process() {
@@ -112,7 +117,7 @@ public class License extends SourceTask implements VerificationTask {
 
         URI uri = getURI()
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding())
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions())
             .execute(callback);
 
         altered = callback.getAffected()
@@ -162,6 +167,16 @@ public class License extends SourceTask implements VerificationTask {
         }
         combinedMappings.putAll(internalMappings)
         return combinedMappings
+    }
+
+    List<HeaderDefinition> buildHeaderDefinitions() {
+        List<HeaderDefinition> definitions = new ArrayList<>();
+        getHeaderDefinitions().all { headerDefinition ->
+            logger.debug("Adding extra header definition ${headerDefinition.toString()}")
+            definitions.add(headerDefinition.build())
+        }
+
+        return definitions
     }
 
     Map<String, String> internalMappings = new HashMap<String, String>();

@@ -1,33 +1,36 @@
 package nl.javadude.gradle.plugins.license.maven;
 
-import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.code.mojo.license.Callback;
+import com.google.code.mojo.license.HeaderSection;
+import com.google.code.mojo.license.document.Document;
+import com.google.code.mojo.license.document.DocumentType;
+import com.google.code.mojo.license.header.Header;
+import com.google.code.mojo.license.header.HeaderDefinition;
+import com.google.code.mojo.license.header.HeaderType;
 import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import com.google.code.mojo.license.Callback;
-import com.google.code.mojo.license.HeaderSection;
-import com.google.code.mojo.license.document.Document;
-import com.google.code.mojo.license.document.DocumentType;
-import com.google.code.mojo.license.header.AdditionalHeaderDefinition;
-import com.google.code.mojo.license.header.Header;
-import com.google.code.mojo.license.header.HeaderDefinition;
-import com.google.code.mojo.license.header.HeaderType;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import com.mycila.xmltool.XMLDoc;
+import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
 
 public class AbstractLicenseMojo {
     static Logger logger = Logging.getLogger(AbstractLicenseMojo.class);
@@ -38,7 +41,7 @@ public class AbstractLicenseMojo {
     Map<String, String> initial;
 
     protected String[] keywords = new String[] { "copyright" };
-    protected String[] headerDefinitions = new String[0]; // TODO Not sure how a user would specify
+    protected List<HeaderDefinition> headerDefinitions;
     protected HeaderSection[] headerSections = new HeaderSection[0];
     protected String encoding;
     protected float concurrencyFactor = 1.5f;
@@ -53,8 +56,7 @@ public class AbstractLicenseMojo {
 
     public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial,
                     boolean dryRun, boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck,
-                    URI header, FileCollection source, Map<String, String> mapping, String encoding) {
-        super();
+                    URI header, FileCollection source, Map<String, String> mapping, String encoding, List<HeaderDefinition> headerDefinitions) {
         this.validHeaders = validHeaders;
         this.rootDir = rootDir;
         this.initial = initial;
@@ -66,6 +68,7 @@ public class AbstractLicenseMojo {
         this.source = source;
         this.mapping = mapping;
         this.encoding = encoding;
+        this.headerDefinitions = headerDefinitions;
     }
 
     protected void execute(final Callback callback) throws MalformedURLException {
@@ -81,7 +84,8 @@ public class AbstractLicenseMojo {
             validHeaders.add(new Header(validHeader.toURI().toURL(), props, headerSections));
         }
 
-        final DocumentFactory documentFactory = new DocumentFactory(rootDir, buildMapping(), buildHeaderDefinitions(),
+        Map<String, HeaderDefinition> definitions = buildHeaderDefinitions();
+        final DocumentFactory documentFactory = new DocumentFactory(rootDir, buildMapping(definitions), definitions,
                         encoding, keywords);
 
         int nThreads = (int) (Runtime.getRuntime().availableProcessors() * concurrencyFactor);
@@ -162,18 +166,21 @@ public class AbstractLicenseMojo {
         return props;
     }
 
-    private Map<String, String> buildMapping() {
+    private Map<String, String> buildMapping(Map<String,HeaderDefinition> headerDefinitions) {
         Map<String, String> extensionMapping = useDefaultMappings ? new HashMap<String, String>(defaultMapping())
                         : new HashMap<String, String>();
                         
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
         Set<String> validHeaderTypes = new HashSet<String>();
         for (HeaderType headerType : headerTypes) {
-            validHeaderTypes.add(headerType.name());
+            validHeaderTypes.add(headerType.name().toLowerCase());
         }
 
+        // Add all custom headers
+        validHeaderTypes.addAll(headerDefinitions.keySet());
+
         for (Map.Entry<String, String> entry : mapping.entrySet()) {
-            String headerType = entry.getValue().toUpperCase();
+            String headerType = entry.getValue().toLowerCase();
             String fileType = entry.getKey().toLowerCase();
             if (!validHeaderTypes.contains(headerType)) {
                 throw new InvalidUserDataException(String.format("The provided header type (%s) for %s is invalid", headerType, fileType));
@@ -189,13 +196,11 @@ public class AbstractLicenseMojo {
         // like mappings, first get default definitions
         final Map<String, HeaderDefinition> headers = new HashMap<String, HeaderDefinition>(
                         HeaderType.defaultDefinitions());
-        // and then override them with those provided in properties file
-        for (String resource : headerDefinitions) {
-            final AdditionalHeaderDefinition fileDefinitions = new AdditionalHeaderDefinition(XMLDoc.from(findResource(resource), true));
-            final Map<String, HeaderDefinition> map = fileDefinitions.getDefinitions();
-            logger.debug("{} header definitions loaded from '{}'", map.size(), resource);
-            headers.putAll(map);
-        }
+
+        // Add additional header definitions
+        for(HeaderDefinition headerDefinitionBuilder : headerDefinitions)
+            headers.put(headerDefinitionBuilder.getType(), headerDefinitionBuilder);
+
         // force inclusion of unknown item to manage unknown files
         headers.put(HeaderType.UNKNOWN.getDefinition().getType(), HeaderType.UNKNOWN.getDefinition());
         return headers;
