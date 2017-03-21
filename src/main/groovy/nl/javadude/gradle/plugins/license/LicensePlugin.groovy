@@ -18,7 +18,11 @@
 package nl.javadude.gradle.plugins.license
 
 import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
-import org.gradle.api.*
+import org.gradle.api.Action
+import org.gradle.api.DomainObjectCollection
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaBasePlugin

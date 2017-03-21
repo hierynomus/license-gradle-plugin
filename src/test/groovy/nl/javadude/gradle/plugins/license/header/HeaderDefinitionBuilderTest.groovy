@@ -1,10 +1,10 @@
 package nl.javadude.gradle.plugins.license.header
 
-import org.hamcrest.CoreMatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
+import static org.hamcrest.CoreMatchers.is
 import static org.junit.Assert.assertThat
 
 class HeaderDefinitionBuilderTest
@@ -25,43 +25,43 @@ class HeaderDefinitionBuilderTest
   @Test
   void setsType()
   {
-    assertThat builder.build().type, CoreMatchers.is("freddie")
+    assertThat builder.build().type, is("freddie")
   }
 
   @Test
   void setsFirstLine()
   {
-    assertThat builder.build().firstLine, CoreMatchers.is("5 September 1946")
+    assertThat builder.build().firstLine, is("5 September 1946")
   }
 
   @Test
   void setsEndLine()
   {
-    assertThat builder.build().endLine, CoreMatchers.is("24 November 1991")
+    assertThat builder.build().endLine, is("24 November 1991")
   }
 
   @Test
   void setsBeforeEachLine()
   {
-    assertThat builder.build().beforeEachLine, CoreMatchers.is("Rock")
+    assertThat builder.build().beforeEachLine, is("Rock")
   }
 
   @Test
   void setsFirstLineDetectionPattern()
   {
-    assertThat builder.build().isFirstHeaderLine("First day"), CoreMatchers.is(true)
+    assertThat builder.build().isFirstHeaderLine("First day"), is(true)
   }
 
   @Test
   void setsLastLineDetectionPattern()
   {
-    assertThat builder.build().isLastHeaderLine("Last day"), CoreMatchers.is(true)
+    assertThat builder.build().isLastHeaderLine("Last day"), is(true)
   }
 
   @Test
   void setsMultiline()
   {
-    assertThat builder.build().isMultiLine(), CoreMatchers.is(true)
+    assertThat builder.build().isMultiLine(), is(true)
   }
 
   @Test
@@ -69,26 +69,26 @@ class HeaderDefinitionBuilderTest
   {
     builder.noMultiLine()
 
-    assertThat builder.build().isMultiLine(), CoreMatchers.is(false)
+    assertThat builder.build().isMultiLine(), is(false)
   }
 
   @Test
   void allowsBlankLines()
   {
-    assertThat builder.build().allowBlankLines(), CoreMatchers.is(true)
+    assertThat builder.build().allowBlankLines(), is(true)
   }
 
   @Test
   void noBlankLines()
   {
     builder.withNoBlankLines()
-    assertThat builder.build().allowBlankLines(), CoreMatchers.is(false)
+    assertThat builder.build().allowBlankLines(), is(false)
   }
 
   @Test
   void setsSkipLines()
   {
-    assertThat builder.build().isSkipLine("HIV"), CoreMatchers.is(true)
+    assertThat builder.build().isSkipLine("HIV"), is(true)
   }
 
   @Test
