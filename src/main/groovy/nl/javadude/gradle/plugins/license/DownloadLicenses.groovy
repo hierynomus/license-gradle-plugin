@@ -94,7 +94,7 @@ public class DownloadLicenses extends ConventionTask {
     @TaskAction
     def downloadLicenses() {
         if (!enabled || (!isReportByDependency() && !isReportByLicenseType())
-           || (!isXml() && !isHtml())) {
+           || (!isXml() && !isHtml() && !isJson())) {
             didWork = false;
             return;
         }
