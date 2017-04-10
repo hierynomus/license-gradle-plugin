@@ -320,6 +320,12 @@ downloadLicenses {
 
 == Changelog
 
+=== v0.14.0 (2017-??-??)
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/134[#134]: Fixed build on Gradle 3.4.+
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/132[#132]: Added custom header definitions
+- Fixed https://github.com/hierynomus/license-gradle-plugin/issues/127[#127]: Made reporting target directory lazy
+- Merged https://github.com/hierynomus/license-gradle-plugin/pull/112[#112]: Added JSON license reporting
+
 === v0.13.1 (2016-06-07)
 - Merged https://github.com/hierynomus/license-gradle-plugin/pull/109[#109]: Fixed compatibility with older Android plugins
 === v0.13.0 (2016-06-06)
