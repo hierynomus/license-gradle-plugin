@@ -64,13 +64,13 @@ class DownloadLicensesIntegTest extends Specification {
 
         when:
         downloadLicenses.execute()
-  
+
         then:
         File f = getLicenseReportFolder()
         assertLicenseReportsExist(f)
         dependenciesInReport(xml4LicenseByDependencyReport(f)) == 2
         licensesInReport(xml4DependencyByLicenseReport(f)) == 2
-        
+
     }
 
     def "Test that ignoring fatal pom parse errors works"() {
@@ -787,6 +787,7 @@ class DownloadLicensesIntegTest extends Specification {
         downloadLicenses.reportByLicenseType = true
         project.downloadLicenses.report {
             xml.enabled = false
+            json.enabled = false
             html.enabled = false
         }
         project.dependencies {
