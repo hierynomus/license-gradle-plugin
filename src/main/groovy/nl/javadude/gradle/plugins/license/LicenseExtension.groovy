@@ -40,7 +40,7 @@ class LicenseExtension {
     /**
      * Source sets to perform search on, will default to all sourceSets in the project
      */
-    DomainObjectCollection<SourceSet> sourceSets // Probably should be final SourceSetContainer, so that it doesn't turn out null at anytime
+    DomainObjectCollection<SourceSet> sourceSets
 
     /**
      * Path patterns to exclude while applying licenses or reporting missing licenses
