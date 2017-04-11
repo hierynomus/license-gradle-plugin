@@ -229,30 +229,30 @@ class LicensePlugin implements Plugin<Project> {
         configureExtensionRule(JavaBasePlugin)
         project.afterEvaluate {
             // Since we're going to look at the extension, we need to run late enough to let the user configure it
-            configureSourceSetRule()
+            configureSourceSetRule(JavaBasePlugin.class, "", { ss -> ss.allSource })
         }
     }
 
     /**
      * Dynamically create a task for each sourceSet, and register with check
      */
-    private void configureSourceSetRule() {
+    private void configureSourceSetRule(Class pluginType, String taskInfix, Closure<Iterable<File>> sourceSetSources) {
         // This follows the other check task pattern
-        project.plugins.withType(JavaBasePlugin) {
-            extension.sourceSets.all { SourceSet sourceSet ->
-                def sourceSetTaskName = "${LICENSE_TASK_BASE_NAME}${sourceSet.name.capitalize()}"
-                logger.info("Adding license tasks for sourceSet ${sourceSetTaskName}");
+        project.plugins.withType(pluginType) {
+            extension.sourceSets.all { sourceSet ->
+                def sourceSetTaskName = "${LICENSE_TASK_BASE_NAME}${taskInfix}${sourceSet.name.capitalize()}"
+                logger.info("Adding ${sourceSetTaskName} task for sourceSet ${sourceSet.name}");
 
                 License checkTask = project.tasks.create(sourceSetTaskName, License)
                 checkTask.check = true
-                configureForSourceSet(sourceSet, checkTask)
+                configureForSourceSet(sourceSet, checkTask, sourceSetSources)
                 baseCheckTask.dependsOn checkTask
 
                 // Add independent license task, which will perform format
-                def sourceSetFormatTaskName = "${FORMAT_TASK_BASE_NAME}${sourceSet.name.capitalize()}"
+                def sourceSetFormatTaskName = "${FORMAT_TASK_BASE_NAME}${taskInfix}${sourceSet.name.capitalize()}"
                 License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
                 formatTask.check = false
-                configureForSourceSet(sourceSet, formatTask)
+                configureForSourceSet(sourceSet, formatTask, sourceSetSources)
                 baseFormatTask.dependsOn formatTask
 
                 // Add independent clean task to remove headers
@@ -265,81 +265,23 @@ class LicensePlugin implements Plugin<Project> {
         }
     }
 
-    protected void configureForSourceSet(SourceSet sourceSet, License task) {
+    protected void configureForSourceSet(sourceSet, License task, Closure<Iterable<File>> sourceSetSources) {
         task.with {
             // Explicitly set description
             description = "Scanning license on ${sourceSet.name} files"
         }
 
         // Default to all source files from SourceSet
-        task.source = sourceSet.allSource
+        task.source = sourceSetSources(sourceSet)
     }
 
     private void configureAndroid(Class pluginType) {
         configureExtensionRule(pluginType)
         project.afterEvaluate {
             // Since we're going to look at the extension, we need to run late enough to let the user configure it
-            configureAndroidSourceSetRule(pluginType)
+            configureSourceSetRule(pluginType, "Android", { ss -> ss.java.sourceFiles + ss.res.sourceFiles })
         }
     }
-
-    /**
-     * Dynamically create a task for each sourceSet, and register with check
-     */
-    private void configureAndroidSourceSetRule(Class pluginType) {
-        // This follows the other check task pattern
-        project.plugins.withType(pluginType) {
-            extension.sourceSets.all { sourceSet ->
-                def sourceSetTaskName = "${LICENSE_TASK_BASE_NAME}Android${sourceSet.name.capitalize()}"
-                logger.info("[AndroidLicensePlugin] Adding license tasks for sourceSet ${sourceSetTaskName}");
-
-                License checkTask = project.tasks.create(sourceSetTaskName, License)
-                checkTask.check = true
-                configureForAndroidSourceSet(sourceSet, checkTask)
-                baseCheckTask.dependsOn checkTask
-
-                // Add independent license task, which will perform format
-                def sourceSetFormatTaskName = "${FORMAT_TASK_BASE_NAME}Android${sourceSet.name.capitalize()}"
-                License formatTask = project.tasks.create(sourceSetFormatTaskName, License)
-                formatTask.check = false
-                configureForAndroidSourceSet(sourceSet, formatTask)
-                baseFormatTask.dependsOn formatTask
-
-                // Add independent clean task to remove headers
-                // TODO
-            }
-
-            // Add license checking into check lifecycle, since its a type of code quality plugin
-
-            project.tasks['check'].dependsOn baseCheckTask
-
-        }
-    }
-
-    protected void configureForAndroidSourceSet(sourceSet, task) {
-        task.with {
-            // Explicitly set description
-            description = "Scanning license on ${sourceSet.name} files"
-        }
-
-        sourceSet.properties.each { key, val ->
-            logger.debug("[AndroidLicensePlugin] sourceSet.$key:$val");
-        }
-
-        ArrayList androidSource = new ArrayList<File>();
-
-        for (File file : sourceSet.java.sourceFiles) {
-            androidSource.add(file);
-        }
-
-        for (File file : sourceSet.res.sourceFiles) {
-            androidSource.add(file);
-        }
-
-        task.source = project.files(androidSource)
-
-    }
-
 }
 
 

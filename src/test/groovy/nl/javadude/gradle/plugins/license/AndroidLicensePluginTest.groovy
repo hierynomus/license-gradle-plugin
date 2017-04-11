@@ -58,7 +58,7 @@ class AndroidLicensePluginTest {
         project.apply plugin: pluginName
 
         // Otherwise we'd need a project.evaluate() which would trigger Android SDK detection
-        plugin.configureAndroidSourceSetRule(pluginClass)
+        plugin.configureSourceSetRule(pluginClass, "Android", { ss -> ss.java.sourceFiles + ss.res.sourceFiles })
     }
 
     @Test
