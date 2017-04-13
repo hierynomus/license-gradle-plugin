@@ -39,6 +39,7 @@ class LicenseExtension {
 
     /**
      * Source sets to perform search on, will default to all sourceSets in the project
+     * @deprecated Is no longer used.
      */
     DomainObjectCollection<SourceSet> sourceSets
 
@@ -61,12 +62,12 @@ class LicenseExtension {
      * Whether to create new files which have changes or to make them inline
      *
      */
-    boolean dryRun;
+    boolean dryRun
 
     /**
      * Whether to skip file where a header has been detected
      */
-    boolean skipExistingHeaders;
+    boolean skipExistingHeaders
 
     /**
      * @link {AbstractLicenseMojo.useDefaultMappings}
@@ -85,44 +86,45 @@ class LicenseExtension {
      */
     String encoding
 
-    Map<String, String> internalMappings = new HashMap<String, String>();
-    public void mapping(String fileType, String headerType) {
-        internalMappings.put(fileType, headerType);
+    Map<String, String> internalMappings = new HashMap<String, String>()
+
+    void mapping(String fileType, String headerType) {
+        internalMappings.put(fileType, headerType)
     }
 
-    public void mapping(Map<String, String> provided) {
-        internalMappings.putAll(provided);
+    void mapping(Map<String, String> provided) {
+        internalMappings.putAll(provided)
     }
 
-    public void mapping(Closure closure) {
+    void mapping(Closure closure) {
         Map<String,String> tmpMap = new HashMap<String,String>()
-        closure.delegate = tmpMap;
+        closure.delegate = tmpMap
         closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure();
-        internalMappings.putAll(tmpMap);
+        closure()
+        internalMappings.putAll(tmpMap)
     }
 
-    public void exclude(String pattern) {
+    void exclude(String pattern) {
       excludePatterns.add(pattern)
     }
 
-    public void excludes(Collection<String> patterns) {
+    void excludes(Collection<String> patterns) {
       excludePatterns.addAll(patterns)
     }
 
-    public void include(String pattern) {
+    void include(String pattern) {
       includePatterns.add(pattern)
     }
 
-    public void includes(Collection<String> patterns) {
+    void includes(Collection<String> patterns) {
       includePatterns.addAll(patterns)
     }
 
     def headerDefinitions(final Closure configureHeaderDefinition) {
-      headerDefinitions.configure(configureHeaderDefinition);
+      headerDefinitions.configure(configureHeaderDefinition)
     }
 
     void headerDefinition(HeaderDefinitionBuilder definition) {
-      headerDefinitions.add(definition);
+      headerDefinitions.add(definition)
     }
 }

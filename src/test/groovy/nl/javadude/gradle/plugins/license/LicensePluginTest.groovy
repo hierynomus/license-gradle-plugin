@@ -17,10 +17,12 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.hierynomus.gradle.license.LicenseBasePlugin
+import com.hierynomus.gradle.license.tasks.LicenseCheck
+import com.hierynomus.gradle.license.tasks.LicenseFormat
 import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
@@ -35,9 +37,8 @@ class LicensePluginTest {
     @Before
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
-        def plugin = project.plugins.apply(LicensePlugin)
-        plugin.configureSourceSetRule(JavaBasePlugin.class, "", { ss -> ss.allSource })
-
+        def plugin = project.plugins.apply(LicenseBasePlugin)
+//        plugin.configureSourceSetRule(JavaBasePlugin.class, "", { ss -> ss.allSource })
     }
 
     @Test
@@ -81,12 +82,6 @@ class LicensePluginTest {
     }
 
     @Test
-    public void extensionShouldHaveSourceSetsWithJava() {
-        project.apply plugin: 'java'
-        assertThat project.license.sourceSets.size(), equalTo(project.sourceSets.size())
-    }
-
-    @Test
     public void shouldBeAbleToConfigureLicenseToOtherFile() {
         project.license.header = project.file("OTHERLICENSE")
         assertThat(project.license.header.name, is("OTHERLICENSE"))
@@ -125,6 +120,7 @@ class LicensePluginTest {
     @Test
     public void shouldRunLicenseDuringCheck() {
         project.apply plugin: 'java'
+        project.apply plugin: 'com.github.hierynomus.license'
         def task = project.tasks.create('licenseManual', License)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
@@ -137,21 +133,25 @@ class LicensePluginTest {
     @Test
     public void shouldRunLicenseFromBaseTasks() {
         project.apply plugin: 'java'
-        def task = project.tasks.create('licenseManual', License)
+        project.apply plugin: 'com.github.hierynomus.license'
+        def task = project.tasks.create('licenseManual', LicenseCheck)
+        def formatTask = project.tasks.create('licenseManualFormat', LicenseFormat)
 
         Set<Task> dependsOn = project.tasks['license'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['licenseMain'])
         assertThat dependsOn, hasItem(project.tasks['licenseTest'])
         
         // Manual tests don't get registered with check
-        assertThat dependsOn, not(hasItem(task))
+        assertThat dependsOn, hasItem(task)
+        assertThat dependsOn, not(hasItem(formatTask))
 
         Set<Task> dependsOnFormat = project.tasks['licenseFormat'].getDependsOn()
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatMain'])
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatTest'])
 
-        // Manual tests don't get registered with check
+        // Manual tests don't get registered with format, as the naming is incorrect
         assertThat dependsOnFormat, not(hasItem(task))
+        assertThat dependsOnFormat, hasItem(formatTask)
     }
     
     @Test

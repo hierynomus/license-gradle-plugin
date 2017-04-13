@@ -19,9 +19,9 @@ package nl.javadude.gradle.plugins.license
 
 import com.google.common.collect.Iterables
 import com.google.common.io.Files
+import com.hierynomus.gradle.license.LicenseBasePlugin
 import nl.javadude.gradle.plugins.license.header.HeaderDefinitionBuilder
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
@@ -39,8 +39,8 @@ class LicenseIntegTest {
         projectDir = Files.createTempDir()
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         project.apply plugin: 'java'
-        def plugin = project.plugins.apply(LicensePlugin)
-        plugin.configureSourceSetRule(JavaBasePlugin.class, "", { ss -> ss.allSource })
+        def plugin = project.plugins.apply(LicenseBasePlugin)
+//        plugin.configureSourceSetRule(JavaBasePlugin.class, "", { ss -> ss.allSource })
 
         project.license.ignoreFailures = true
 

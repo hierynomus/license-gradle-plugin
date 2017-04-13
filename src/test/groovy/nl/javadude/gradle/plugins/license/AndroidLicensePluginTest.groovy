@@ -19,6 +19,9 @@ package nl.javadude.gradle.plugins.license
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import com.hierynomus.gradle.license.LicenseBasePlugin
+import com.hierynomus.gradle.license.tasks.LicenseCheck
+import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
@@ -54,16 +57,17 @@ class AndroidLicensePluginTest {
     @Before
     public void setupProject() {
         project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
-        def plugin = project.plugins.apply(LicensePlugin)
+        def plugin = project.plugins.apply(LicenseBasePlugin)
         project.apply plugin: pluginName
 
         // Otherwise we'd need a project.evaluate() which would trigger Android SDK detection
-        plugin.configureSourceSetRule(pluginClass, "Android", { ss -> ss.java.sourceFiles + ss.res.sourceFiles })
+//        plugin.configureSourceSetRule(pluginClass, "Android", { ss -> ss.java.sourceFiles + ss.res.sourceFiles })
     }
 
     @Test
     public void shouldAddLicenseTask() {
         def tasks = project.tasks.withType(License.class).findAll { true }
+        print(tasks)
         assertFalse tasks.isEmpty()
     }
 
@@ -138,14 +142,14 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldConfigureManuallyConfiguredTask() {
-        def task = project.tasks.create('licenseManual', License)
+        def task = project.tasks.create('licenseManual', LicenseCheck)
 
         assertThat task.header.name, is("LICENSE")
     }
 
     @Test
     public void manualTaskShouldInheritFromExtension() {
-        def task = project.tasks.create('licenseManual', License)
+        def task = project.tasks.create('licenseManual', LicenseCheck)
 
         assertThat project.license.ignoreFailures, is(false) // Default
         assertThat task.ignoreFailures, is(false)
@@ -158,7 +162,8 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldRunLicenseDuringCheck() {
-        def task = project.tasks.create('licenseManual', License)
+        project.apply plugin: 'com.github.hierynomus.license'
+        def task = project.tasks.create('licenseManual', LicenseCheck)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['license'])
@@ -169,21 +174,26 @@ class AndroidLicensePluginTest {
 
     @Test
     public void shouldRunLicenseFromBaseTasks() {
-        def task = project.tasks.create('licenseManual', License)
+        project.apply plugin: "com.github.hierynomus.license"
+        def manual = project.tasks.create('licenseManualCheck', LicenseCheck)
+
+        def manualFormat = project.tasks.create('licenseManualFormat', LicenseFormat)
 
         Set<Task> dependsOn = project.tasks['license'].getDependsOn()
         assertThat dependsOn, hasItem(project.tasks['licenseAndroidMain'])
         assertThat dependsOn, hasItem(project.tasks['licenseAndroidAndroidTest'])
 
-        // Manual tests don't get registered with check
-        assertThat dependsOn, not(hasItem(task))
+        // Manual tests also get registered with check.
+        assertThat dependsOn, hasItem(manual)
+        assertThat dependsOn, not(hasItem(manualFormat))
 
         Set<Task> dependsOnFormat = project.tasks['licenseFormat'].getDependsOn()
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatAndroidMain'])
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatAndroidAndroidTest'])
 
-        // Manual tests don't get registered with check
-        assertThat dependsOnFormat, not(hasItem(task))
+        // Manual test does not get registered with format, as it does not have the correct name.
+        assertThat dependsOnFormat, not(hasItem(manual))
+        assertThat dependsOnFormat, hasItem(manualFormat)
     }
 
     @Test

@@ -17,9 +17,8 @@
 
 package nl.javadude.gradle.plugins.license
 
+import com.hierynomus.gradle.license.LicenseBasePlugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
@@ -32,10 +31,8 @@ class LicenseTest {
     public void setupProject() {
         Project project = ProjectBuilder.builder().withProjectDir(new File("testProject")).build()
         project.apply plugin: 'java'
-        def plugin = project.plugins.apply(LicensePlugin)
-        plugin.configureSourceSetRule(JavaBasePlugin.class, "", {ss -> ss.allSource })
+        def plugin = project.plugins.apply(LicenseBasePlugin)
         task = project.tasks['licenseMain']
-
     }
 
     @Test

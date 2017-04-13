@@ -1,5 +1,6 @@
 package nl.javadude.gradle.plugins.license
 
+import com.hierynomus.gradle.license.LicenseReportingPlugin
 import groovy.util.slurpersupport.GPathResult
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -859,12 +860,12 @@ class DownloadLicensesIntegTest extends Specification {
     }
 
     def xml4DependencyByLicenseReport(File reportDir) {
-        File reportByLicense = new File(reportDir, LicensePlugin.DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE + ".xml")
+        File reportByLicense = new File(reportDir, LicenseReportingPlugin.DEFAULT_FILE_NAME_FOR_REPORTS_BY_LICENSE + ".xml")
         new XmlSlurper().parse(reportByLicense)
     }
 
     def xml4LicenseByDependencyReport(File reportDir) {
-        File reportByDependency = new File(reportDir, LicensePlugin.DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY + ".xml")
+        File reportByDependency = new File(reportDir, LicenseReportingPlugin.DEFAULT_FILE_NAME_FOR_REPORTS_BY_DEPENDENCY + ".xml")
         new XmlSlurper().parse(reportByDependency)
     }
 
