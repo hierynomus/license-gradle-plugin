@@ -40,7 +40,7 @@ dependencies {
     compile "org.codehaus.plexus:plexus-utils:2.0.5"
     compile "com.mycila.xmltool:xmltool:3.3"
     // Using compile instead of groovy, so that it goes into the pom
-    compile ('com.mycila.maven-license-plugin:maven-license-plugin:1.10.b1') {
+    compile ('com.mycila:license-maven-plugin:3.0') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }

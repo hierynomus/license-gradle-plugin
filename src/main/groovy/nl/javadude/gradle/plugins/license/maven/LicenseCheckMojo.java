@@ -16,8 +16,8 @@
 
 package nl.javadude.gradle.plugins.license.maven;
 
-import com.google.code.mojo.license.document.Document;
-import com.google.code.mojo.license.header.Header;
+import com.mycila.maven.plugin.license.document.Document;
+import com.mycila.maven.plugin.license.header.Header;
 
 import java.io.File;
 import java.util.Collection;
@@ -56,6 +56,11 @@ public final class LicenseCheckMojo implements CallbackWithFailure {
             logger.lifecycle("Missing header in: {}", DocumentFactory.getRelativeFile(basedir, document));
         }
         missingHeaders.add(document.getFile());
+    }
+
+    @Override
+    public void onUnknownFile(Document document, Header header) {
+        logger.error("Unknown file: {}", DocumentFactory.getRelativeFile(basedir, document));
     }
 
     @Override

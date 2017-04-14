@@ -16,8 +16,8 @@
 
 package nl.javadude.gradle.plugins.license.maven;
 
-import com.google.code.mojo.license.document.Document;
-import com.google.code.mojo.license.header.Header;
+import com.mycila.maven.plugin.license.document.Document;
+import com.mycila.maven.plugin.license.header.Header;
 
 import java.io.File;
 import java.util.Collection;
@@ -28,13 +28,13 @@ import org.gradle.api.logging.Logging;
 
 /**
  * Reformat files with a missing header to add it
- * 
+ *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public final class LicenseFormatMojo implements CallbackWithFailure {
     Logger logger = Logging.getLogger(LicenseCheckMojo.class);
     File basedir;
-    
+
     public LicenseFormatMojo(File basedir, boolean dryRun, boolean skipExistingHeaders) {
         this.basedir = basedir;
         this.dryRun = dryRun;
@@ -73,6 +73,11 @@ public final class LicenseFormatMojo implements CallbackWithFailure {
             logger.debug("Result saved to: {}", copy);
             document.saveTo(copy);
         }
+    }
+
+    @Override
+    public void onUnknownFile(Document document, Header header) {
+        logger.error("Unknown file: {}", DocumentFactory.getRelativeFile(basedir, document));
     }
 
     public void onExistingHeader(Document document, Header header) {

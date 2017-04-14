@@ -1,19 +1,21 @@
 package nl.javadude.gradle.plugins.license.header
 
-import com.google.code.mojo.license.header.HeaderDefinition
+import com.mycila.maven.plugin.license.header.HeaderDefinition
 import org.gradle.api.Named
 
 class HeaderDefinitionBuilder implements Named {
   String type
-  String firstLine
-  String beforeEachLine
-  String endLine
+  String firstLine = ""
+  String beforeEachLine = ""
+  String afterEachLine = ""
+  String endLine = ""
   boolean allowBlankLines = false
 
   String skipLinePattern
   String firstLineDetectionPattern
   String lastLineDetectionPattern
   boolean isMultiline = false
+  boolean padLines = false
 
   static HeaderDefinitionBuilder headerDefinition(String name) {
     return new HeaderDefinitionBuilder(name)
@@ -30,6 +32,11 @@ class HeaderDefinitionBuilder implements Named {
 
   HeaderDefinitionBuilder withBeforeEachLine(String beforeEachLine) {
     this.beforeEachLine = beforeEachLine
+    return this
+  }
+
+  HeaderDefinitionBuilder withAfterEachLine(String afterEachLine) {
+    this.afterEachLine = afterEachLine
     return this
   }
 
@@ -73,16 +80,28 @@ class HeaderDefinitionBuilder implements Named {
     return this
   }
 
+  HeaderDefinitionBuilder padLines() {
+    this.padLines = false
+    return this
+  }
+
+  HeaderDefinitionBuilder noPadLines() {
+    this.padLines = false
+    return this
+  }
+
   HeaderDefinition build() {
     return new HeaderDefinition(type,
       firstLine,
       beforeEachLine,
       endLine,
+      afterEachLine,
       skipLinePattern,
       firstLineDetectionPattern,
       lastLineDetectionPattern,
       allowBlankLines,
-      isMultiline)
+      isMultiline,
+      padLines)
   }
 
   @Override
@@ -91,12 +110,14 @@ class HeaderDefinitionBuilder implements Named {
       "type='" + type + '\'' +
       ", firstLine='" + firstLine + '\'' +
       ", beforeEachLine='" + beforeEachLine + '\'' +
+      ", afterEachLine='" + afterEachLine + '\'' +
       ", endLine='" + endLine + '\'' +
       ", allowBlankLines=" + allowBlankLines +
       ", skipLinePattern='" + skipLinePattern + '\'' +
       ", firstLineDetectionPattern='" + firstLineDetectionPattern + '\'' +
       ", lastLineDetectionPattern='" + lastLineDetectionPattern + '\'' +
       ", isMultiline=" + isMultiline +
+      ", padLines=" + padLines +
       '}'
   }
 

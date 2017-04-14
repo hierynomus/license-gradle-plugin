@@ -1,12 +1,14 @@
 package nl.javadude.gradle.plugins.license.maven;
 
-import com.google.code.mojo.license.Callback;
-import com.google.code.mojo.license.HeaderSection;
-import com.google.code.mojo.license.document.Document;
-import com.google.code.mojo.license.document.DocumentType;
-import com.google.code.mojo.license.header.Header;
-import com.google.code.mojo.license.header.HeaderDefinition;
-import com.google.code.mojo.license.header.HeaderType;
+import com.mycila.maven.plugin.license.Callback;
+import com.mycila.maven.plugin.license.HeaderSection;
+import com.mycila.maven.plugin.license.document.Document;
+import com.mycila.maven.plugin.license.document.DocumentPropertiesLoader;
+import com.mycila.maven.plugin.license.document.DocumentType;
+import com.mycila.maven.plugin.license.header.Header;
+import com.mycila.maven.plugin.license.header.HeaderSource.UrlHeaderSource;
+import com.mycila.maven.plugin.license.header.HeaderDefinition;
+import com.mycila.maven.plugin.license.header.HeaderType;
 import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.file.FileCollection;
@@ -14,6 +16,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -30,7 +34,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.google.code.mojo.license.document.DocumentType.defaultMapping;
+import static com.mycila.maven.plugin.license.document.DocumentType.defaultMapping;
 
 public class AbstractLicenseMojo {
     static Logger logger = Logging.getLogger(AbstractLicenseMojo.class);
@@ -46,7 +50,7 @@ public class AbstractLicenseMojo {
     protected String encoding;
     protected float concurrencyFactor = 1.5f;
     protected Map<String, String> mapping;
-    
+
     boolean dryRun;
     boolean skipExistingHeaders;
     boolean useDefaultMappings;
@@ -71,22 +75,37 @@ public class AbstractLicenseMojo {
         this.headerDefinitions = headerDefinitions;
     }
 
-    protected void execute(final Callback callback) throws MalformedURLException {
-        Map<String, String> props = mergeProperties();
+    protected void execute(final Callback callback) throws MalformedURLException, IOException {
+        final Map<String, String> props = mergeProperties();
 
-        final Header h = new Header(header.toURL(), props, headerSections);
+        final Header h = new Header(new UrlHeaderSource(header.toURL(), encoding), headerSections);
         logger.debug("Header {}:\n{}", h.getLocation(), h);
 
-        if (this.validHeaders == null)
+        if (this.validHeaders == null) {
             this.validHeaders = new ArrayList<File>();
+        }
         final List<Header> validHeaders = new ArrayList<Header>(this.validHeaders.size());
         for (File validHeader : this.validHeaders) {
-            validHeaders.add(new Header(validHeader.toURI().toURL(), props, headerSections));
+            validHeaders.add(new Header(new UrlHeaderSource(validHeader.toURI().toURL(), encoding), headerSections));
         }
 
+        final DocumentPropertiesLoader documentPropertiesLoader = new DocumentPropertiesLoader() {
+            @Override
+            public Properties load(Document d) {
+                Properties properties = new Properties();
+
+                for (String key : props.keySet()) {
+                    properties.put(key, String.valueOf(props.get(key)));
+                }
+
+                properties.put("file.name", d.getFile().getName());
+
+                return properties;
+            }
+        };
         Map<String, HeaderDefinition> definitions = buildHeaderDefinitions();
         final DocumentFactory documentFactory = new DocumentFactory(rootDir, buildMapping(definitions), definitions,
-                        encoding, keywords);
+                        encoding, keywords, documentPropertiesLoader);
 
         int nThreads = (int) (Runtime.getRuntime().availableProcessors() * concurrencyFactor);
         ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
@@ -169,7 +188,7 @@ public class AbstractLicenseMojo {
     private Map<String, String> buildMapping(Map<String,HeaderDefinition> headerDefinitions) {
         Map<String, String> extensionMapping = useDefaultMappings ? new HashMap<String, String>(defaultMapping())
                         : new HashMap<String, String>();
-                        
+
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
         Set<String> validHeaderTypes = new HashSet<String>();
         for (HeaderType headerType : headerTypes) {

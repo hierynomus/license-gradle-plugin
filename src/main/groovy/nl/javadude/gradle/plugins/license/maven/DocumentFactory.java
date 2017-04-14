@@ -16,8 +16,9 @@
 
 package nl.javadude.gradle.plugins.license.maven;
 
-import com.google.code.mojo.license.document.Document;
-import com.google.code.mojo.license.header.HeaderDefinition;
+import com.mycila.maven.plugin.license.document.Document;
+import com.mycila.maven.plugin.license.document.DocumentPropertiesLoader;
+import com.mycila.maven.plugin.license.header.HeaderDefinition;
 
 import java.io.File;
 import java.util.Map;
@@ -34,13 +35,15 @@ public final class DocumentFactory {
     private final File basedir;
     private final String encoding;
     private final String[] keywords;
+    private final DocumentPropertiesLoader documentPropertiesLoader;
 
-    public DocumentFactory(File basedir, Map<String, String> mapping, Map<String, HeaderDefinition> definitions, String encoding, String[] keywords) {
+    public DocumentFactory(File basedir, Map<String, String> mapping, Map<String, HeaderDefinition> definitions, String encoding, String[] keywords, DocumentPropertiesLoader documentPropertiesLoader) {
         this.mapping = mapping;
         this.definitions = definitions;
         this.basedir = basedir;
         this.encoding = encoding;
         this.keywords = keywords.clone();
+        this.documentPropertiesLoader = documentPropertiesLoader;
     }
 
     public Document createDocuments(String file) {
@@ -54,7 +57,7 @@ public final class DocumentFactory {
     private Document getWrapper(String file, String encoding) {
         return getWrapper( new File(basedir, file), encoding);
     }
-    
+
     private Document getWrapper(File file, String encoding) {
         String headerType = mapping.get(extension(file.getName()).toLowerCase());
         if (headerType == null) {
@@ -62,9 +65,9 @@ public final class DocumentFactory {
         } else {
             headerType = headerType.toLowerCase();
         }
-        return new Document(file, definitions.get(headerType), encoding, keywords);
+        return new Document(file, definitions.get(headerType), encoding, keywords, documentPropertiesLoader);
     }
-    
+
     public static String getRelativeFile(File basedir, Document document) {
         String prefix = basedir.getAbsolutePath();
         String whole = document.getFile().getAbsolutePath();

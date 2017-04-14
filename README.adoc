@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.13.1
+:license_plugin_version: 0.14.0
 
 image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
@@ -8,7 +8,7 @@ This plugin will scan and adapt your source files to include a provided header, 
 
 This plugin will also report on the licenses of your dependencies.
 
-== Usage
+== Applying the plugin
 From v0.11.0 onwards the `license-gradle-plugin` will be published to http://bintray.com[] and will be available through the http://plugins.gradle.org/[Gradle plugin exchange]. This means that there are a few different usage scenarios listed below.
 
 
@@ -59,20 +59,37 @@ In your `build.gradle` file add:
     apply plugin: 'license'
 ----
 
-This will add two types of tasks for each source set (created by BasePlugin) in your project: one for checking for consistency and one to apply the header, e.g.
+== Source file license application
 
-- licenseMain        : checks for header consistency in the main source set
-- licenseFormatMain  : applies the license found in the header file in files missing the header
-- licenseTest        : checks for header consistency in the test source set
+=== com.github.hierynomus.license-base Plugin
+This plugin two types of tasks to each source set available in your project: one for checking for consistency and one to apply the header, e.g.
 
-The check tasks are added to the standard Gradle _check_ task.
+- licenseMain (`LicenseCheck`)        : checks for header consistency in the main source set
+- licenseFormatMain (`LicenseFormat`) : applies the license found in the header file in files missing the header
+- licenseTest (`LicenseCheck`)        : checks for header consistency in the test source set
+- licenseFormatTest (`LicenseFormat`) : applies the license found in the header file in files missing the header in the test source set
+- etc.
 
-This will also add a task to manage the downloading and reporting of licenses of your dependencies.
+Furthermore this task exposes the `license` extension to the project, allowing you to finetune the configuration of the plugin.
 
-- downloadLicenses   : generates reports on your runtime dependencies
+=== com.github.hierynomus.license Plugin
+This plugin will apply the following plugins:
 
-== License Task
-The license task has a properties, most can be set in the extension:
+- `com.github.hierynomus.license-base`
+- `com.github.hierynomus.license-report`
+
+Furthermore it will create the following tasks:
+
+- `licenseCheck`: This task depends on all the available `LicenseCheck` tasks in the project
+- `licenseFormat`: This task depends on all the available `LicenseFormat` tasks in the project
+
+Also it will add the `licenseCheck` task to the `check` lifecycle task dependencies, so that during a regular build any missing headers are flagged.
+
+=== Tasks
+
+==== LicenseCheck
+This task checks all the configured source files to validate whether the correct header has been applied. It can be configured using the following properties,
+most of which can also be set on the extension to configure them for all tasks.
 
 [cols="h,d"]
 |====
@@ -83,14 +100,39 @@ The license task has a properties, most can be set in the extension:
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
-|sourceSets |List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
 |mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
 |mapping(Closure) |Adds mappings between file extensions and a style types, see example below
+|exclude(String pattern) |Add an ANT style pattern to exclude files from license absence reporting and license application
+|excludes(Collection<String> patterns) |Add ANT style patterns to exclude files from license absence reporting and license application
+|include(String pattern) |Add an ANT style pattern to include files into license absence reporting and license application
+|includes(Collection<String> patterns) |Add ANT style patterns to include files into license absence reporting and license application
+|====
+
+==== LicenseFormat
+This task formats all the configured source files to add a header to them if no header has been applied yet. It can be configured using the following properties,
+most of which can also be set on the extension to configure them for all tasks.
+
+[cols="h,d"]
+|====
+|header |Specify location of header to use in comparisons, default to project.file('LICENSE')
+|headerURI |Specify location of header as a URI, see section below on Header Locations for examples
+|ignoreFailures |Prevent tasks from stopping the build, defaults to false
+|dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
+|skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
+|useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
+|strictCheck |Be extra strict in the formatting of existing headers, defaults to false
+|mapping(String ext, String style) |Adds a mapping between a file extension and a style type
+|mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
+|mapping(Closure) |Adds mappings between file extensions and a style types, see example below
+|exclude(String pattern) |Add an ANT style pattern to exclude files from license absence reporting and license application
+|excludes(Collection<String> patterns) |Add ANT style patterns to exclude files from license absence reporting and license application
+|include(String pattern) |Add an ANT style pattern to include files into license absence reporting and license application
+|includes(Collection<String> patterns) |Add ANT style patterns to include files into license absence reporting and license application
 |====
 
 === License Extension
-A license extension is added to the project, which can be used to configure all license tasks. E.g.
+A license extension is added to the project, which can be used to configure all `LicenseCheck` and `LicenseFormat` tasks. E.g.
 
 [source,groovy,subs="verbatim,attributes"]
 ----
@@ -111,7 +153,6 @@ Here is a general overview of the options:
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
-|sourceSets |List of sourceSets to create tasks for, will default to all sourceSets created by Java Plugin
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
 |mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
 |mapping(Closure) |Adds mappings between file extensions and a style types, see example below
@@ -123,8 +164,12 @@ Here is a general overview of the options:
 |headerDefinitions(Closure) | Add a custom header definition that will be added to the defaults.
 |====
 
-=== Header Locations
+[[supported-file-types]]
+=== File Types
+Supported by default: `java`, `groovy`, `js`, `css`, `xml`, `dtd`, `xsd`, `html`, `htm`, `xsl`, `fml`, `apt`, `properties`, `sh`, `txt`, `bat`, `cmd`, `sql`, `jsp`, `ftl`, `xhtml`, `vm`, `jspx`, `gsp`, `json`. Complete list can be found in the parent project at http://code.mycila.com/license-maven-plugin/#supported-comment-types.
 
+=== Usage and Configuration
+==== Header Locations
 The plugin can load a reference license file from the local file system with the _header_ property.
 
 [source,groovy,subs="verbatim,attributes"]
@@ -158,11 +203,8 @@ In regards to the header, tasks can be configured individually or in bulk also,
     tasks.withType(License) { header = file('LGPL.txt') }
 ----
 
-=== File Types
-Supported by default: java, groovy, js, css, xml, dtd, xsd, html, htm, xsl, fml, apt, properties, sh, txt, bat, cmd, sql, jsp, ftl, xhtml, vm, jspx, gsp, json. Complete list can be found in the parent project at http://code.mycila.com/license-maven-plugin/#supported-comment-types.
-
-=== Recognizing other file types.
-An extensive list of formats and mappings are available by default, see the SupportedFormats link above. Occasionally a project might need to add a mapping to a unknown file type to an existing comment style.
+==== Recognizing other file types.
+An extensive list of formats and mappings are available by default, see the <<supported-file-types,SupportedFormats>> link above. Occasionally a project might need to add a mapping to a unknown file type to an existing comment style.
 
 [source,groovy,subs="verbatim,attributes"]
 ----
@@ -181,7 +223,7 @@ licenseMain.mapping 'javascript' 'JAVADOC_STYLE'
 
 Defining new comment types is not currently supported, but file a bug and it can be added.
 
-=== Variable substitution
+==== Variable substitution
 Variables in the format `${}` format will be substituted, as long as their values are provided in the extension or the task.
 
 ----
@@ -201,11 +243,10 @@ license {
 licenseMain.ext.year = 2012
 ----
 
-=== Creating your own header definition
-In some cases the default header definitions can not be used for a specific project
-so the ability to specify your own is beneficial.
+==== Creating custom header definitions
+When the default header definitions can not be used for your specific project, we support the ability to define custom header definitions.
 
-Adding a new header definition is done through the license extension
+Adding a new header definition is done through the license extension. These header definitions can then be assigned to the necessary file types by mapping them to their extensions.
 
 [source,groovy]
 ----
@@ -224,7 +265,7 @@ license {
 }
 ----
 
-=== Include/Exclude files from license absence reporting and license application
+==== Include/Exclude files from license absence reporting and license application
 By default all files in the sourceSets configured are required to carry a license. Just like with Gradle `SourceSet` you can use include/exclude patterns to control this behaviour.
 
 The semantics are:
@@ -266,19 +307,28 @@ license {
 
 This will include all `*.java` files, except the `*Test.java` files.
 
-=== Running on a non-java project
+==== Running on a non-java project
 By default, applying the plugin will generate license tasks for all source sets defined by the java plugin. You can also run the license task on an arbitrary file tree, if you don't have the java plugin, or your files are outside a java source tree.
 
 [source,groovy]
 ----
-task licenseFormatSql (type:nl.javadude.gradle.plugins.license.License) {
+task licenseFormatSql(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "source").include("**/*.sql")
 }
 licenseFormat.dependsOn licenseFormatSql
 ----
 
+
+== Dependency License Reporting
+Next to checking for and applying license headers to your source files, this plugin also supports reporting on the licenses that your dependencies are licensed under.
+
+== com.github.hierynomus.license-report
+This plugin will add a task to manage the downloading and reporting of licenses of your dependencies.
+
+- `downloadLicenses`   : generates reports on your runtime dependencies
+
 == License Reporting
-The `downloadLicense` task has a set of properties, most can be set in the extension:
+The `downloadLicenses` task has a set of properties, most can be set in the extension:
 
 [cols="h,d"]
 |====
@@ -320,7 +370,9 @@ downloadLicenses {
 
 == Changelog
 
-=== v0.14.0 (2017-??-??)
+=== v0.14.0 (2017-??-??) --> See Upgrade Notes!
+- Upgraded to com.mycila:license-maven-plugin:3.0
+- Split up plugin into smaller parts (`license-base`, `license-report`, `license`)
 - Merged https://github.com/hierynomus/license-gradle-plugin/pull/134[#134]: Fixed build on Gradle 3.4.+
 - Merged https://github.com/hierynomus/license-gradle-plugin/pull/132[#132]: Added custom header definitions
 - Fixed https://github.com/hierynomus/license-gradle-plugin/issues/127[#127]: Made reporting target directory lazy

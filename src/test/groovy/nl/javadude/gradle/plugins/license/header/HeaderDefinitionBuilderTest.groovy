@@ -85,6 +85,6 @@ class HeaderDefinitionBuilderTest {
     expectedException.expect(IllegalStateException)
     expectedException.expectMessage("missing for header definition")
 
-    HeaderDefinitionBuilder.headerDefinition("farrokh_bulsara").build()
+    HeaderDefinitionBuilder.headerDefinition("farrokh_bulsara").withFirstLine(null).build()
   }
 }
