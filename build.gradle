@@ -12,15 +12,19 @@ buildscript {
   }
 }
 
+plugins {
+  id 'groovy'
+  id 'idea'
+  id "org.ajoberstar.release-opinion" version "1.4.2"
+  id 'com.gradle.plugin-publish' version '0.9.1'
+  id 'java-gradle-plugin'
+}
+
+apply plugin: 'com.github.hierynomus.license'
+
 defaultTasks 'build'
 
-apply plugin: 'groovy'
-apply plugin: 'idea'
-apply plugin: "com.gradle.plugin-publish"
-apply plugin: 'license'
-
 group = 'nl.javadude.gradle.plugins'
-version = "0.13.2-SNAPSHOT"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -32,6 +36,10 @@ idea {
         downloadJavadoc = true
         downloadSources = true
     }
+}
+
+release {
+  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
 }
 
 configurations.compile.transitive = false
