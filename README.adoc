@@ -62,6 +62,14 @@ In your `build.gradle` file add:
 == Source file license application
 
 === com.github.hierynomus.license-base Plugin
+
+[source,groovy,subs="verbatim,attributes"]
+----
+plugins {
+  id "com.github.hierynomus.license-base" version"{license_plugin_version}"
+}
+----
+
 This plugin two types of tasks to each source set available in your project: one for checking for consistency and one to apply the header, e.g.
 
 - licenseMain (`LicenseCheck`)        : checks for header consistency in the main source set
@@ -73,6 +81,14 @@ This plugin two types of tasks to each source set available in your project: one
 Furthermore this task exposes the `license` extension to the project, allowing you to finetune the configuration of the plugin.
 
 === com.github.hierynomus.license Plugin
+
+[source,groovy,subs="verbatim,attributes"]
+----
+plugins {
+  id "com.github.hierynomus.license" version"{license_plugin_version}"
+}
+----
+
 This plugin will apply the following plugins:
 
 - `com.github.hierynomus.license-base`
@@ -323,6 +339,14 @@ licenseFormat.dependsOn licenseFormatSql
 Next to checking for and applying license headers to your source files, this plugin also supports reporting on the licenses that your dependencies are licensed under.
 
 == com.github.hierynomus.license-report
+
+[source,groovy,subs="verbatim,attributes"]
+----
+plugins {
+  id "com.github.hierynomus.license-report" version"{license_plugin_version"
+}
+----
+
 This plugin will add a task to manage the downloading and reporting of licenses of your dependencies.
 
 - `downloadLicenses`   : generates reports on your runtime dependencies
