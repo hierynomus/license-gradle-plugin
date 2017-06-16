@@ -146,7 +146,7 @@ class LicenseResolver {
             def configuration = project.configurations.getByName(dependencyConfiguration)
             configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(!dependenciesToIgnore.contains(dependencyDesc)) {
+                if(!matchExcludedDependency(dependencyDesc)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
                     if (subproject) {
                         if(includeProjectDependencies) {
@@ -268,5 +268,23 @@ class LicenseResolver {
         } else {
             noLicenseMetaData(dependencyDesc)
         }
+    }
+
+    private boolean matchExcludedDependency(String dependencyDesc) {
+       if (dependenciesToIgnore.contains(dependencyDesc)) {
+           return true;
+       } else {
+           for (String exclude : dependenciesToIgnore) {
+              if (exclude.endsWith("+")) {
+                 int excludeLength = exclude.length() - 1;
+                 if (dependencyDesc.substring(0, excludeLength).equals(exclude.substring(0, excludeLength))) {
+                    return true;
+                 }
+              }
+           }
+       }
+
+       return false;
+
     }
 }
