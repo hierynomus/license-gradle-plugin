@@ -24,8 +24,9 @@ import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
-import static DependencyMetadata.noLicenseMetaData
+import java.util.regex.Pattern
 
+import static DependencyMetadata.noLicenseMetaData
 /**
  * License resolver for dependencies.
  */
@@ -177,7 +178,7 @@ class LicenseResolver {
             d.each {
                 FileCollectionDependency fileDependency ->
                     fileDependency.resolve().each {
-                        if (!dependenciesToIgnore.contains(it.name)) {
+                        if (isDependencyIncluded(it.name, dependenciesToIgnore)) {
                             fileDependencies.add(it.name)
                         }
                     }
@@ -187,6 +188,18 @@ class LicenseResolver {
 
         logger.debug("Project $project.name found ${fileDependencies.size()} file dependencies to handle.")
         fileDependencies
+    }
+
+    boolean isDependencyIncluded(String depName, List<String> patternsToIgnore){
+        for(String pattern: patternsToIgnore){
+            if(depName.equals(pattern)){
+                return false;
+            }
+            if(Pattern.compile(pattern).matcher(depName).matches()){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
