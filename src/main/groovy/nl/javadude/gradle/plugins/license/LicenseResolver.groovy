@@ -147,7 +147,7 @@ class LicenseResolver {
             def configuration = project.configurations.getByName(dependencyConfiguration)
             configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(!dependenciesToIgnore.contains(dependencyDesc)) {
+                if(isDependencyIncluded(dependencyDesc, dependenciesToIgnore)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
                     if (subproject) {
                         if(includeProjectDependencies) {
