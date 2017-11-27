@@ -587,6 +587,39 @@ class DownloadLicensesIntegTest extends Specification {
         dependencyWithLicensePresent(xmlByDependency, "dep3.jar", "dep3.jar", "No license found")
     }
 
+    def "Test that we can exclude particular file dependencies from report by regex"() {
+        setup:
+        File dependencyJar1 = new File(projectDir, "dep1.jar")
+        dependencyJar1.createNewFile()
+        File dependencyJar2 = new File(projectDir, "dep2.jar")
+        dependencyJar2.createNewFile()
+        File dependencyJar3 = new File(projectDir, "dep3.jar")
+        dependencyJar3.createNewFile()
+        project.dependencies {
+            runtime project.files("dep1.jar")
+            runtime project.files("dep2" +
+                    ".jar")
+            runtime project.files("dep3.jar")
+        }
+        project.downloadLicenses {
+            excludeDependencies = ["dep[1.2].*"]
+        }
+        when:
+        downloadLicenses.execute()
+
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+        dependenciesInReport(xmlByDependency) == 1
+        licensesInReport(xmlByLicense) == 1
+
+        dependencyWithLicensePresent(xmlByDependency, "dep3.jar", "dep3.jar", "No license found")
+    }
+
     def "Test that we can exclude particular external dependencies from report"() {
         setup:
         project.dependencies {
@@ -594,6 +627,31 @@ class DownloadLicensesIntegTest extends Specification {
         }
         project.downloadLicenses {
             excludeDependencies = ['com.google.guava:guava:15.0']
+        }
+        when:
+        downloadLicenses.execute()
+
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+        dependenciesInReport(xmlByDependency) == 0
+        licensesInReport(xmlByLicense) == 0
+    }
+
+    def "Test that we can exclude particular external dependencies from report using regex"() {
+        setup:
+        project.dependencies {
+            compile 'com.google.guava:guava:15.0'
+            compile "org.jboss.logging:jboss-logging:3.1.3.GA"
+            compile 'org.jboss.logging:jboss-logging-log4j:2.1.2.GA'
+        }
+
+        project.downloadLicenses {
+            excludeDependencies = ['.*jboss.*', 'com.google.*']
         }
         when:
         downloadLicenses.execute()

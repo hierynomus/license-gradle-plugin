@@ -24,8 +24,9 @@ import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
-import static DependencyMetadata.noLicenseMetaData
+import java.util.regex.Pattern
 
+import static DependencyMetadata.noLicenseMetaData
 /**
  * License resolver for dependencies.
  */
@@ -39,10 +40,10 @@ class LicenseResolver {
     private Project project
     private Map<Object, Object> licenses
     private Map<LicenseMetadata, List<Object>> aliases
-    private List<String> dependenciesToIgnore
     private boolean includeProjectDependencies
     private String dependencyConfiguration
     private boolean ignoreFatalParseErrors
+    private List<Pattern> patternsToIgnore
 
     /**
      * Provide set with dependencies metadata.
@@ -96,7 +97,7 @@ class LicenseResolver {
                 }
             }
 
-            provideFileDependencies(p, dependenciesToIgnore).each {
+            provideFileDependencies(p).each {
                 fileDependency ->
                     Closure<DependencyMetadata> licenseMetadata = {
                         if (licenses.containsKey(fileDependency)) {
@@ -134,7 +135,6 @@ class LicenseResolver {
      * Provide full list of resolved artifacts to handle for a given project.
      *
      * @param project                       the project
-     * @param dependenciesToIgnore list of dependencies that will be excluded from the report
      * @return Set with resolved artifacts
      */
     Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
@@ -146,7 +146,7 @@ class LicenseResolver {
             def configuration = project.configurations.getByName(dependencyConfiguration)
             configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(!dependenciesToIgnore.contains(dependencyDesc)) {
+                if(isDependencyIncluded(dependencyDesc)) {
                     Project subproject = subprojects[dependencyDesc]?.first()
                     if (subproject) {
                         if(includeProjectDependencies) {
@@ -164,7 +164,7 @@ class LicenseResolver {
         dependenciesToHandle
     }
 
-    Set<String> provideFileDependencies(Project project, List<String> dependenciesToIgnore) {
+    Set<String> provideFileDependencies(Project project) {
         Set<String> fileDependencies = new HashSet<String>()
 
         if (project.configurations.any { it.name == dependencyConfiguration }) {
@@ -177,7 +177,7 @@ class LicenseResolver {
             d.each {
                 FileCollectionDependency fileDependency ->
                     fileDependency.resolve().each {
-                        if (!dependenciesToIgnore.contains(it.name)) {
+                        if (isDependencyIncluded(it.name)) {
                             fileDependencies.add(it.name)
                         }
                     }
@@ -188,6 +188,16 @@ class LicenseResolver {
         logger.debug("Project $project.name found ${fileDependencies.size()} file dependencies to handle.")
         fileDependencies
     }
+
+    boolean isDependencyIncluded(String depName){
+        for(Pattern pattern: this.patternsToIgnore){
+            if(pattern.matcher(depName).matches()){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Recursive function for retrieving licenses via creating
@@ -267,6 +277,18 @@ class LicenseResolver {
             retrieveLicensesForDependency(project, "$parentGroup:$parentName:$parentVersion", initialDependency)
         } else {
             noLicenseMetaData(dependencyDesc)
+        }
+    }
+
+    void setDependenciesToIgnore(List<String> dependenciesToIgnore){
+        if(dependenciesToIgnore == null){
+            this.patternsToIgnore = Collections.emptyList();
+            return;
+        }
+
+        this.patternsToIgnore = new ArrayList<>(dependenciesToIgnore.size());
+        for(String toIgnore: dependenciesToIgnore){
+            this.patternsToIgnore.add(Pattern.compile(toIgnore))
         }
     }
 }
