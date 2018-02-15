@@ -748,6 +748,42 @@ class DownloadLicensesIntegTest extends Specification {
         !xmlByDependency.dependency.license.find { it['@url'] == "testDependency.jar" }.asBoolean()
     }
 
+	def "Test that if dependency has no license then parent license will be reported"() {
+		setup:
+		project.dependencies {
+			compile 'org.springframework.vault:spring-vault-core:1.1.1.RELEASE'
+		}
+
+		when:
+		downloadLicenses.execute()
+
+		then:
+		File f = getLicenseReportFolder()
+		assertLicenseReportsExist(f)
+
+		def xmlByDependency = xml4LicenseByDependencyReport(f)
+
+		dependencyWithLicensePresent(xmlByDependency, "org.springframework.vault:spring-vault-core:1.1.1.RELEASE", "spring-vault-core-1.1.1.RELEASE.jar", "Apache License, Version 2.0")
+	}
+	
+	def "Test that if dependency and none of its parents have a license it is reported as not found"() {
+		setup:
+        project.dependencies {
+            compile 'org.antlr:antlr-runtime:3.4'
+        }
+
+		when:
+		downloadLicenses.execute()
+
+		then:
+		File f = getLicenseReportFolder()
+		assertLicenseReportsExist(f)
+
+		def xmlByDependency = xml4LicenseByDependencyReport(f)
+
+		dependencyWithLicensePresent(xmlByDependency, "org.antlr:antlr-runtime:3.4", "antlr-runtime-3.4.jar", "No license found")
+	}
+	
     def "Test if a dependency from a local repository without pom should be excluded"() {
       setup:
       File flatRepoDir = new File(projectDir, "libs")
