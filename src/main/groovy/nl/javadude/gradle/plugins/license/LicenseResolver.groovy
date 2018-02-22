@@ -288,7 +288,7 @@ class LicenseResolver {
 
             retrieveLicensesForDependency(project, "$parentGroup:$parentName:$parentVersion", initialDependency)
         } else {
-            noLicenseMetaData(dependencyDesc)
+            noLicenseMetaData(initialDependency)
         }
     }
 

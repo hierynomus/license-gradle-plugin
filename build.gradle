@@ -18,13 +18,14 @@ plugins {
   id "org.ajoberstar.release-opinion" version "1.4.2"
   id 'com.gradle.plugin-publish' version '0.9.1'
   id 'java-gradle-plugin'
+  id 'ru.vyarus.animalsniffer' version '1.4.2'
 }
 
 apply plugin: 'com.github.hierynomus.license'
 
 defaultTasks 'build'
 
-group = 'nl.javadude.gradle.plugins'
+group = 'com.hierynomus.gradle.plugins'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -45,6 +46,8 @@ release {
 configurations.compile.transitive = false
 
 dependencies {
+  signature 'org.codehaus.mojo.signature:java17:1.0@signature'
+
     compile "org.codehaus.plexus:plexus-utils:2.0.5"
     compile "com.mycila.xmltool:xmltool:3.3"
     // Using compile instead of groovy, so that it goes into the pom
@@ -141,10 +144,22 @@ pluginBundle {
     vcsUrl = "https://github.com/hierynomus/license-gradle-plugin.git"
     description = "Applies a header to files, typically a license"
     plugins {
-        jythonPlugin {
+        licensePlugin {
             id = "com.github.hierynomus.license"
             displayName = "License plugin for Gradle"
             tags = [ "gradle", "plugin", "license" ]
+        }
+
+        licenseBasePlugin {
+            id = "com.github.hierynomus.license-base"
+            displayName = "Base License plugin for Gradle"
+            tags = [ "gradle", "plugin", "license" ]
+        }
+
+        licenseReportPlugin {
+            id = "com.github.hierynomus.license-report"
+            displayName = "License Report plugin for Gradle"
+            tags = [ "gradle", "plugin", "license", "report" ]
         }
     }
 }
