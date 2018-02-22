@@ -142,7 +142,7 @@ class LicenseResolver {
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
-        if (project.configurations.any { it.name == dependencyConfiguration }) {
+        if (project.configurations.any { it.name == dependencyConfiguration && isResolvable(it) }) {
             def configuration = project.configurations.getByName(dependencyConfiguration)
             configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
@@ -187,6 +187,18 @@ class LicenseResolver {
 
         logger.debug("Project $project.name found ${fileDependencies.size()} file dependencies to handle.")
         fileDependencies
+    }
+
+    /**
+     * Since Gradle 3.4, configurations can be marked as not resolvable by default.
+     * Configuration#isCanBeResolved() from Gradle 3.3 can be used to check that.
+     * @param conf Configuration
+     * @return whether conf is resolvable
+     *
+     * @see <a href="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable">Gradle 3.4 release notes</a>
+     */
+    boolean isResolvable(Configuration conf) {
+        return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
     }
 
     boolean isDependencyIncluded(String depName){
