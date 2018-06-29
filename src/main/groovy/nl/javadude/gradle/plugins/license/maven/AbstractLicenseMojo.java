@@ -37,13 +37,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -187,8 +187,8 @@ public class AbstractLicenseMojo {
      * From com/google/code/mojo/license/AbstractLicenseMojo.java
      */
     protected final Map<String, String> mergeProperties() {
-        // first put syste environment
-        Map<String, String> props = new HashMap<String, String>(System.getenv());
+        // first put system environment
+        Map<String, String> props = new ConcurrentHashMap<String, String>(System.getenv());
 
         // Override with extension
         props.putAll(initial);
@@ -201,8 +201,8 @@ public class AbstractLicenseMojo {
     }
 
     private Map<String, String> buildMapping(Map<String,HeaderDefinition> headerDefinitions) {
-        Map<String, String> extensionMapping = useDefaultMappings ? new HashMap<String, String>(defaultMapping())
-                        : new HashMap<String, String>();
+        Map<String, String> extensionMapping = useDefaultMappings ? new ConcurrentHashMap<String, String>(defaultMapping())
+                        : new ConcurrentHashMap<String, String>();
 
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
         Set<String> validHeaderTypes = new HashSet<String>();
@@ -228,7 +228,7 @@ public class AbstractLicenseMojo {
 
     private Map<String, HeaderDefinition> buildHeaderDefinitions() {
         // like mappings, first get default definitions
-        final Map<String, HeaderDefinition> headers = new HashMap<String, HeaderDefinition>(
+        final Map<String, HeaderDefinition> headers = new ConcurrentHashMap<String, HeaderDefinition>(
                         HeaderType.defaultDefinitions());
 
         // Add additional header definitions
