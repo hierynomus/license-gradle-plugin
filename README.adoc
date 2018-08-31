@@ -343,7 +343,7 @@ Next to checking for and applying license headers to your source files, this plu
 [source,groovy,subs="verbatim,attributes"]
 ----
 plugins {
-  id "com.github.hierynomus.license-report" version"{license_plugin_version"
+  id "com.github.hierynomus.license-report" version"{license_plugin_version}"
 }
 ----
 
