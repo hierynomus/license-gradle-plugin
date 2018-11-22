@@ -16,7 +16,7 @@ plugins {
   id 'groovy'
   id 'idea'
   id "org.ajoberstar.release-opinion" version "1.4.2"
-  id 'com.gradle.plugin-publish' version '0.9.1'
+  id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
   id 'ru.vyarus.animalsniffer' version '1.4.2'
 }
@@ -139,26 +139,42 @@ def pomConfig = {
     }
 }
 
-pluginBundle {
-    website = "https://github.com/hierynomus/license-gradle-plugin"
-    vcsUrl = "https://github.com/hierynomus/license-gradle-plugin.git"
-    description = "Applies a header to files, typically a license"
+gradlePlugin {
     plugins {
         licensePlugin {
             id = "com.github.hierynomus.license"
-            displayName = "License plugin for Gradle"
-            tags = [ "gradle", "plugin", "license" ]
+            implementationClass = "nl.javadude.gradle.plugins.license.LicensePlugin"
         }
 
         licenseBasePlugin {
             id = "com.github.hierynomus.license-base"
-            displayName = "Base License plugin for Gradle"
-            tags = [ "gradle", "plugin", "license" ]
+            implementationClass = "com.hierynomus.gradle.license.LicenseBasePlugin"
         }
 
         licenseReportPlugin {
             id = "com.github.hierynomus.license-report"
+            implementationClass = "com.hierynomus.gradle.license.LicenseReportingPlugin"
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/hierynomus/license-gradle-plugin"
+    vcsUrl = "https://github.com/hierynomus/license-gradle-plugin.git"
+    tags = ["gradle", "plugin", "license"]
+    plugins {
+        licensePlugin {
+            displayName = "License plugin for Gradle"
+            description = "Applies a header to files, typically a license"
+        }
+        licenseBasePlugin {
+            displayName = "Base License plugin for Gradle"
+            description = "Base plugin to apply a header to files, typically a license"
+        }
+
+        licenseReportPlugin {
             displayName = "License Report plugin for Gradle"
+            description = "Reports over licenses"
             tags = [ "gradle", "plugin", "license", "report" ]
         }
     }
