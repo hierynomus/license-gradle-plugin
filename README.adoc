@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.14.0
+:license_plugin_version: 0.15.0
 
 image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
@@ -393,6 +393,9 @@ downloadLicenses {
 ----
 
 == Changelog
+
+=== v0.15.0 (2018-11-22)
+- Correctly published the split-up plugins (I hope..)
 
 === v0.14.0 (2017-??-??) --> See Upgrade Notes!
 - Upgraded to com.mycila:license-maven-plugin:3.0
