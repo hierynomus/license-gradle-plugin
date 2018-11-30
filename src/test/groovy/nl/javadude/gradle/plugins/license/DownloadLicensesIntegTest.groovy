@@ -405,7 +405,7 @@ class DownloadLicensesIntegTest extends Specification {
         dependencyJar3.createNewFile()
 
         HashMap<Object, List> aliases = new HashMap()
-        aliases.put(license("The Apache Software License, Version 2.0", "MY_URL"), ["Apache [23]", "The Apache 2", "Apache"])
+        aliases.put(license("The Apache Software License, Version 2.0", "MY_URL"), ["/Apache [23]/", "The Apache 2", "Apache"])
         downloadLicenses.aliases = aliases
 
         downloadLicenses.licenses = ["testDependency1.jar": license("Apache 3"),
