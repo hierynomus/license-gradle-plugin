@@ -16,6 +16,7 @@
 package nl.javadude.gradle.plugins.license
 
 import com.hierynomus.gradle.license.LicenseBasePlugin
+import com.hierynomus.gradle.license.LicenseReportingPlugin;
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
 import org.gradle.api.Plugin
@@ -28,8 +29,8 @@ class LicensePlugin implements Plugin<Project> {
     protected Task baseFormatTask
     @Override
     void apply(Project project) {
-        project.apply plugin: 'com.github.hierynomus.license-base'
-        project.apply plugin: 'com.github.hierynomus.license-report'
+        project.apply plugin: LicenseBasePlugin
+        project.apply plugin: LicenseReportingPlugin
 
         baseCheckTask = project.task(LicenseBasePlugin.LICENSE_TASK_BASE_NAME)
         baseFormatTask = project.task(LicenseBasePlugin.FORMAT_TASK_BASE_NAME)
