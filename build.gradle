@@ -13,12 +13,18 @@ buildscript {
 }
 
 plugins {
+  id 'com.gradle.build-scan' version '1.16'
   id 'groovy'
   id 'idea'
   id "org.ajoberstar.release-opinion" version "1.4.2"
   id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
   id 'ru.vyarus.animalsniffer' version '1.4.2'
+}
+
+buildScan {
+  termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+  termsOfServiceAgree = 'yes'
 }
 
 apply plugin: 'com.github.hierynomus.license'
