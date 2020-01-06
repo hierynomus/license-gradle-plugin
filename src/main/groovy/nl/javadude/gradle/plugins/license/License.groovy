@@ -40,36 +40,36 @@ class License extends SourceTask implements VerificationTask {
     /**
      * Whether or not to allow the build to continue if there are warnings.
      */
-    boolean ignoreFailures
+    @Input boolean ignoreFailures
 
     /**
      * Check determines if we doing mutation on the files or just looking
      */
-    boolean check
+    @Input boolean check
 
     /**
      * Whether to create new files which have changes or to make them inline
      */
-    boolean dryRun = false
+    @Input boolean dryRun = false
 
     /**
      * Whether to skip file where a header has been detected
      */
-    boolean skipExistingHeaders = false
+    @Input boolean skipExistingHeaders = false
 
     // TODO useDefaultExcludes, not necessary because we're using source sets
 
     /**
      * @link {AbstractLicenseMojo.useDefaultMappings}
      */
-    boolean useDefaultMappings
+    @Input boolean useDefaultMappings
 
-    boolean strictCheck
+    @Input boolean strictCheck
 
     /**
      * The encoding used to open files
      */
-    String encoding
+    @Input String encoding
 
     @Optional
     @InputFile
@@ -88,12 +88,20 @@ class License extends SourceTask implements VerificationTask {
     Iterable<File> altered = new ArrayList<File>()
 
     // Backing AbstraceLicenseMojo
+    @Optional
+    @InputFiles
     FileCollection validHeaders
 
+    @Optional
+    @Input
     Map<String, String> inheritedProperties
-    Map<String, String> inheritedMappings
+
+    @Optional
+    @Input Map<String, String> inheritedMappings
 
     // Container for all custom header definitions
+    @Optional
+    @Nested
     NamedDomainObjectContainer<HeaderDefinitionBuilder> headerDefinitions
 
     @Inject
@@ -125,7 +133,7 @@ class License extends SourceTask implements VerificationTask {
         Map<String, String> initial = combineVariables()
         Map<String, String> combinedMappings = combinedMappings()
 
-        URI uri = getURI()
+        URI uri = resolveURI()
 
         new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions())
             .execute(callback)
@@ -139,7 +147,9 @@ class License extends SourceTask implements VerificationTask {
 
     }
 
-    URI getURI() {
+    // Gradle thinks all getters should be associated with properties that must be annotated
+    // renamed as @Internal is not available in Gradle 2.x
+    URI resolveURI() {
         def uri = getHeaderURI() ?: getHeader().toURI()
         if (!uri) {
             throw new GradleException("A headerUri or header has to be provided to the License task")

@@ -49,13 +49,13 @@ class LicenseTest {
         task.header = file
 
         // Then
-        assert task.getURI().getPath().endsWith("LICENSE")
+        assert task.resolveURI().getPath().endsWith("LICENSE")
 
         // When
         task.headerURI = uri
 
         // Then
-        assert task.getURI() == uri
+        assert task.resolveURI() == uri
     }
 }
 

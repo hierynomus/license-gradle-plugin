@@ -12,4 +12,4 @@ script:
   - ./gradlew -Dscan=true build
 
 jdk:
-  - oraclejdk8
+  - openjdk8
