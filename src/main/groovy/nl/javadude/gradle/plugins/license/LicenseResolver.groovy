@@ -108,7 +108,7 @@ class LicenseResolver {
                                     aliasEntry.value.any {
                                         aliasElem ->
                                             if (aliasElem instanceof String) {
-                                                return aliasElem == licenseMetadata.licenseName
+                                                return aliasElem[0,-1] != '//' ? licenseMetadata.licenseName == aliasElem : licenseMetadata.licenseName.matches(aliasElem[1..-2])
                                             } else if(aliasElem instanceof LicenseMetadata) {
                                                 return aliasElem == licenseMetadata
                                             }
@@ -266,7 +266,7 @@ class LicenseResolver {
                     aliasEntry.value.any {
                         aliasElem ->
                             if (aliasElem instanceof String) {
-                               return aliasElem == license.licenseName
+                                return aliasElem[0,-1] != '//' ? license.licenseName == aliasElem : license.licenseName.matches(aliasElem[1..-2])
                             } else if(aliasElem instanceof LicenseMetadata) {
                                 return aliasElem == license
                             }

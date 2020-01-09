@@ -393,6 +393,55 @@ class DownloadLicensesIntegTest extends Specification {
         dependencyWithLicenseUrlPresent(xmlByDependency, "testDependency3.jar", "MY_URL")
     }
 
+    def "Test that aliases supports regex"() {
+        setup:
+        File dependencyJar1 = new File(projectDir, "testDependency1.jar")
+        dependencyJar1.createNewFile()
+
+        File dependencyJar2 = new File(projectDir, "testDependency2.jar")
+        dependencyJar2.createNewFile()
+
+        File dependencyJar3 = new File(projectDir, "testDependency3.jar")
+        dependencyJar3.createNewFile()
+
+        HashMap<Object, List> aliases = new HashMap()
+        aliases.put(license("The Apache Software License, Version 2.0", "MY_URL"), ["/Apache [23]/", "The Apache 2", "Apache"])
+        downloadLicenses.aliases = aliases
+
+        downloadLicenses.licenses = ["testDependency1.jar": license("Apache 3"),
+                "testDependency2.jar": license("The Apache 2"),
+                "testDependency3.jar": license("Apache")]
+
+        project.dependencies {
+            runtime project.files("testDependency1.jar")
+            runtime project.files("testDependency2.jar")
+            runtime project.files("testDependency3.jar")
+        }
+
+        when:
+        downloadLicenses.execute()
+
+        then:
+        File f = getLicenseReportFolder()
+        assertLicenseReportsExist(f)
+
+        def xmlByDependency = xml4LicenseByDependencyReport(f)
+        def xmlByLicense = xml4DependencyByLicenseReport(f)
+
+        dependenciesInReport(xmlByDependency) == 3
+        licensesInReport(xmlByLicense) == 1
+
+        xmlByLicense.license.@name.text() == "The Apache Software License, Version 2.0"
+        xmlByLicense.license.dependency.size() == 3
+
+        dependencyWithLicensePresent(xmlByDependency, "testDependency1.jar", "testDependency1.jar", "The Apache Software License, Version 2.0")
+        dependencyWithLicensePresent(xmlByDependency, "testDependency2.jar", "testDependency2.jar", "The Apache Software License, Version 2.0")
+        dependencyWithLicensePresent(xmlByDependency, "testDependency3.jar", "testDependency3.jar", "The Apache Software License, Version 2.0")
+        dependencyWithLicenseUrlPresent(xmlByDependency, "testDependency1.jar", "MY_URL")
+        dependencyWithLicenseUrlPresent(xmlByDependency, "testDependency2.jar", "MY_URL")
+        dependencyWithLicenseUrlPresent(xmlByDependency, "testDependency3.jar", "MY_URL")
+    }
+
     def "Test that aliases can me mixed in mapping licenseMetadata/String->list<String/LicenseMetadata> mapping for file dependencies"() {
         setup:
         File dependencyJar1 = new File(projectDir, "testDependency1.jar")
