@@ -150,7 +150,7 @@ class LicenseResolver {
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
 
         project.configurations.each { Configuration configuration ->
-            if (!canBeResolved(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
+            if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
                 return null
             } else {
                 try {
