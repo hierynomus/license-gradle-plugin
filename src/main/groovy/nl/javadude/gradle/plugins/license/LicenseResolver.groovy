@@ -45,6 +45,8 @@ class LicenseResolver {
     private boolean ignoreFatalParseErrors
     private List<Pattern> patternsToIgnore
 
+    private static final Set<String> PACKAGED_DEPENDENCIES_PREFIXES = ["compile","implementation","api"]
+
     /**
      * Provide set with dependencies metadata.
      *
@@ -142,7 +144,7 @@ class LicenseResolver {
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
-        if (project.configurations.any { it.name == dependencyConfiguration && isResolvable(it) }) {
+        if (project.configurations.any { it.name == dependencyConfiguration && (isResolvable(it) || isPackagedDependency(it)) }) {
             def configuration = project.configurations.getByName(dependencyConfiguration)
             configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
                 String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
@@ -200,6 +202,27 @@ class LicenseResolver {
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
     }
+ 
+    
+    /**
+     * Checks if the configuration is for a packaged dependency (rather than e.g. a build or test time dependency)
+     * @param configuration
+     * @return true if the configuration is in the set of @link #BINARY_DEPENDENCIES
+     */
+    protected boolean isPackagedDependency(Configuration configuration) {
+        boolean isPackagedDependency = PACKAGED_DEPENDENCIES_PREFIXES.any {
+            configuration.name.startsWith(it)
+        }
+        configuration.hierarchy.each {
+            String configurationHierarchyName = it.name
+            isPackagedDependency |= PACKAGED_DEPENDENCIES_PREFIXES.any {
+                configurationHierarchyName.startsWith(it)
+            }
+        }
+
+        return isPackagedDependency
+    }
+    
 
     boolean isDependencyIncluded(String depName){
         for(Pattern pattern: this.patternsToIgnore){
