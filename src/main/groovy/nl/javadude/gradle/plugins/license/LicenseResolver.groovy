@@ -153,7 +153,7 @@ class LicenseResolver {
             def configuration = project.configurations.getByName(dependencyConfiguration)
 
             if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
-                println(configuration.name + " ->  no no no")
+                println(project.name + " -> " + configuration.name + " -> no no no")
             } else {
                 try {
                     Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
@@ -163,7 +163,7 @@ class LicenseResolver {
 
                     dependenciesToHandle.addAll(deps)
 
-                    println(configuration.name + " -> " + deps.size())
+                    println(project.name + " -> " + configuration.name + " -> " + deps.size())
 
                 } catch (ResolveException exception) {
                     logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
