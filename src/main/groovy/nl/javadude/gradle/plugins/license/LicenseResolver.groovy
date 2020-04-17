@@ -159,6 +159,8 @@ class LicenseResolver {
                                     .getLenientConfiguration()
                                     .getFirstLevelModuleDependencies())
 
+                    logger.info(configuration.name + " -> " + deps.count())
+
                     dependenciesToHandle.addAll(deps)
 
                 } catch (ResolveException exception) {
