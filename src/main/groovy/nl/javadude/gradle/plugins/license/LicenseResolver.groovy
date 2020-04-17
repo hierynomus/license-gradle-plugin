@@ -159,7 +159,7 @@ class LicenseResolver {
                                     .getLenientConfiguration()
                                     .getFirstLevelModuleDependencies())
 
-                    logger.info(configuration.name + " -> " + deps.count())
+                    logger.info(configuration.name + " -> " + deps.size())
 
                     dependenciesToHandle.addAll(deps)
 
