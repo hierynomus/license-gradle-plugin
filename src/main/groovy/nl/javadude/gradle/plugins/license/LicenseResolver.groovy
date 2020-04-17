@@ -21,12 +21,14 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.FileCollectionDependency
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 
 import java.util.regex.Pattern
 
 import static DependencyMetadata.noLicenseMetaData
+
 /**
  * License resolver for dependencies.
  */
@@ -45,7 +47,7 @@ class LicenseResolver {
     private boolean ignoreFatalParseErrors
     private List<Pattern> patternsToIgnore
 
-    private static final Set<String> PACKAGED_DEPENDENCIES_PREFIXES = ["compile","implementation","api"]
+    private static final Set<String> PACKAGED_DEPENDENCIES_PREFIXES = ["compile", "implementation", "api"]
 
     /**
      * Provide set with dependencies metadata.
@@ -57,7 +59,7 @@ class LicenseResolver {
      */
     public Set<DependencyMetadata> provideLicenseMap4Dependencies() {
         Set<DependencyMetadata> licenseSet = new HashSet<DependencyMetadata>()
-        def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
+        def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString() }
 
         Set<Project> projects = new HashSet<Project>()
         projects.add(project)
@@ -66,68 +68,68 @@ class LicenseResolver {
         projects.each {
             p ->
 
-            // Resolve each dependency
-            resolveProjectDependencies(p).each {
-                rd ->
-                String dependencyDesc = "$rd.moduleVersion.id.group:$rd.moduleVersion.id.name:$rd.moduleVersion.id.version".toString()
-                Map.Entry licenseEntry = licenses.find {
-                    dep ->
-                    if(dep.key instanceof String) {
-                        dep.key == dependencyDesc
-                    } else if (dep.key instanceof DependencyGroup) {
-                        rd.moduleVersion.id.group == dep.key.group
-                    }
-                }
-                if (licenseEntry != null) {
-                    def license = licenseEntry.value
-                    def licenseMetadata = license instanceof String ? DownloadLicensesExtension.license(license) : license
-                    licenseSet << new DependencyMetadata(
-                            dependency: dependencyDesc, dependencyFileName: rd.file.name, licenseMetadataList: [ licenseMetadata ]
-                    )
-                } else {
-                    Closure<DependencyMetadata> dependencyMetadata = {
-                        if(!subprojects[dependencyDesc]) {
-                            def depMetadata = retrieveLicensesForDependency(p, dependencyDesc)
-                            depMetadata.dependencyFileName = rd.file.name
-                            depMetadata
-                        } else {
-                            noLicenseMetaData(dependencyDesc, rd.file.name)
+                // Resolve each dependency
+                resolveProjectDependencies(p).each {
+                    rd ->
+                        String dependencyDesc = "$rd.moduleVersion.id.group:$rd.moduleVersion.id.name:$rd.moduleVersion.id.version".toString()
+                        Map.Entry licenseEntry = licenses.find {
+                            dep ->
+                                if (dep.key instanceof String) {
+                                    dep.key == dependencyDesc
+                                } else if (dep.key instanceof DependencyGroup) {
+                                    rd.moduleVersion.id.group == dep.key.group
+                                }
                         }
-                    }
-
-                    licenseSet << dependencyMetadata()
-                }
-            }
-
-            provideFileDependencies(p).each {
-                fileDependency ->
-                    Closure<DependencyMetadata> licenseMetadata = {
-                        if (licenses.containsKey(fileDependency)) {
-                            def license = licenses[fileDependency]
-                            LicenseMetadata licenseMetadata = license instanceof String ? DownloadLicensesExtension.license(license) : license
-                            def alias = aliases.find {
-                                aliasEntry ->
-                                    aliasEntry.value.any {
-                                        aliasElem ->
-                                            if (aliasElem instanceof String) {
-                                                return aliasElem == licenseMetadata.licenseName
-                                            } else if(aliasElem instanceof LicenseMetadata) {
-                                                return aliasElem == licenseMetadata
-                                            }
-
-                                    }
-                            }
-                            if (alias) {
-                                licenseMetadata = alias.key
-                            }
-                            new DependencyMetadata(dependency: fileDependency, dependencyFileName: fileDependency, licenseMetadataList: [licenseMetadata])
+                        if (licenseEntry != null) {
+                            def license = licenseEntry.value
+                            def licenseMetadata = license instanceof String ? DownloadLicensesExtension.license(license) : license
+                            licenseSet << new DependencyMetadata(
+                                    dependency: dependencyDesc, dependencyFileName: rd.file.name, licenseMetadataList: [licenseMetadata]
+                            )
                         } else {
-                            noLicenseMetaData(fileDependency, fileDependency)
-                        }
-                    }
+                            Closure<DependencyMetadata> dependencyMetadata = {
+                                if (!subprojects[dependencyDesc]) {
+                                    def depMetadata = retrieveLicensesForDependency(p, dependencyDesc)
+                                    depMetadata.dependencyFileName = rd.file.name
+                                    depMetadata
+                                } else {
+                                    noLicenseMetaData(dependencyDesc, rd.file.name)
+                                }
+                            }
 
-                    licenseSet << licenseMetadata()
-            }
+                            licenseSet << dependencyMetadata()
+                        }
+                }
+
+                provideFileDependencies(p).each {
+                    fileDependency ->
+                        Closure<DependencyMetadata> licenseMetadata = {
+                            if (licenses.containsKey(fileDependency)) {
+                                def license = licenses[fileDependency]
+                                LicenseMetadata licenseMetadata = license instanceof String ? DownloadLicensesExtension.license(license) : license
+                                def alias = aliases.find {
+                                    aliasEntry ->
+                                        aliasEntry.value.any {
+                                            aliasElem ->
+                                                if (aliasElem instanceof String) {
+                                                    return aliasElem == licenseMetadata.licenseName
+                                                } else if (aliasElem instanceof LicenseMetadata) {
+                                                    return aliasElem == licenseMetadata
+                                                }
+
+                                        }
+                                }
+                                if (alias) {
+                                    licenseMetadata = alias.key
+                                }
+                                new DependencyMetadata(dependency: fileDependency, dependencyFileName: fileDependency, licenseMetadataList: [licenseMetadata])
+                            } else {
+                                noLicenseMetaData(fileDependency, fileDependency)
+                            }
+                        }
+
+                        licenseSet << licenseMetadata()
+                }
         }
 
         licenseSet
@@ -136,35 +138,66 @@ class LicenseResolver {
     /**
      * Provide full list of resolved artifacts to handle for a given project.
      *
-     * @param project                       the project
+     * @param project the project
      * @return Set with resolved artifacts
      */
     Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
 
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
-        def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
+        def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString() }
 
-        if (project.configurations.any { it.name == dependencyConfiguration && (isResolvable(it) || isPackagedDependency(it)) }) {
+        if (project.configurations.any {
+            it.name == dependencyConfiguration && (isResolvable(it) || isPackagedDependency(it))
+        }) {
             def configuration = project.configurations.getByName(dependencyConfiguration)
-            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
-                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(isDependencyIncluded(dependencyDesc)) {
-                    Project subproject = subprojects[dependencyDesc]?.first()
-                    if (subproject) {
-                        if(includeProjectDependencies) {
-                            dependenciesToHandle.add(d)
-                        }
-                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
-                    } else if (!subproject) {
-                        dependenciesToHandle.add(d)
-                    }
-                }
-            }
+
+            dependenciesToHandle.addAll(getResolvedArtifactsFromResolvedDependencies(configuration.getResolvedConfiguration()
+                    .getLenientConfiguration()
+                    .getFirstLevelModuleDependencies()))
+
+//            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
+//                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
+//                if (isDependencyIncluded(dependencyDesc)) {
+//                    Project subproject = subprojects[dependencyDesc]?.first()
+//                    if (subproject) {
+//                        if (includeProjectDependencies) {
+//                            dependenciesToHandle.add(d)
+//                        }
+//                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
+//                    } else if (!subproject) {
+//                        dependenciesToHandle.add(d)
+//                    }
+//                }
+//            }
         }
 
         logger.debug("Project $project.name found ${dependenciesToHandle.size()} dependencies to handle.")
         dependenciesToHandle
     }
+
+    protected Set<ResolvedArtifact> getResolvedArtifactsFromResolvedDependencies(Set<ResolvedDependency> resolvedDependencies) {
+        HashSet<ResolvedArtifact> resolvedArtifacts = new HashSet<>()
+
+        for (resolvedDependency in resolvedDependencies) {
+            try {
+                if (resolvedDependency.getModuleVersion() == LOCAL_LIBRARY_VERSION) {
+                    /**
+                     * Attempting to getAllModuleArtifacts on a local library project will result
+                     * in AmbiguousVariantSelectionException as there are not enough criteria
+                     * to match a specific variant of the library project. Instead we skip the
+                     * the library project itself and enumerate its dependencies.
+                     */
+                    resolvedArtifacts.addAll(getResolvedArtifactsFromResolvedDependencies(resolvedDependency.getChildren()))
+                } else {
+                    resolvedArtifacts.addAll(resolvedDependency.getAllModuleArtifacts())
+                }
+            } catch (Exception exception) {
+                logger.warn("Failed to process $resolvedDependency.name", exception)
+            }
+        }
+        return resolvedArtifacts
+    }
+
 
     Set<String> provideFileDependencies(Project project) {
         Set<String> fileDependencies = new HashSet<String>()
@@ -197,13 +230,13 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <a href="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable">Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"    >    Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
     }
- 
-    
+
+
     /**
      * Checks if the configuration is for a packaged dependency (rather than e.g. a build or test time dependency)
      * @param configuration
@@ -222,11 +255,11 @@ class LicenseResolver {
 
         return isPackagedDependency
     }
-    
 
-    boolean isDependencyIncluded(String depName){
-        for(Pattern pattern: this.patternsToIgnore){
-            if(pattern.matcher(depName).matches()){
+
+    boolean isDependencyIncluded(String depName) {
+        for (Pattern pattern : this.patternsToIgnore) {
+            if (pattern.matcher(depName).matches()) {
                 return false;
             }
         }
@@ -244,7 +277,7 @@ class LicenseResolver {
      * Implementation note: We rely that while resolving configuration with one dependency we get one pom.
      * Otherwise we have IllegalStateException
      *
-     * @param project                       the project
+     * @param project the project
      * @param dependencyDesc dependency description
      * @param aliases alias mapping for similar license names
      * @param initialDependency base dependency (not parent)
@@ -289,8 +322,8 @@ class LicenseResolver {
                     aliasEntry.value.any {
                         aliasElem ->
                             if (aliasElem instanceof String) {
-                               return aliasElem == license.licenseName
-                            } else if(aliasElem instanceof LicenseMetadata) {
+                                return aliasElem == license.licenseName
+                            } else if (aliasElem instanceof LicenseMetadata) {
                                 return aliasElem == license
                             }
 
@@ -315,14 +348,14 @@ class LicenseResolver {
         }
     }
 
-    void setDependenciesToIgnore(List<String> dependenciesToIgnore){
-        if(dependenciesToIgnore == null){
+    void setDependenciesToIgnore(List<String> dependenciesToIgnore) {
+        if (dependenciesToIgnore == null) {
             this.patternsToIgnore = Collections.emptyList();
             return;
         }
 
         this.patternsToIgnore = new ArrayList<>(dependenciesToIgnore.size());
-        for(String toIgnore: dependenciesToIgnore){
+        for (String toIgnore : dependenciesToIgnore) {
             this.patternsToIgnore.add(Pattern.compile(toIgnore))
         }
     }
