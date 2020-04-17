@@ -152,72 +152,40 @@ class LicenseResolver {
         if (project.configurations.any { it.name == dependencyConfiguration }) {
             def configuration = project.configurations.getByName(dependencyConfiguration)
 
-            if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
-                println(project.name + " -> " + configuration.name + " -> no no no")
-            } else {
-                try {
-                    Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
-                            configuration.getResolvedConfiguration()
-                                    .getLenientConfiguration()
-                                    .getFirstLevelModuleDependencies())
+            Set<ResolvedArtifact> dependencies = getResolvedArtifacts(configuration)
+            dependenciesToHandle.addAll(dependencies)
 
-                    dependenciesToHandle.addAll(deps)
+            println(project.name + " -> " + configuration.name + " -> " + dependencies.size())
+        } else if (dependencyConfiguration == 'all') {
+            // Hack to look at configurations
+            project.configurations.each { Configuration configuration ->
+                Set<ResolvedArtifact> dependencies = getResolvedArtifacts(configuration)
+                dependenciesToHandle.addAll(dependencies)
 
-                    println(project.name + " -> " + configuration.name + " -> " + deps.size())
-
-                } catch (ResolveException exception) {
-                    logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
-                }
+                println(project.name + " -> " + configuration.name + " -> " + dependencies.size())
             }
         }
-
-//        project.configurations.each { Configuration configuration ->
-//            if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
-//                println(configuration.name + " ->  no no no")
-//            } else {
-//                try {
-//                    Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
-//                            configuration.getResolvedConfiguration()
-//                                    .getLenientConfiguration()
-//                                    .getFirstLevelModuleDependencies())
-//
-//                    println(configuration.name + " -> " + deps.size())
-//
-//                    dependenciesToHandle.addAll(deps)
-//
-//                } catch (ResolveException exception) {
-//                    logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
-//                }
-//            }
-//        }
-
-        /*
-        def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString() }
-
-        if (project.configurations.any {
-            it.name == dependencyConfiguration && (isResolvable(it) || isPackagedDependency(it))
-        }) {
-            def configuration = project.configurations.getByName(dependencyConfiguration)
-
-            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
-                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if (isDependencyIncluded(dependencyDesc)) {
-                    Project subproject = subprojects[dependencyDesc]?.first()
-                    if (subproject) {
-                        if (includeProjectDependencies) {
-                            dependenciesToHandle.add(d)
-                        }
-                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
-                    } else if (!subproject) {
-                        dependenciesToHandle.add(d) `
-                    }
-                }
-            }
-        }
-        */
 
         logger.debug("Project $project.name found ${dependenciesToHandle.size()} dependencies to handle.")
         dependenciesToHandle
+    }
+
+    Set<ResolvedArtifact> getResolvedArtifacts(Configuration configuration) {
+        if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
+            logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
+        } else {
+            try {
+                return getResolvedArtifactsFromResolvedDependencies(
+                        configuration.getResolvedConfiguration()
+                                .getLenientConfiguration()
+                                .getFirstLevelModuleDependencies())
+
+            } catch (ResolveException exception) {
+                logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
+            }
+        }
+
+        return new HashSet<ResolvedArtifact>()
     }
 
     protected Set<ResolvedArtifact> getResolvedArtifactsFromResolvedDependencies(Set<ResolvedDependency> resolvedDependencies) {
@@ -275,7 +243,7 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"           >           Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"                   >                   Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
