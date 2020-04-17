@@ -149,9 +149,11 @@ class LicenseResolver {
     Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
 
-        project.configurations.each { Configuration configuration ->
+        if (project.configurations.any { it.name == dependencyConfiguration }) {
+            def configuration = project.configurations.getByName(dependencyConfiguration)
+
             if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
-                return null
+                println(configuration.name + " ->  no no no")
             } else {
                 try {
                     Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
@@ -159,17 +161,35 @@ class LicenseResolver {
                                     .getLenientConfiguration()
                                     .getFirstLevelModuleDependencies())
 
-                    println(configuration.name + " -> " + deps.size())
-
                     dependenciesToHandle.addAll(deps)
+
+                    println(configuration.name + " -> " + deps.size())
 
                 } catch (ResolveException exception) {
                     logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
-                    return null
                 }
-
             }
         }
+
+//        project.configurations.each { Configuration configuration ->
+//            if (!isResolvable(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
+//                println(configuration.name + " ->  no no no")
+//            } else {
+//                try {
+//                    Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
+//                            configuration.getResolvedConfiguration()
+//                                    .getLenientConfiguration()
+//                                    .getFirstLevelModuleDependencies())
+//
+//                    println(configuration.name + " -> " + deps.size())
+//
+//                    dependenciesToHandle.addAll(deps)
+//
+//                } catch (ResolveException exception) {
+//                    logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
+//                }
+//            }
+//        }
 
         /*
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString() }
@@ -255,7 +275,7 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"       >       Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"           >           Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
