@@ -20,6 +20,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.FileCollectionDependency
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.logging.Logger
@@ -34,7 +35,7 @@ import static DependencyMetadata.noLicenseMetaData
  */
 class LicenseResolver {
 
-    private static final Logger logger = Logging.getLogger(LicenseResolver);
+    private static final Logger logger = Logging.getLogger(LicenseResolver)
 
     /**
      * Reference to gradle project.
@@ -47,6 +48,10 @@ class LicenseResolver {
     private boolean ignoreFatalParseErrors
     private List<Pattern> patternsToIgnore
 
+    protected static final String LOCAL_LIBRARY_VERSION = "unspecified"
+    private static final String TEST_PREFIX = "test"
+    private static final String ANDROID_TEST_PREFIX = "androidTest"
+    private static final Set<String> TEST_COMPILE = ["testCompile", "androidTestCompile"]
     private static final Set<String> PACKAGED_DEPENDENCIES_PREFIXES = ["compile", "implementation", "api"]
 
     /**
@@ -142,8 +147,29 @@ class LicenseResolver {
      * @return Set with resolved artifacts
      */
     Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
-
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
+        
+        project.configurations.each {
+            if (!canBeResolved(configuration) || isTest(configuration) || !isPackagedDependency(configuration)) {
+                return null
+            } else {
+                try {
+                    Set<ResolvedArtifact> deps = getResolvedArtifactsFromResolvedDependencies(
+                            configuration.getResolvedConfiguration()
+                                    .getLenientConfiguration()
+                                    .getFirstLevelModuleDependencies())
+
+                    dependenciesToHandle.addAll(deps)
+
+                } catch (ResolveException exception) {
+                    logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
+                    return null
+                }
+
+            }
+        }
+
+        /*
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString() }
 
         if (project.configurations.any {
@@ -151,25 +177,22 @@ class LicenseResolver {
         }) {
             def configuration = project.configurations.getByName(dependencyConfiguration)
 
-            dependenciesToHandle.addAll(getResolvedArtifactsFromResolvedDependencies(configuration.getResolvedConfiguration()
-                    .getLenientConfiguration()
-                    .getFirstLevelModuleDependencies()))
-
-//            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
-//                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-//                if (isDependencyIncluded(dependencyDesc)) {
-//                    Project subproject = subprojects[dependencyDesc]?.first()
-//                    if (subproject) {
-//                        if (includeProjectDependencies) {
-//                            dependenciesToHandle.add(d)
-//                        }
-//                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
-//                    } else if (!subproject) {
-//                        dependenciesToHandle.add(d)
-//                    }
-//                }
-//            }
+            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
+                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
+                if (isDependencyIncluded(dependencyDesc)) {
+                    Project subproject = subprojects[dependencyDesc]?.first()
+                    if (subproject) {
+                        if (includeProjectDependencies) {
+                            dependenciesToHandle.add(d)
+                        }
+                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
+                    } else if (!subproject) {
+                        dependenciesToHandle.add(d) `
+                    }
+                }
+            }
         }
+        */
 
         logger.debug("Project $project.name found ${dependenciesToHandle.size()} dependencies to handle.")
         dependenciesToHandle
@@ -230,12 +253,24 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"    >    Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"       >       Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
     }
 
+    /**
+     * Checks if the configuration is from test.
+     * @param configuration
+     * @return true if configuration is a test configuration or its parent
+     * configurations are either testCompile or androidTestCompile, otherwise
+     * false.
+     */
+    protected boolean isTest(Configuration configuration) {
+        boolean isTestConfiguration = (configuration.name.startsWith(TEST_PREFIX) || configuration.name.startsWith(ANDROID_TEST_PREFIX))
+        configuration.hierarchy.each { isTestConfiguration |= TEST_COMPILE.contains(it.name) }
+        return isTestConfiguration
+    }
 
     /**
      * Checks if the configuration is for a packaged dependency (rather than e.g. a build or test time dependency)
