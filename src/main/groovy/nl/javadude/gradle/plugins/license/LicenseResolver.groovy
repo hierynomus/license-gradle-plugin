@@ -182,6 +182,8 @@ class LicenseResolver {
 
             } catch (ResolveException exception) {
                 logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
+            } catch (Exception exception) {
+                logger.warn("Failed to resolve OSS licenses for $configuration.name.", exception)
             }
         }
 
@@ -243,7 +245,7 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable">Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"    >    Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
