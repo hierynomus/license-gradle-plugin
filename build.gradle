@@ -19,7 +19,7 @@ plugins {
   id "org.ajoberstar.release-opinion" version "1.4.2"
   id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
-  id 'ru.vyarus.animalsniffer' version '1.4.2'
+  id 'ru.vyarus.animalsniffer' version '1.5.0'
 }
 
 buildScan {
