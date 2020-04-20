@@ -63,7 +63,7 @@ dependencies {
     }
     compile gradleApi()
 
-    def androidGradlePlugin = 'com.android.tools.build:gradle:2.0.+'
+    def androidGradlePlugin = ':com.android.tools.build:gradle3.6.3'
     compileOnly androidGradlePlugin
     testCompile androidGradlePlugin
 
