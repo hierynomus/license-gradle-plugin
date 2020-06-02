@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
-        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.2'
     }
 }
 
@@ -98,6 +98,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 license {
+    ignoreFailures true
+}
+
+animalsniffer {
+    excludeJars 'gradle-api-*'
     ignoreFailures true
 }
 
