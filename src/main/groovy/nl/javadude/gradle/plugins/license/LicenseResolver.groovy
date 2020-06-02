@@ -245,7 +245,7 @@ class LicenseResolver {
      * @param conf Configuration
      * @return whether conf is resolvable
      *
-     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable"    >    Gradle 3.4 release notes</a>
+     * @see <ahref="https://docs.gradle.org/3.4/release-notes.html#configurations-can-be-unresolvable" > Gradle 3.4 release notes</a>
      */
     boolean isResolvable(Configuration conf) {
         return conf.metaClass.respondsTo(conf, "isCanBeResolved") ? conf.isCanBeResolved() : true
@@ -260,8 +260,7 @@ class LicenseResolver {
      */
     protected boolean isTest(Configuration configuration) {
         boolean isTestConfiguration = (configuration.name.startsWith(TEST_PREFIX) || configuration.name.startsWith(ANDROID_TEST_PREFIX))
-        configuration.hierarchy.each { isTestConfiguration |= TEST_COMPILE.contains(it.name) }
-        return isTestConfiguration
+        return isTestConfiguration || configuration.hierarchy.any { TEST_COMPILE.contains(it.name) }
     }
 
     /**
@@ -285,12 +284,7 @@ class LicenseResolver {
 
 
     boolean isDependencyIncluded(String depName) {
-        for (Pattern pattern : this.patternsToIgnore) {
-            if (pattern.matcher(depName).matches()) {
-                return false;
-            }
-        }
-        return true;
+        return !patternsToIgnore.any { it.matcher(depName).matches() }
     }
 
 
