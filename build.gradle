@@ -1,30 +1,29 @@
 // First, apply the publishing plugin
 buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-      jcenter()
+    repositories {
+        gradlePluginPortal()
+        google()
+        jcenter()
     }
-  }
-  dependencies {
-    classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
-    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
-  }
+    dependencies {
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.2'
+    }
 }
 
 plugins {
-  id 'com.gradle.build-scan' version '1.16'
-  id 'groovy'
-  id 'idea'
-  id "org.ajoberstar.release-opinion" version "1.4.2"
-  id 'com.gradle.plugin-publish' version '0.10.0'
-  id 'java-gradle-plugin'
-  id 'ru.vyarus.animalsniffer' version '1.4.2'
+    id 'com.gradle.build-scan' version '2.0.2'
+    id 'groovy'
+    id 'idea'
+    id "org.ajoberstar.release-opinion" version "1.4.2"
+    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'java-gradle-plugin'
+    id 'ru.vyarus.animalsniffer' version '1.5.1'
 }
 
 buildScan {
-  termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-  termsOfServiceAgree = 'yes'
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
 }
 
 apply plugin: 'com.github.hierynomus.license'
@@ -36,7 +35,12 @@ group = 'com.hierynomus.gradle.plugins'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-repositories { jcenter() }
+
+repositories {
+    gradlePluginPortal()
+    google()
+    jcenter()
+}
 
 idea {
     module {
@@ -46,24 +50,24 @@ idea {
 }
 
 release {
-  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+    grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
 }
 
 configurations.compile.transitive = false
 
 dependencies {
-  signature 'org.codehaus.mojo.signature:java17:1.0@signature'
+    signature 'org.codehaus.mojo.signature:java17:1.0@signature'
 
     compile "org.codehaus.plexus:plexus-utils:2.0.5"
     compile "com.mycila.xmltool:xmltool:3.3"
     // Using compile instead of groovy, so that it goes into the pom
-    compile ('com.mycila:license-maven-plugin:3.0') {
+    compile('com.mycila:license-maven-plugin:3.0') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
     compile gradleApi()
 
-    def androidGradlePlugin = 'com.android.tools.build:gradle:2.0.+'
+    def androidGradlePlugin = 'com.android.tools.build:gradle:3.6.3'
     compileOnly androidGradlePlugin
     testCompile androidGradlePlugin
 
@@ -97,14 +101,19 @@ license {
     ignoreFailures true
 }
 
+animalsniffer {
+    excludeJars 'gradle-api-*'
+    ignoreFailures true
+}
+
 test {
-  afterSuite { descriptor, result ->
-    def indicator = "\u001B[32m✓\u001b[0m"
-    if (result.failedTestCount > 0) {
-      indicator = "\u001B[31m✘\u001b[0m"
+    afterSuite { descriptor, result ->
+        def indicator = "\u001B[32m✓\u001b[0m"
+        if (result.failedTestCount > 0) {
+            indicator = "\u001B[31m✘\u001b[0m"
+        }
+        logger.lifecycle("$indicator Test ${descriptor.name}; Executed: ${result.testCount}/\u001B[32m${result.successfulTestCount}\u001B[0m/\u001B[31m${result.failedTestCount}\u001B[0m")
     }
-    logger.lifecycle("$indicator Test ${descriptor.name}; Executed: ${result.testCount}/\u001B[32m${result.successfulTestCount}\u001B[0m/\u001B[31m${result.failedTestCount}\u001B[0m")
-  }
 }
 
 def pomConfig = {
@@ -181,7 +190,7 @@ pluginBundle {
         licenseReportPlugin {
             displayName = "License Report plugin for Gradle"
             description = "Reports over licenses"
-            tags = [ "gradle", "plugin", "license", "report" ]
+            tags = ["gradle", "plugin", "license", "report"]
         }
     }
 }

@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 
 repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://dl.google.com/dl/android/maven2/" }
     jcenter()
 }
 
@@ -9,13 +11,13 @@ configurations.compile.transitive = false
 dependencies {
     compile "org.codehaus.plexus:plexus-utils:2.0.5"
     compile "com.mycila.xmltool:xmltool:3.3"
-    compile ('com.mycila:license-maven-plugin:3.0') {
+    compile('com.mycila:license-maven-plugin:3.0') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
     compile gradleApi()
 
-    compileOnly 'com.android.tools.build:gradle:2.0.+'
+    compileOnly 'com.android.tools.build:gradle:3.6.3'
 }
 
 sourceSets {
