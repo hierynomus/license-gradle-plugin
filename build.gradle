@@ -13,18 +13,12 @@ buildscript {
 }
 
 plugins {
-  id 'com.gradle.build-scan' version '1.16'
   id 'groovy'
   id 'idea'
   id "org.ajoberstar.release-opinion" version "1.4.2"
   id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
-  id 'ru.vyarus.animalsniffer' version '1.4.2'
-}
-
-buildScan {
-  termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-  termsOfServiceAgree = 'yes'
+  id 'ru.vyarus.animalsniffer' version '1.5.3'
 }
 
 apply plugin: 'com.github.hierynomus.license'
@@ -33,10 +27,15 @@ defaultTasks 'build'
 
 group = 'com.hierynomus.gradle.plugins'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-repositories { jcenter() }
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    google()
+}
 
 idea {
     module {
@@ -49,29 +48,29 @@ release {
   grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
 }
 
-configurations.compile.transitive = false
+configurations.implementation.transitive = false
 
 dependencies {
   signature 'org.codehaus.mojo.signature:java17:1.0@signature'
 
-    compile "org.codehaus.plexus:plexus-utils:2.0.5"
-    compile "com.mycila.xmltool:xmltool:3.3"
-    // Using compile instead of groovy, so that it goes into the pom
-    compile ('com.mycila:license-maven-plugin:3.0') {
+    implementation "org.codehaus.plexus:plexus-utils:2.0.5"
+    implementation "com.mycila.xmltool:xmltool:3.3"
+    // Using implementation instead of groovy, so that it goes into the pom
+    implementation ('com.mycila:license-maven-plugin:3.0') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile gradleApi()
+    implementation gradleApi()
 
-    def androidGradlePlugin = 'com.android.tools.build:gradle:2.0.+'
+    def androidGradlePlugin = 'com.android.tools.build:gradle:4.1.0'
     compileOnly androidGradlePlugin
-    testCompile androidGradlePlugin
+    testImplementation androidGradlePlugin
 
-    testCompile gradleTestKit()
-    testCompile 'com.netflix.nebula:nebula-test:4.4.3'
-    testCompile 'junit:junit:4.11'
-    testCompile 'com.google.guava:guava:17.0'
-    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+    testImplementation gradleTestKit()
+    testImplementation 'com.netflix.nebula:nebula-test:4.4.3'
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'com.google.guava:guava:17.0'
+    testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
 }
