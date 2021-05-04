@@ -15,7 +15,7 @@ buildscript {
 plugins {
   id 'groovy'
   id 'idea'
-  id "org.ajoberstar.release-opinion" version "1.4.2"
+  id 'pl.allegro.tech.build.axion-release' version '1.11.0'
   id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
   id 'ru.vyarus.animalsniffer' version '1.5.3'
@@ -44,9 +44,20 @@ idea {
     }
 }
 
-release {
-  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+
+scmVersion {
+    tag {
+        prefix = 'v'
+        versionSeparator = ''
+    }
+    hooks {
+        pre 'fileUpdate', [file: 'README.adoc', pattern: { v, c -> /:license_plugin_version .*/}, replacement: { v, c -> ":license_plugin_version: $v" }]
+        pre 'commit'
+    }
 }
+
+project.version = scmVersion.version
+
 
 configurations.implementation.transitive = false
 
