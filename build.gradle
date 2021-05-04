@@ -13,18 +13,12 @@ buildscript {
 }
 
 plugins {
-  id 'com.gradle.build-scan' version '1.16'
   id 'groovy'
   id 'idea'
-  id "org.ajoberstar.release-opinion" version "1.4.2"
+  id 'pl.allegro.tech.build.axion-release' version '1.11.0'
   id 'com.gradle.plugin-publish' version '0.10.0'
   id 'java-gradle-plugin'
-  id 'ru.vyarus.animalsniffer' version '1.4.2'
-}
-
-buildScan {
-  termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-  termsOfServiceAgree = 'yes'
+  id 'ru.vyarus.animalsniffer' version '1.5.3'
 }
 
 apply plugin: 'com.github.hierynomus.license'
@@ -33,10 +27,15 @@ defaultTasks 'build'
 
 group = 'com.hierynomus.gradle.plugins'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-repositories { jcenter() }
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    google()
+}
 
 idea {
     module {
@@ -45,36 +44,72 @@ idea {
     }
 }
 
-release {
-  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+
+scmVersion {
+    tag {
+        prefix = 'v'
+        versionSeparator = ''
+    }
+    hooks {
+        pre 'fileUpdate', [file: 'README.adoc', pattern: { v, c -> /:license_plugin_version .*/}, replacement: { v, c -> ":license_plugin_version: $v" }]
+        pre 'commit'
+    }
 }
 
-configurations.compile.transitive = false
+project.version = scmVersion.version
+
+
+configurations.implementation.transitive = false
+
+sourceSets.create("integrationTest")
 
 dependencies {
   signature 'org.codehaus.mojo.signature:java17:1.0@signature'
 
-    compile "org.codehaus.plexus:plexus-utils:2.0.5"
-    compile "com.mycila.xmltool:xmltool:3.3"
-    // Using compile instead of groovy, so that it goes into the pom
-    compile ('com.mycila:license-maven-plugin:3.0') {
+    implementation "org.codehaus.plexus:plexus-utils:2.0.5"
+    implementation "com.mycila.xmltool:xmltool:3.3"
+    // Using implementation instead of groovy, so that it goes into the pom
+    implementation ('com.mycila:license-maven-plugin:3.0') {
         exclude group: 'org.apache.maven', module: 'maven-plugin-api'
         exclude group: 'org.apache.maven', module: 'maven-project'
     }
-    compile gradleApi()
+    implementation gradleApi()
 
-    def androidGradlePlugin = 'com.android.tools.build:gradle:2.0.+'
+    def androidGradlePlugin = 'com.android.tools.build:gradle:4.1.0'
     compileOnly androidGradlePlugin
-    testCompile androidGradlePlugin
+    testImplementation androidGradlePlugin
 
-    testCompile gradleTestKit()
-    testCompile 'com.netflix.nebula:nebula-test:4.4.3'
-    testCompile 'junit:junit:4.11'
-    testCompile 'com.google.guava:guava:17.0'
-    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-    }
+    integrationTestImplementation(project)
+    integrationTestImplementation gradleTestKit()
+    integrationTestImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
+    integrationTestImplementation 'com.netflix.nebula:nebula-test:8.1.0'
+    integrationTestImplementation 'org.spockframework:spock-core'
+    integrationTestImplementation 'org.spockframework:spock-junit4'
+    integrationTestImplementation 'junit:junit:4.13.1'
+    integrationTestImplementation 'com.google.guava:guava:17.0'
+
+    testImplementation gradleTestKit()
+    testImplementation 'com.netflix.nebula:nebula-test:8.1.0'
+    testImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
+    testImplementation 'org.spockframework:spock-core'
+    testImplementation 'org.spockframework:spock-junit4'
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'com.google.guava:guava:17.0'
 }
+
+def integrationTestTask = tasks.register("integrationTest", Test) {
+    description = 'Runs the integration tests.'
+    group = "verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    mustRunAfter(tasks.named('test'))
+    useJUnitPlatform()
+}
+
+tasks.named('check') {
+    it.dependsOn(integrationTestTask)
+}
+
 
 // This disables the pedantic doclint feature of JDK8
 if (JavaVersion.current().isJava8Compatible()) {
@@ -97,8 +132,8 @@ license {
     ignoreFailures true
 }
 
-test {
-  afterSuite { descriptor, result ->
+tasks.withType(Test).all { t ->
+  t.afterSuite { descriptor, result ->
     def indicator = "\u001B[32m✓\u001b[0m"
     if (result.failedTestCount > 0) {
       indicator = "\u001B[31m✘\u001b[0m"

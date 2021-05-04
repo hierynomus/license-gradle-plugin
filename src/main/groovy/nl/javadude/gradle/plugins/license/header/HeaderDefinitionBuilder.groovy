@@ -17,20 +17,23 @@ package nl.javadude.gradle.plugins.license.header
 
 import com.mycila.maven.plugin.license.header.HeaderDefinition
 import org.gradle.api.Named
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 
-class HeaderDefinitionBuilder implements Named {
-  String type
-  String firstLine = ""
-  String beforeEachLine = ""
-  String afterEachLine = ""
-  String endLine = ""
-  boolean allowBlankLines = false
+class HeaderDefinitionBuilder {
+  @Input String type
+  @Input String firstLine = ""
+  @Input String beforeEachLine = ""
+  @Input String afterEachLine = ""
+  @Input String endLine = ""
+  @Input boolean allowBlankLines = false
 
-  String skipLinePattern
-  String firstLineDetectionPattern
-  String lastLineDetectionPattern
-  boolean isMultiline = false
-  boolean padLines = false
+  @Input @Optional String skipLinePattern
+  @Input String firstLineDetectionPattern
+  @Input String lastLineDetectionPattern
+  @Input boolean isMultiline = false
+  @Input boolean padLines = false
 
   static HeaderDefinitionBuilder headerDefinition(String name) {
     return new HeaderDefinitionBuilder(name)
@@ -136,7 +139,7 @@ class HeaderDefinitionBuilder implements Named {
       '}'
   }
 
-  @Override
+  @Internal
   String getName() {
     return type
   }
