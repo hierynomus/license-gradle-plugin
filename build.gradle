@@ -16,7 +16,7 @@ plugins {
   id 'groovy'
   id 'idea'
   id 'pl.allegro.tech.build.axion-release' version '1.11.0'
-  id 'com.gradle.plugin-publish' version '0.10.0'
+  id 'com.gradle.plugin-publish' version '0.14.0'
   id 'java-gradle-plugin'
   id 'ru.vyarus.animalsniffer' version '1.5.3'
 }
