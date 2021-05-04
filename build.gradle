@@ -50,6 +50,8 @@ release {
 
 configurations.implementation.transitive = false
 
+sourceSets.create("integrationTest")
+
 dependencies {
   signature 'org.codehaus.mojo.signature:java17:1.0@signature'
 
@@ -66,14 +68,37 @@ dependencies {
     compileOnly androidGradlePlugin
     testImplementation androidGradlePlugin
 
+    integrationTestImplementation(project)
+    integrationTestImplementation gradleTestKit()
+    integrationTestImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
+    integrationTestImplementation 'com.netflix.nebula:nebula-test:8.1.0'
+    integrationTestImplementation 'org.spockframework:spock-core'
+    integrationTestImplementation 'org.spockframework:spock-junit4'
+    integrationTestImplementation 'junit:junit:4.13.1'
+    integrationTestImplementation 'com.google.guava:guava:17.0'
+
     testImplementation gradleTestKit()
-    testImplementation 'com.netflix.nebula:nebula-test:4.4.3'
-    testImplementation 'junit:junit:4.11'
+    testImplementation 'com.netflix.nebula:nebula-test:8.1.0'
+    testImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
+    testImplementation 'org.spockframework:spock-core'
+    testImplementation 'org.spockframework:spock-junit4'
+    testImplementation 'junit:junit:4.13.1'
     testImplementation 'com.google.guava:guava:17.0'
-    testImplementation('org.spockframework:spock-core:2.0-M5-groovy-3.0') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-    }
 }
+
+def integrationTestTask = tasks.register("integrationTest", Test) {
+    description = 'Runs the integration tests.'
+    group = "verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    mustRunAfter(tasks.named('test'))
+    useJUnitPlatform()
+}
+
+tasks.named('check') {
+    it.dependsOn(integrationTestTask)
+}
+
 
 // This disables the pedantic doclint feature of JDK8
 if (JavaVersion.current().isJava8Compatible()) {
@@ -96,8 +121,8 @@ license {
     ignoreFailures true
 }
 
-test {
-  afterSuite { descriptor, result ->
+tasks.withType(Test).all { t ->
+  t.afterSuite { descriptor, result ->
     def indicator = "\u001B[32m✓\u001b[0m"
     if (result.failedTestCount > 0) {
       indicator = "\u001B[31m✘\u001b[0m"

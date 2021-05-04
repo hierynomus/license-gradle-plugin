@@ -36,11 +36,6 @@ class LicenseTest {
     }
 
     @Test
-    public void shouldRunTaskWithoutException() {
-        task.execute()
-    }
-
-    @Test
     public void shoudUseUriHeader() {
         def uri = new URI("https://www.gnu.org/licenses/lgpl.txt")
         def file = new File('LICENSE')

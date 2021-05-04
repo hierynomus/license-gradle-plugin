@@ -56,6 +56,7 @@ class LicenseResolver {
     public Set<DependencyMetadata> provideLicenseMap4Dependencies() {
         Set<DependencyMetadata> licenseSet = new HashSet<DependencyMetadata>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
+        project.logger.info("Found subprojects: $subprojects")
 
         Set<Project> projects = new HashSet<Project>()
         projects.add(project)
@@ -142,19 +143,22 @@ class LicenseResolver {
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
 
-        if (project.configurations.any { it.name == dependencyConfiguration && isResolvable(it) }) {
-            def configuration = project.configurations.getByName(dependencyConfiguration)
-            configuration.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
-                String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
-                if(isDependencyIncluded(dependencyDesc)) {
-                    Project subproject = subprojects[dependencyDesc]?.first()
-                    if (subproject) {
-                        if(includeProjectDependencies) {
+        project.configurations.each { c ->
+            project.logger.info("Project $project -> Configuration $c (can be resolved? ${c.isCanBeResolved()})")
+            if (c.name == dependencyConfiguration && isResolvable(c)) {
+                project.logger.debug("Resolvable $c in project $project")
+                c.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact d ->
+                    String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
+                    if(isDependencyIncluded(dependencyDesc)) {
+                        Project subproject = subprojects[dependencyDesc]?.first()
+                        if (subproject) {
+                            if(includeProjectDependencies) {
+                                dependenciesToHandle.add(d)
+                            }
+                            dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
+                        } else if (!subproject) {
                             dependenciesToHandle.add(d)
                         }
-                        dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
-                    } else if (!subproject) {
-                        dependenciesToHandle.add(d)
                     }
                 }
             }
