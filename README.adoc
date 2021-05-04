@@ -34,7 +34,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:{license_plugin_version}"
+    classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:{license_plugin_version}"
   }
 }
 
