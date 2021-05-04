@@ -1,4 +1,7 @@
-apply plugin: 'groovy'
+plugins {
+    id "groovy"
+    id "java"
+}
 
 repositories {
     jcenter()
