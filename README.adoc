@@ -70,7 +70,7 @@ plugins {
 }
 ----
 
-This plugin two types of tasks to each source set available in your project: one for checking for consistency and one to apply the header, e.g.
+This plugin contains two types of tasks to each source set available in your project: one for checking for consistency and one to apply the header, e.g.
 
 - licenseMain (`LicenseCheck`)        : checks for header consistency in the main source set
 - licenseFormatMain (`LicenseFormat`) : applies the license found in the header file in files missing the header
