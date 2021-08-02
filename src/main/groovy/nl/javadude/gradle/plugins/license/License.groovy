@@ -176,6 +176,7 @@ class License extends SourceTask implements VerificationTask {
             combinedMappings.put('gradle', 'JAVADOC_STYLE')
             combinedMappings.put('json', 'JAVADOC_STYLE')
             combinedMappings.put('scala', 'JAVADOC_STYLE')
+            combinedMappings.put('g4', 'JAVADOC_STYLE')
             combinedMappings.put('gsp', 'DYNASCRIPT_STYLE')
             combinedMappings.put('groovy', 'SLASHSTAR_STYLE')
             combinedMappings.put('clj', 'SEMICOLON_STYLE')
