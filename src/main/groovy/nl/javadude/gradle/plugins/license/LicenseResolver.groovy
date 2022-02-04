@@ -132,13 +132,17 @@ class LicenseResolver {
         licenseSet
     }
 
+    Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
+        resolveProjectDependencies(project, new HashSet<Project>())
+    }
+
     /**
      * Provide full list of resolved artifacts to handle for a given project.
      *
      * @param project                       the project
      * @return Set with resolved artifacts
      */
-    Set<ResolvedArtifact> resolveProjectDependencies(Project project) {
+    Set<ResolvedArtifact> resolveProjectDependencies(Project project, HashSet<Project> subprojectsAlreadyScanned) {
 
         Set<ResolvedArtifact> dependenciesToHandle = new HashSet<ResolvedArtifact>()
         def subprojects = project.rootProject.subprojects.groupBy { Project p -> "$p.group:$p.name:$p.version".toString()}
@@ -151,11 +155,12 @@ class LicenseResolver {
                     String dependencyDesc = "$d.moduleVersion.id.group:$d.moduleVersion.id.name:$d.moduleVersion.id.version".toString()
                     if(isDependencyIncluded(dependencyDesc)) {
                         Project subproject = subprojects[dependencyDesc]?.first()
-                        if (subproject) {
+                        if (subproject && !subprojectsAlreadyScanned.contains(subproject)) {
+                            subprojectsAlreadyScanned.add(subproject)
                             if(includeProjectDependencies) {
                                 dependenciesToHandle.add(d)
                             }
-                            dependenciesToHandle.addAll(resolveProjectDependencies(subproject))
+                            dependenciesToHandle.addAll(resolveProjectDependencies(subproject, subprojectsAlreadyScanned))
                         } else if (!subproject) {
                             dependenciesToHandle.add(d)
                         }
