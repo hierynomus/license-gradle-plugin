@@ -33,7 +33,7 @@ downloadLicenses {
         html.enabled = false
         json.enabled = true
     }
-    dependencyConfiguration = "runtimeClasspath"
+    configurationDependencies = ["runtimeClasspath"]
 }
 """
         subProject = addSubproject("subproject")

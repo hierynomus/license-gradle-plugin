@@ -15,6 +15,7 @@
  */
 package nl.javadude.gradle.plugins.license
 
+import org.gradle.api.tasks.Input
 import org.gradle.util.ConfigureUtil
 
 /**
@@ -84,9 +85,9 @@ class DownloadLicensesExtension {
 
 
     /**
-     * The dependency configuration to report on.
+     * List of configurations to report on.
      */
-    String dependencyConfiguration
+    @Input List<String> configurationDependencies
 
     /**
      * Report extension.

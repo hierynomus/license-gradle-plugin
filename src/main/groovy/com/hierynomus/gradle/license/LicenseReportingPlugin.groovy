@@ -76,7 +76,7 @@ class LicenseReportingPlugin implements Plugin<Project> {
             licenses = [:]
             aliases = [:]
             report = new DownloadLicensesReportExtension(html: html, xml: xml, json: json)
-            dependencyConfiguration = LicenseBasePlugin.DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE
+            configurationDependencies = [LicenseBasePlugin.DEFAULT_DEPENDENCY_CONFIGURATION_TO_HANDLE]
         }
 
         project.logger.info("Adding download licenses extension");
@@ -106,7 +106,7 @@ class LicenseReportingPlugin implements Plugin<Project> {
             xmlDestination = { new File("${downloadLicensesExtension.report.xml.destination}") }
             htmlDestination = { new File("${downloadLicensesExtension.report.html.destination}") }
             jsonDestination = { new File("${downloadLicensesExtension.report.json.destination}") }
-            dependencyConfiguration = { downloadLicensesExtension.dependencyConfiguration }
+            configurationDependencies = { downloadLicensesExtension.configurationDependencies }
         }
     }
 

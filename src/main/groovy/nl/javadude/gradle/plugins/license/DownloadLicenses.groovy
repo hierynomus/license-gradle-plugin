@@ -102,9 +102,9 @@ public class DownloadLicenses extends ConventionTask {
     @Input boolean json
 
     /**
-     * The dependency configuration to report on.
+     * List of configurations to report on.
      */
-    @Input String dependencyConfiguration
+    @Input List<String> configurationDependencies
 
     @TaskAction
     def downloadLicenses() {
@@ -124,7 +124,7 @@ public class DownloadLicenses extends ConventionTask {
                                                       },
                                                       licenses: getLicenses(),
                                                       dependenciesToIgnore: excludeDependencies,
-                                                      dependencyConfiguration: dependencyConfiguration)
+                    configurationDependencies: configurationDependencies)
             licenseResolver.provideLicenseMap4Dependencies()
         }.memoize()
 
