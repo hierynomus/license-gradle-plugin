@@ -1,6 +1,6 @@
 = License Gradle Plugin
 Jeroen van Erp
-:license_plugin_version: 0.15.0
+:license_plugin_version: 0.17.0
 
 image:https://travis-ci.org/hierynomus/license-gradle-plugin.svg?branch=master[Build Status,link=https://travis-ci.org/hierynomus/license-gradle-plugin]
 
@@ -361,7 +361,7 @@ The `downloadLicenses` task has a set of properties, most can be set in the exte
 |licenses |a pre-defined mapping of a dependency to a license; useful if the external repositories do not have license information available
 |aliases |a mapping between licenses; useful to consolidate the various POM definitions of different spelled/named licenses
 |excludeDependencies |a List of dependencies that are to be excluded from reporting
-|dependencyConfiguration |Gradle dependency configuration to report on (defaults to "runtime").
+|configurationDependencies |Gradle dependency configuration to report on (defaults to "runtime").
 |====
 
 A 'license()' method is made available by the License Extension that takes two Strings, the first is the license name, the second is the URL to the license.
@@ -388,11 +388,17 @@ downloadLicenses {
         'com.some-other-project.bar:foobar:1.0'
     ]
 
-    dependencyConfiguration = 'compile'
+    configurationDependencies = ["compile"]
 }
 ----
 
 == Changelog
+
+=== v0.17.0 (2022-05-31)
+- Change downloadLicenses task to accept a list of configurationDependencies
+
+=== v0.15.0 (2018-11-22)
+- Correctly published the split-up plugins (I hope..)
 
 === v0.15.0 (2018-11-22)
 - Correctly published the split-up plugins (I hope..)
