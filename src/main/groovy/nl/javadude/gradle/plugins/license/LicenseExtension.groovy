@@ -72,6 +72,12 @@ class LicenseExtension {
      */
     boolean useDefaultMappings
 
+    /**
+     * Specify the list of keywords to use to detect a header. A header must
+     * include all keywords to be valid. Detection is case insensitive.
+     */
+    Collection<String> keywords
+
     boolean strictCheck
 
     /**

@@ -76,6 +76,11 @@ class LicensePluginTest {
     }
 
     @Test
+    public void extensionKeywordsDefaults() {
+        assertThat project.license.keywords, is(['copyright'])
+    }
+
+    @Test
     public void extensionShouldNotHaveSourceSets() {
         assertThat project.license.sourceSets, is(notNullValue())
         assertThat project.license.sourceSets.size(), equalTo(0)

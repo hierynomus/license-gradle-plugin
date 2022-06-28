@@ -59,7 +59,7 @@ public class AbstractLicenseMojo {
     File rootDir;
     Map<String, String> initial;
 
-    protected String[] keywords = new String[] { "copyright" };
+    protected String[] keywords;
     protected List<HeaderDefinition> headerDefinitions;
     protected HeaderSection[] headerSections = new HeaderSection[0];
     protected String encoding;
@@ -75,7 +75,8 @@ public class AbstractLicenseMojo {
 
     public AbstractLicenseMojo(Collection<File> validHeaders, File rootDir, Map<String, String> initial,
                     boolean dryRun, boolean skipExistingHeaders, boolean useDefaultMappings, boolean strictCheck,
-                    URI header, FileCollection source, Map<String, String> mapping, String encoding, List<HeaderDefinition> headerDefinitions) {
+                    URI header, FileCollection source, Map<String, String> mapping, String encoding, List<HeaderDefinition> headerDefinitions,
+                    Collection<String> keywords) {
         this.validHeaders = validHeaders;
         this.rootDir = rootDir;
         this.initial = initial;
@@ -88,6 +89,7 @@ public class AbstractLicenseMojo {
         this.mapping = mapping;
         this.encoding = encoding;
         this.headerDefinitions = headerDefinitions;
+        this.keywords = keywords.toArray(new String[0]);
     }
 
     protected void execute(final Callback callback) throws MalformedURLException, IOException {
