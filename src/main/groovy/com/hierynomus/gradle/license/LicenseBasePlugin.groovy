@@ -76,6 +76,7 @@ class LicenseBasePlugin implements Plugin<Project> {
             dryRun = false
             skipExistingHeaders = false
             useDefaultMappings = true
+            keywords = ['copyright']
             strictCheck = false
             encoding = System.properties['file.encoding']
             sourceSets = project.container(SourceSet)
@@ -113,6 +114,7 @@ class LicenseBasePlugin implements Plugin<Project> {
             dryRun = { extension.dryRun }
             skipExistingHeaders = { extension.skipExistingHeaders }
             useDefaultMappings = { extension.useDefaultMappings }
+            keywords = { extension.keywords }
             strictCheck = { extension.strictCheck }
             inheritedProperties = { extension.ext.properties }
             inheritedMappings = { extension.internalMappings }

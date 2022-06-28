@@ -64,6 +64,12 @@ class License extends SourceTask implements VerificationTask {
      */
     @Input boolean useDefaultMappings
 
+    /**
+     * Specify the list of keywords to use to detect a header. A header must
+     * include all keywords to be valid. Detection is case insensitive.
+     */
+    @Input Collection<String> keywords;
+
     @Input boolean strictCheck
 
     /**
@@ -135,7 +141,7 @@ class License extends SourceTask implements VerificationTask {
 
         URI uri = resolveURI()
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions())
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions(), getKeywords())
             .execute(callback)
 
         altered = callback.getAffected()

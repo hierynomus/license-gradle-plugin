@@ -115,6 +115,7 @@ most of which can also be set on the extension to configure them for all tasks.
 |dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
+|keywords |Specify the list of keywords to use to detect a header. A header must include all keywords to be valid. By default, the word 'copyright' is used. Detection is case insensitive.
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
 |mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
@@ -137,6 +138,7 @@ most of which can also be set on the extension to configure them for all tasks.
 |dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
+|keywords |Specify the list of keywords to use to detect a header. A header must include all keywords to be valid. By default, the word 'copyright' is used. Detection is case insensitive.
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
 |mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
@@ -168,6 +170,7 @@ Here is a general overview of the options:
 |dryRun |Show what would happen if the task was run, defaults to false but also inherits from `--dryRun`
 |skipExistingHeaders |Skip over files that have some header already, which might not be the one specified in the header parameter, defaults to false
 |useDefaultMappings |Use a long list of standard mapping, defaults to true. See http://code.mycila.com/license-maven-plugin/#supported-comment-types[] for the complete list
+|keywords |Specify the list of keywords to use to detect a header. A header must include all keywords to be valid. By default, the word 'copyright' is used. Detection is case insensitive.
 |strictCheck |Be extra strict in the formatting of existing headers, defaults to false
 |mapping(String ext, String style) |Adds a mapping between a file extension and a style type
 |mapping(Map<String,String> mappings) |Adds mappings between file extensions and style types
