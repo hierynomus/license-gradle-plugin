@@ -97,7 +97,7 @@ class LicenseBasePlugin implements Plugin<Project> {
      * @param task
      */
     protected void configureTaskRule() {
-        project.tasks.withType(License) { License task ->
+        project.tasks.withType(License).configureEach { License task ->
             logger.info("Applying license defaults to task: ${task.path}");
             configureTaskDefaults(task)
         }
