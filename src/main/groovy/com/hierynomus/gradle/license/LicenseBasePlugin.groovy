@@ -29,6 +29,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
 
 class LicenseBasePlugin implements Plugin<Project> {
 
@@ -140,12 +141,12 @@ class LicenseBasePlugin implements Plugin<Project> {
             def sourceSetTaskName = "${LICENSE_TASK_BASE_NAME}${taskInfix}${sourceSet.name.capitalize()}"
             logger.info("Adding ${sourceSetTaskName} task for sourceSet ${sourceSet.name}");
 
-            License checkTask = project.tasks.create(sourceSetTaskName, LicenseCheck)
+            TaskProvider<LicenseCheck> checkTask = project.tasks.register(sourceSetTaskName, LicenseCheck)
             configureForSourceSet(sourceSet, checkTask, sourceSetSources)
 
             // Add independent license task, which will perform format
             def sourceSetFormatTaskName = "${FORMAT_TASK_BASE_NAME}${taskInfix}${sourceSet.name.capitalize()}"
-            License formatTask = project.tasks.create(sourceSetFormatTaskName, LicenseFormat)
+            TaskProvider<LicenseFormat> formatTask = project.tasks.register(sourceSetFormatTaskName, LicenseFormat)
             configureForSourceSet(sourceSet, formatTask, sourceSetSources)
 
             // Add independent clean task to remove headers
@@ -153,14 +154,14 @@ class LicenseBasePlugin implements Plugin<Project> {
         }
     }
 
-    protected void configureForSourceSet(sourceSet, License task, Closure<Iterable<File>> sourceSetSources) {
-        task.with {
+    protected static void configureForSourceSet(sourceSet, TaskProvider task, Closure<Iterable<File>> sourceSetSources) {
+        task.configure {
             // Explicitly set description
-            description = "Scanning license on ${sourceSet.name} files"
-        }
+            it.description = "Scanning license on ${sourceSet.name} files"
 
-        // Default to all source files from SourceSet
-        task.source = sourceSetSources(sourceSet)
+            // Default to all source files from SourceSet
+            it.source = sourceSetSources(sourceSet)
+        }
     }
 }
 
