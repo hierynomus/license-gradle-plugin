@@ -166,7 +166,7 @@ class AndroidLicensePluginTest {
         def task = project.tasks.create('licenseManual', LicenseCheck)
 
         Set<Task> dependsOn = project.tasks['check'].getDependsOn()
-        assertThat dependsOn, hasItem(project.tasks['license'])
+        assertThat dependsOn, hasItem(project.tasks.named('license'))
 
         // Manual tests don't get registered with check
         assertThat dependsOn, not(hasItem(task))
@@ -179,7 +179,7 @@ class AndroidLicensePluginTest {
 
         def manualFormat = project.tasks.create('licenseManualFormat', LicenseFormat)
 
-        Set<Task> dependsOn = project.tasks['license'].getDependsOn()
+        Set<Task> dependsOn = project.tasks['license'].getDependsOn().flatten()
         assertThat dependsOn, hasItem(project.tasks['licenseAndroidMain'])
         assertThat dependsOn, hasItem(project.tasks['licenseAndroidAndroidTest'])
 
@@ -187,7 +187,7 @@ class AndroidLicensePluginTest {
         assertThat dependsOn, hasItem(manual)
         assertThat dependsOn, not(hasItem(manualFormat))
 
-        Set<Task> dependsOnFormat = project.tasks['licenseFormat'].getDependsOn()
+        Set<Task> dependsOnFormat = project.tasks['licenseFormat'].getDependsOn().flatten()
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatAndroidMain'])
         assertThat dependsOnFormat, hasItem(project.tasks['licenseFormatAndroidAndroidTest'])
 
