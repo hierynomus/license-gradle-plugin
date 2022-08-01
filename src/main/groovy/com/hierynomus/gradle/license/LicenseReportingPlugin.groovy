@@ -21,8 +21,8 @@ import nl.javadude.gradle.plugins.license.DownloadLicensesReportExtension
 import nl.javadude.gradle.plugins.license.LicensesReport
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.plugins.ReportingBasePlugin
+import org.gradle.api.tasks.TaskProvider
 
 class LicenseReportingPlugin implements Plugin<Project> {
     static final String DOWNLOAD_LICENSES_TASK_NAME = 'downloadLicenses'
@@ -31,7 +31,7 @@ class LicenseReportingPlugin implements Plugin<Project> {
 
     protected DownloadLicensesExtension downloadLicensesExtension
 
-    protected Task downloadLicenseTask
+    protected TaskProvider<DownloadLicenses> downloadLicenseTask
     private Project project
 
     @Override
@@ -39,14 +39,15 @@ class LicenseReportingPlugin implements Plugin<Project> {
         this.project = project
         project.plugins.apply(ReportingBasePlugin)
         // Create a single task to run all license checks and reformattings
-        downloadLicenseTask = project.tasks.create(DOWNLOAD_LICENSES_TASK_NAME, DownloadLicenses)
+        downloadLicenseTask = project.tasks.register(DOWNLOAD_LICENSES_TASK_NAME, DownloadLicenses) {
+            it.group = "License"
+            it.description = "Generates reports on your runtime dependencies."
+        }
 
-        downloadLicenseTask.group = "License"
-        downloadLicenseTask.description = "Generates reports on your runtime dependencies."
         downloadLicensesExtension = createDownloadLicensesExtension()
 
 
-        project.tasks.withType(DownloadLicenses) { DownloadLicenses task ->
+        project.tasks.withType(DownloadLicenses).configureEach { DownloadLicenses task ->
             project.logger.info("Applying defaults to download task: ${task.path}");
             configureTaskDefaults(task)
         }
