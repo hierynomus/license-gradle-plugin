@@ -69,10 +69,8 @@ dependencies {
     implementation "org.codehaus.plexus:plexus-utils:2.0.5"
     implementation "com.mycila.xmltool:xmltool:3.3"
     // Using implementation instead of groovy, so that it goes into the pom
-    implementation ('com.mycila:license-maven-plugin:3.0') {
-        exclude group: 'org.apache.maven', module: 'maven-plugin-api'
-        exclude group: 'org.apache.maven', module: 'maven-project'
-    }
+    implementation "com.mycila:license-maven-plugin:4.2.rc3"
+    implementation "com.mycila:license-maven-plugin-git:4.2.rc3"
     implementation gradleApi()
 
     def androidGradlePlugin = 'com.android.tools.build:gradle:4.1.0'
@@ -130,6 +128,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 license {
     ignoreFailures true
+    inceptionYear 2011
 }
 
 tasks.withType(Test).all { t ->

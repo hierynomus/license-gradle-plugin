@@ -40,36 +40,43 @@ class License extends SourceTask implements VerificationTask {
     /**
      * Whether or not to allow the build to continue if there are warnings.
      */
-    @Input boolean ignoreFailures
+    @Input
+    boolean ignoreFailures
 
     /**
      * Check determines if we doing mutation on the files or just looking
      */
-    @Input boolean check
+    @Input
+    boolean check
 
     /**
      * Whether to create new files which have changes or to make them inline
      */
-    @Input boolean dryRun = false
+    @Input
+    boolean dryRun = false
 
     /**
      * Whether to skip file where a header has been detected
      */
-    @Input boolean skipExistingHeaders = false
+    @Input
+    boolean skipExistingHeaders = false
 
     // TODO useDefaultExcludes, not necessary because we're using source sets
 
     /**
      * @link {AbstractLicenseMojo.useDefaultMappings}
      */
-    @Input boolean useDefaultMappings
+    @Input
+    boolean useDefaultMappings
 
-    @Input boolean strictCheck
+    @Input
+    boolean strictCheck
 
     /**
      * The encoding used to open files
      */
-    @Input String encoding
+    @Input
+    String encoding
 
     @Optional
     @InputFile
@@ -97,12 +104,16 @@ class License extends SourceTask implements VerificationTask {
     Map<String, String> inheritedProperties
 
     @Optional
-    @Input Map<String, String> inheritedMappings
+    @Input
+    Map<String, String> inheritedMappings
 
     // Container for all custom header definitions
     @Optional
     @Nested
     NamedDomainObjectContainer<HeaderDefinitionBuilder> headerDefinitions
+
+    @Input
+    int inceptionYear;
 
     @Inject
     @Deprecated
@@ -135,8 +146,8 @@ class License extends SourceTask implements VerificationTask {
 
         URI uri = resolveURI()
 
-        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions())
-            .execute(callback)
+        new AbstractLicenseMojo(validHeaders, getProject().rootDir, initial, isDryRun(), isSkipExistingHeaders(), isUseDefaultMappings(), isStrictCheck(), uri, source, combinedMappings, getEncoding(), buildHeaderDefinitions(), getInceptionYear(), getProject().rootDir)
+                .execute(callback)
 
         altered = callback.getAffected()
         didWork = !altered.isEmpty()
@@ -161,7 +172,7 @@ class License extends SourceTask implements VerificationTask {
     // Use properties on this task over the ones from the extension
     private Map combineVariables() {
         Map<String, String> initial = new HashMap<String, String>()
-        if (getInheritedProperties() != null ) { // Convention will pull these from the extension
+        if (getInheritedProperties() != null) { // Convention will pull these from the extension
             initial.putAll(getInheritedProperties())
         }
         initial.putAll(ext.properties)
@@ -169,7 +180,7 @@ class License extends SourceTask implements VerificationTask {
     }
 
     // Setup mappings
-    Map<String,String> combinedMappings() {
+    Map<String, String> combinedMappings() {
         Map<String, String> combinedMappings = new HashMap<String, String>()
         if (isUseDefaultMappings()) {
             // Sprinkle in some other well known types, which maven-license-plugin doesn't have
@@ -212,7 +223,7 @@ class License extends SourceTask implements VerificationTask {
     }
 
     void mapping(Closure closure) {
-        Map<String,String> tmpMap = new HashMap<String,String>()
+        Map<String, String> tmpMap = new HashMap<String, String>()
         closure.delegate = tmpMap
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure()
