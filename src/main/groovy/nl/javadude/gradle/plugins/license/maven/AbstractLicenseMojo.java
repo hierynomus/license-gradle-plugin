@@ -250,9 +250,9 @@ public class AbstractLicenseMojo {
     }
 
     private Map<String, String> buildMapping(Map<String, HeaderDefinition> headerDefinitions) {
-        Map<String, String> extensionMapping = useDefaultMappings ? new HashMap<String, String>(
-                defaultMapping())
-                                                                  : new HashMap<String, String>();
+        Map<String, String> extensionMapping = useDefaultMappings ?
+                                               new HashMap<>(defaultMapping()) :
+                                               new HashMap<>();
 
         List<HeaderType> headerTypes = Arrays.asList(HeaderType.values());
         Set<String> validHeaderTypes = new HashSet<String>();
