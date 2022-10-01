@@ -44,6 +44,7 @@ class LicenseIntegrationTest extends IntegrationSpec {
     
     license {
         ignoreFailures = true
+        inceptionYear = 2011
     }
 """
         license = createLicenseFile()
@@ -248,7 +249,7 @@ key2 = value2
         ExecutionResult r = runTasksSuccessfully("licenseFormatMain")
 
         then:
-        javaFile.text == '''/**
+        javaFile.text == '''/*
  * This is a sample license created in ${year}
  */
 public class Test {

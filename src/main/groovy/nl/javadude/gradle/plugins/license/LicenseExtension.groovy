@@ -74,6 +74,8 @@ class LicenseExtension {
 
     boolean strictCheck
 
+    int inceptionYear
+
     /**
      * Additional header definitions
      */

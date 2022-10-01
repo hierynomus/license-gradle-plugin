@@ -120,6 +120,7 @@ class LicenseBasePlugin implements Plugin<Project> {
             includes = { extension.includePatterns }
             encoding = { extension.encoding }
             headerDefinitions = { extension.headerDefinitions }
+            inceptionYear = { extension.inceptionYear }
         }
     }
 

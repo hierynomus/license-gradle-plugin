@@ -12,10 +12,8 @@ configurations.api.transitive = false
 dependencies {
     implementation "org.codehaus.plexus:plexus-utils:2.0.5"
     implementation "com.mycila.xmltool:xmltool:3.3"
-    implementation ('com.mycila:license-maven-plugin:3.0') {
-        exclude group: 'org.apache.maven', module: 'maven-plugin-api'
-        exclude group: 'org.apache.maven', module: 'maven-project'
-    }
+    implementation "com.mycila:license-maven-plugin:4.2.rc3"
+    implementation "com.mycila:license-maven-plugin-git:4.2.rc3"
     implementation gradleApi()
 
     compileOnly 'com.android.tools.build:gradle:2.0.+'
