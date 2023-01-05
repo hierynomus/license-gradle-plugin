@@ -24,6 +24,7 @@ import nl.javadude.gradle.plugins.license.maven.LicenseFormatMojo
 import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.*
 
 import javax.inject.Inject
@@ -73,6 +74,7 @@ class License extends SourceTask implements VerificationTask {
 
     @Optional
     @InputFile
+    @PathSensitive(PathSensitivity.RELATIVE)
     File header
 
     /**
@@ -111,6 +113,14 @@ class License extends SourceTask implements VerificationTask {
 
     License(boolean check) {
         this.check = check
+    }
+
+    @InputFiles
+    @SkipWhenEmpty
+    @IgnoreEmptyDirectories
+    @PathSensitive(PathSensitivity.RELATIVE)
+    public FileTree getSource() {
+        return super.getSource()
     }
 
     @TaskAction
