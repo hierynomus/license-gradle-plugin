@@ -15,9 +15,9 @@ plugins {
   id 'groovy'
   id 'idea'
   id 'pl.allegro.tech.build.axion-release' version '1.11.0'
-  id 'com.gradle.plugin-publish' version '0.14.0'
+  id 'com.gradle.plugin-publish' version '1.2.1'
   id 'java-gradle-plugin'
-  id 'ru.vyarus.animalsniffer' version '1.5.3'
+  id 'ru.vyarus.animalsniffer' version '1.7.1'
 }
 
 apply plugin: 'com.github.hierynomus.license'
@@ -28,7 +28,7 @@ group = 'com.hierynomus.gradle.plugins'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
@@ -198,26 +198,25 @@ gradlePlugin {
             implementationClass = "com.hierynomus.gradle.license.LicenseReportingPlugin"
         }
     }
-}
-
-pluginBundle {
     website = "https://github.com/hierynomus/license-gradle-plugin"
     vcsUrl = "https://github.com/hierynomus/license-gradle-plugin.git"
-    tags = ["gradle", "plugin", "license"]
+
     plugins {
         licensePlugin {
             displayName = "License plugin for Gradle"
             description = "Applies a header to files, typically a license"
+            tags.set(["gradle", "plugin", "license"])
         }
         licenseBasePlugin {
             displayName = "Base License plugin for Gradle"
             description = "Base plugin to apply a header to files, typically a license"
+            tags.set(["gradle", "plugin", "license"])
         }
 
         licenseReportPlugin {
             displayName = "License Report plugin for Gradle"
             description = "Reports over licenses"
-            tags = [ "gradle", "plugin", "license", "report" ]
+            tags.set([ "gradle", "plugin", "license", "report" ])
         }
     }
 }
