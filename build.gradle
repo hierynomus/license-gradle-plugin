@@ -3,7 +3,6 @@ buildscript {
   repositories {
     maven {
       url "https://plugins.gradle.org/m2/"
-      jcenter()
     }
   }
   dependencies {
@@ -27,11 +26,13 @@ defaultTasks 'build'
 
 group = 'com.hierynomus.gradle.plugins'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
 
 repositories {
-    jcenter()
     maven { url 'https://jitpack.io' }
     mavenCentral()
     google()
@@ -120,11 +121,11 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
